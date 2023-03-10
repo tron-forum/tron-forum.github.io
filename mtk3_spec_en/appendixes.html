@@ -1,0 +1,405 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Appendix</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="Trace Functions"
+HREF="trace_functions.html"><LINK
+REL="NEXT"
+TITLE="Keywords"
+HREF="list_of_keywords.html"></HEAD
+><BODY
+CLASS="chapter"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="trace_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="list_of_keywords.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="chapter"
+><H1
+><A
+NAME="appendixes"
+></A
+>Appendix</H1
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="system_configuration_of_reference_implementation"
+>System Configuration</A
+></H1
+><P
+>It is permitted to change μT-Kernel or remove unnecessary functions from it when an implementation of μT-Kernel is embedded into a real-world product, etc. The reference implementation of μT-Kernel 3.0 contains features to change and set the parameters such as the number of resources and limit values of certain parameters. Changing and setting system parameters is called system configuration.</P
+><P
+>This section lists the system configuration items that are provided by the μT-Kernel 3.0 reference implementation.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN34125"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Name</TH
+><TH
+>Explanations</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_PRI</TT
+>
+              </TD
+><TD
+>Maximum task priority (it is reflected in service profile item, <TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+>)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_SYSTEMAREA_TOP</TT
+>
+              </TD
+><TD
+>Lowest address of a region dynamically managed by the memory management function of μT-Kernel</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_SYSTEMAREA_END</TT
+>
+              </TD
+><TD
+>Highest address of a region dynamically managed by the memory management function of μT-Kernel</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_TIMER_PERIOD</TT
+>
+              </TD
+><TD
+>Timer interrupt interval (in milliseconds)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_TSKID</TT
+>
+              </TD
+><TD
+>Maximum number of tasks</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_SEMID</TT
+>
+              </TD
+><TD
+>Maximum number of semaphores</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_FLGID</TT
+>
+              </TD
+><TD
+>Maximum number of event flags</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_MBXID</TT
+>
+              </TD
+><TD
+>Maximum number of mailboxes</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_MTXID</TT
+>
+              </TD
+><TD
+>Maximum number of mutexes</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_MBFID</TT
+>
+              </TD
+><TD
+>Maximum number of messages buffers.</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_MPFID</TT
+>
+              </TD
+><TD
+>Maximum number of fixed-size memory pools</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_MPLID</TT
+>
+              </TD
+><TD
+>Maximum number of variable-size memory pools</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_CYCID</TT
+>
+              </TD
+><TD
+>Maximum number of cyclic handlers</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_ALMID</TT
+>
+              </TD
+><TD
+>Maximum number of alarm handlers</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_SSYID</TT
+>
+              </TD
+><TD
+>Maximum number of subsystems</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_SSYPRI</TT
+>
+              </TD
+><TD
+>Maximum number of subsystem priorities</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_REGDEV</TT
+>
+              </TD
+><TD
+>Maximum number of registered devices</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_OPNDEV</TT
+>
+              </TD
+><TD
+>Maximum number of open devices</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_REQDEV</TT
+>
+              </TD
+><TD
+>Maximum number of pending device requests</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Additional Notes</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>System configuration is not within the scope of μT-Kernel 3.0. But if similar function is to be provided, it is desirable to use naming conventions that are compatible with these item names.</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="trace_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="list_of_keywords.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Trace Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Keywords</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

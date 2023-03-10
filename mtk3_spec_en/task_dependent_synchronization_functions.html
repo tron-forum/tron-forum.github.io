@@ -1,0 +1,6106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Task Synchronization Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/OS Functions"
+HREF="utk_os_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="μT-Kernel/OS Functions"
+HREF="utk_os_functions.html"><LINK
+REL="NEXT"
+TITLE="Task Exception Handling Functions"
+HREF="task_exception_handling_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/OS Functions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="task_exception_handling_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="task_dependent_synchronization_functions"
+>Task Synchronization Functions</A
+></H1
+><P
+>Task synchronization functions achieve synchronization among tasks by direct manipulation of task states. They include functions for task sleep and wakeup, for canceling wakeup requests, for forcibly releasing task WAITING state, for changing a task state to SUSPENDED state, for delaying execution of the invoking task, and for disabling task WAITING state.</P
+><P
+>Wakeup requests for a task are queued. That is, when it is attempted to wake up a task that is not sleeping, the wakeup request is remembered, and the next time the task is to go to a sleep state (waiting for wakeup), it does not enter that state. The queuing of task wakeup requests is realized by having the task keep a task wakeup request queuing count. When the task is started, this count is cleared to 0.</P
+><P
+>Suspend requests for a task are nested. That is, if it is attempted to suspend a task already in SUSPENDED state (including WAITING-SUSPENDED state), the request is remembered, and later when it is attempted to resume the task in SUSPENDED state (including WAITING-SUSPENDED state), it is not resumed. The nesting of suspend requests is realized by having the task keep a suspend request nesting count. When the task is started, this count is cleared to 0.</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_slp_tsk"
+>tk_slp_tsk - Sleep Task</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4059"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN4061"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_slp_tsk</CODE
+>(TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4068"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4070"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (ms)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4083"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4085"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4098"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4100"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>tmout</CODE
+> ≦ (-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4131"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4133"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4148"
+>Related Service Profile Items</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4151"
+>Description</A
+></H3
+><P
+>Changes the state of the invoking task from RUNNING state to sleep state (WAITING state for <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+>). Note if the wakeup requests for the invoking task are queued, i.e., the wakeup request queuing count of the invoking task is 1 or more, the count is decremented by 1, and the execution is continued without moving the invoking task to the waiting state.</P
+><P
+>If <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> is issued for the invoking task before the time specified in <CODE
+CLASS="varname"
+>tmout</CODE
+> has elapsed, this system call completes normally. If timeout occurs before <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> is issued, the timeout error code <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> is returned.<CODE
+CLASS="varname"
+></CODE
+> Specifying <CODE
+CLASS="varname"
+>tmout</CODE
+> = <TT
+CLASS="literal"
+>TMO_FEVR</TT
+> (= -1) means eternal wait. In this case, the task stays in waiting state until <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> is issued.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4164"
+>Additional Notes</A
+></H3
+><P
+>Since <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> is a system call that puts the invoking task into the waiting state, <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> can never be nested. It is possible, however, for another task to issue <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> for a task that was put in the waiting state by <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+>. In this case the task goes to WAITING-SUSPENDED state.</P
+><P
+>For simply delaying a task, <A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk"
+>tk_dly_tsk</A
+> should be used rather than <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+>.</P
+><P
+>The task sleep function is intended for use by applications and as a rule should not be used by middleware. The reason is as follows.</P
+><P
+>Attempting to achieve synchronization by putting a task to sleep in two or more places would cause confusion, leading to mis-operation. For example, if sleep were used by both an application and middleware for synchronization, a wakeup request might arise in the application while middleware has a task sleeping. In such a situation, normal operation would not be possible in either the application or middleware.</P
+><P
+>In this manner, proper task synchronization is not possible if it is not clear where the wait for wakeup originated. Task sleep is often used as a simple means of task synchronization. Applications should be able to use it freely, which means as a rule it should not be used by middleware.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_slp_tsk_u"
+>tk_slp_tsk_u - Sleep Task (Microseconds)</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4179"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN4181"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_slp_tsk_u</CODE
+>(TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4188"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4190"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (in microseconds)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4203"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4205"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4218"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4220"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>tmout_u</CODE
+> ≦ (-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4251"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4253"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4268"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4271"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>Support of microsecond</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4280"
+>Description</A
+></H3
+><P
+>This system call takes 64-bit <CODE
+CLASS="varname"
+>tmout_u</CODE
+> in microseconds instead of the parameter <CODE
+CLASS="varname"
+>tmout</CODE
+> of <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+>.</P
+><P
+>The specification of this system call is same as that of <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+>, except that the parameter is replaced with <CODE
+CLASS="varname"
+>tmout_u</CODE
+>. For more details, see the description of <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_wup_tsk"
+>tk_wup_tsk - Wakeup Task</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4292"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN4294"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_wup_tsk</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4301"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4303"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4316"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4318"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4331"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4333"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (called for the invoking task or for a task in DORMANT state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_QOVR</SPAN
+>
+              </TD
+><TD
+>Queuing or nesting overflow (too many queued wakeup requests in <CODE
+CLASS="varname"
+>wupcnt</CODE
+> )</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4361"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4363"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4378"
+>Related Service Profile Items</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4380"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_WAKEUP_MAXCNT</TT
+>
+              </TD
+><TD
+>Maximum queuing count of the task wakeup requests (&#62;= 1)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4389"
+>Description</A
+></H3
+><P
+>If the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> has been put in WAITING state by <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+>, this system call releases the WAITING state.</P
+><P
+>This system call cannot be called for the invoking task. If the invoking task is specified, error code <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> is returned.</P
+><P
+>If the target task has not called <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> and is not in WAITING state, the wakeup request by <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> is queued. That is, the calling of <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> for the target task is recorded, then when <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> is called after that, the task does not go to WAITING state. This is what is meant by queuing of wakeup requests.</P
+><P
+>The queuing of wakeup requests works as follows. Each task keeps a wakeup request queuing count (<CODE
+CLASS="varname"
+>wupcnt</CODE
+>) in its TCB. Its initial value (when <A
+HREF="utk_os_functions.html#tk_sta_tsk"
+>tk_sta_tsk</A
+> is executed) is 0. When <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> is issued for a task not sleeping (not in WAITING state), the count is incremented by 1; but each time <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> is executed, the count is decremented by 1. When <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> is executed for a task whose wakeup queuing count is 0, the queuing count is not made negative but rather the task goes to WAITING state.</P
+><P
+>It is always possible to queue <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> at least one time (<CODE
+CLASS="varname"
+>wupcnt</CODE
+> = 1), but the maximum queuing count ( <CODE
+CLASS="varname"
+>wupcnt</CODE
+>) is implementation-dependent and its maximum value is defined by serviced profile item, <TT
+CLASS="literal"
+>TK_WAKEUP_MAXCNT</TT
+>. In other words, issuing <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> once for a task not in WAITING state does not return an error, but whether an error is returned for the second or subsequent call of <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> is implementation-dependent.</P
+><P
+>When calling <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> causes <CODE
+CLASS="varname"
+>wupcnt</CODE
+> to exceed the allowed maximum value, error code <SPAN
+CLASS="errorname"
+>E_QOVR</SPAN
+> is returned.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_can_wup"
+>tk_can_wup - Cancel Wakeup Task</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4420"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN4422"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT wupcnt = tk_can_wup</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4429"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4431"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4444"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4446"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wupcnt</CODE
+>
+              </TD
+><TD
+>Wakeup Count</TD
+><TD
+>Number of queued wakeup requests</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4463"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4465"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (called for a task in DORMANT state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4484"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4486"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4501"
+>Related Service Profile Items</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4504"
+>Description</A
+></H3
+><P
+>Passes in the return value the wakeup request queuing count (<CODE
+CLASS="varname"
+>wupcnt</CODE
+>) for the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>, at the same time canceling all wakeup requests. That is, this system call clears the wakeup request queuing count (<CODE
+CLASS="varname"
+>wupcnt</CODE
+>) to 0 for the specified task.</P
+><P
+>The invoking task can be specified by setting <CODE
+CLASS="varname"
+>tskid</CODE
+> = <TT
+CLASS="literal"
+>TSK_SELF</TT
+> = 0. Note, however, that when <CODE
+CLASS="varname"
+>tskid</CODE
+> = <TT
+CLASS="literal"
+> TSK_SELF </TT
+> = 0 is specified in a system call issued from a task-independent portion, error code <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+> is returned.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4516"
+>Additional Notes</A
+></H3
+><P
+>This system call can be used to determine whether the processing was completed within the allotted time when processing is performed that involves cyclic wakeup of a task. Before processing of a prior wakeup request is completed and <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> is called by the waken up task, the task monitoring this task calls <A
+HREF="task_dependent_synchronization_functions.html#tk_can_wup"
+>tk_can_wup</A
+>. If <CODE
+CLASS="varname"
+>wupcnt</CODE
+> in the return parameter is 1 or above, this means the previous wakeup request was not processed within the allotted time. Measure can then be taken accordingly to compensate for the delay.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_rel_wai"
+>tk_rel_wai - Release Wait</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4524"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN4526"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_rel_wai</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4533"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4535"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4548"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4550"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4563"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4565"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (called for a task not in WAITING state (including when called for the invoking task, or for a task in DORMANT state))</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4588"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4590"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4605"
+>Related Service Profile Items</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4608"
+>Description</A
+></H3
+><P
+>If the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> is in some kind of waiting state (not including SUSPENDED state), forcibly releases that state.</P
+><P
+>To the task whose WAITING state was released by <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+>, the error code <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+> is returned. At this time, the target task is guaranteed to be released from its wait state without the allocation of the waited resource (without the wait release conditions being met).</P
+><P
+>Wait release requests are not queued by <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+>. That is, if the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> is already in WAITING state, the WAITING state is cleared; but if it is not in WAITING state when this system call is issued, error code <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> is returned to the caller. Likewise, error code <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> is returned when this system call is issued specifying the invoking task.</P
+><P
+>The <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> system call does not release a SUSPENDED state. If <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> is issued for a task in WAITING-SUSPENDED state, the task goes to SUSPENDED state. If it is necessary to release SUSPENDED state, the separate system call <A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> or <A
+HREF="task_dependent_synchronization_functions.html#tk_frsm_tsk"
+>tk_frsm_tsk</A
+> is used.</P
+><P
+>The states of the target task when <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> is called and the results of its execution in each state are shown in <A
+HREF="task_dependent_synchronization_functions.html#table_tk_rel_wai"
+>Table 3</A
+>.</P
+><DIV
+CLASS="table"
+><A
+NAME="table_tk_rel_wai"
+></A
+><P
+><B
+>Table 3. Target Task State and Execution Result (tk_rel_wai)
+</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="45%"><COL
+WIDTH="27%"><COL
+WIDTH="27%"><THEAD
+><TR
+><TH
+ALIGN="left"
+>Target Task State</TH
+><TH
+ALIGN="left"
+><A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+><CODE
+CLASS="varname"
+>ercd</CODE
+> Return Value</TH
+><TH
+ALIGN="left"
+>(processing)</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>Run state (RUNNING or READY) (not for invoking task)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>No operation</TD
+></TR
+><TR
+><TD
+>Running state (RUNNING) (invoking task)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>No operation</TD
+></TR
+><TR
+><TD
+>Waiting state (WAITING)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Wait released/release wait</TD
+></TR
+><TR
+><TD
+>Suspended state (SUSPENDED)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>No operation</TD
+></TR
+><TR
+><TD
+>Waiting-suspended state (WAITING-SUSPENDED)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Goes to SUSPENDED state</TD
+></TR
+><TR
+><TD
+>Dormant state (DORMANT)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>No operation</TD
+></TR
+><TR
+><TD
+>Non-existent state (NON-EXISTENT)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>No operation</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4677"
+>Additional Notes</A
+></H3
+><P
+>A function similar to timeout can be realized by using an alarm handler or the like to issue this system call after a given task has been in WAITING state for a set time.</P
+><P
+>The main differences between <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> and <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> are the following.</P
+><P
+></P
+><UL
+><LI
+><P
+>Whereas <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> releases only WAITING state effected by <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+>, <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> releases also WAITING state caused by other factors (<A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+>, <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_sem"
+>tk_wai_sem</A
+>, <A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+>, <A
+HREF="memory_pool_management_functions.html#tk_get_mpl"
+>tk_get_mpl</A
+>, <A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk"
+>tk_dly_tsk</A
+>, etc.).</P
+></LI
+><LI
+><P
+>Seen from the task in WAITING state, release of the WAITING state by <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> returns a Normal completion (<SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>), whereas release by <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> returns an error code (<SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>).</P
+></LI
+><LI
+><P
+>Wakeup requests by <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> are queued if <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> has not yet been executed. If <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> is issued for a task not in WAITING state, error code <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> is returned.</P
+></LI
+></UL
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_sus_tsk"
+>tk_sus_tsk - Suspend Task</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4708"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN4710"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_sus_tsk</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4717"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4719"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4732"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4734"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4747"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4749"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (called for the invoking task or for a task in DORMANT state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>A task in RUNNING state was specified in dispatch disabled state</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_QOVR</SPAN
+>
+              </TD
+><TD
+>Queuing or nesting overflow (too many nested requests in <CODE
+CLASS="varname"
+>suscnt</CODE
+> )</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4781"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4783"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4798"
+>Related Service Profile Items</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4800"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUSPEND_MAXCNT</TT
+>
+              </TD
+><TD
+>Maximum nest count of the forced wait of tasks (&#62;= 1)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4809"
+>Description</A
+></H3
+><P
+>Puts the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> in SUSPENDED state and interrupts execution by the task.</P
+><P
+>SUSPENDED state is released by issuing system call <A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> or <A
+HREF="task_dependent_synchronization_functions.html#tk_frsm_tsk"
+>tk_frsm_tsk</A
+>.</P
+><P
+>If <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> is called for a task already in WAITING state, the state goes to a combination of WAITING state and SUSPENDED state (WAITING-SUSPENDED state) after the execution of <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+>. Thereafter when the task wait release conditions are met, the task goes to SUSPENDED state. If <A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> is issued for the task in WAITING-SUSPENDED state, the task state reverts to WAITING state. (See <A
+HREF="task_states_and_scheduling_rules.html#figure_task_status"
+>Figure 1 in the Section called <I
+>Task States</I
+> in the Chapter called <I
+>μT-Kernel Concepts</I
+></A
+>).</P
+><P
+>Since SUSPENDED state means task interruption by a system call issued by another task, this system call cannot be issued for the invoking task. If the invoking task is specified, error code <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> is returned.</P
+><P
+>When this system call is issued from a task-independent portion, if a task in RUNNING state is specified while dispatching is disabled, error code <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+> is returned.</P
+><P
+>If <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> is issued more than once for the same task, the task is put in nested SUSPENDED state. This is called nesting of suspend requests. In this case, the task reverts to its original state only when <A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> has been issued for the same number of times as <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> (<CODE
+CLASS="varname"
+>suscnt</CODE
+>). Accordingly, nesting of the pair of system calls <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> and <A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> is possible.</P
+><P
+>The nesting feature of suspend requests (issuing <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> two or more times for the same task) and upper limits on nesting count are implementation-dependent.</P
+><P
+>If <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> is issued multiple times in a system that does not allow suspend request nesting, or if the nesting count exceeds the allowed limit, error code <SPAN
+CLASS="errorname"
+>E_QOVR</SPAN
+> is returned.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4837"
+>Additional Notes</A
+></H3
+><P
+>When a task is in WAITING state for resource acquisition (semaphore wait, etc.) and is also in SUSPENDED state, the resource allocation (semaphore allocation, etc.) takes place under the same conditions as when the task is not in SUSPENDED state. Resource allocation is not delayed by the SUSPENDED state, and there is no change whatsoever in the priority of resource allocation or release from WAITING state. In this way SUSPENDED state is in an orthogonal relation with other processing and task states.</P
+><P
+>In order to delay resource allocation to a task in SUSPENDED state (temporarily lowering its priority), the user can employ <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> and <A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> in combination with <A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+>.</P
+><P
+>Task suspension is intended only for very limited uses closely related to the OS, such as breakpoint processing in a debugger. As a rule it should not be used in ordinary applications or in middleware. The reason is as follows.</P
+><P
+>Task suspension takes place regardless of the target task running state. If, for example, a task is put in SUSPENDED state while it is calling a middleware function, the task will be stopped in the course of middleware internal processing. In some cases middleware performs resource management or other mutual exclusion control. If a task stops inside middleware while it has resources allocated, other tasks may not be able to use that middleware. This situation can cause chain reactions, with other tasks stopping and leading to system-wide deadlock.</P
+><P
+>For this reason a task must not be stopped without knowing its status (what it is doing at the time), and ordinary tasks should not use the task suspension function.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_rsm_tsk"
+>tk_rsm_tsk - Resumes a task in a SUSPENDED state</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4849"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN4851"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_rsm_tsk</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4858"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4860"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4873"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4875"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4888"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4890"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (the specified task is not in SUSPENDED state (including when this system call specifies the invoking task or a task in DORMANT state))</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4913"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4915"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4930"
+>Related Service Profile Items</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4933"
+>Description</A
+></H3
+><P
+>Releases the SUSPENDED state of the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>. If the target task was earlier put in SUSPENDED state by the <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> system call, this system call releases that SUSPENDED state and resumes the task execution.</P
+><P
+>When the target task is in a combined WAITING state and SUSPENDED state (WAITING-SUSPENDED state), executing <A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> releases only the SUSPENDED state, putting the task in WAITING state (see <A
+HREF="task_states_and_scheduling_rules.html#figure_task_status"
+>Figure 1 in the Section called <I
+>Task States</I
+> in the Chapter called <I
+>μT-Kernel Concepts</I
+></A
+>).</P
+><P
+>This system call cannot be called for the invoking task. If the invoking task is specified, error code <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> is returned.</P
+><P
+>Executing <A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> once clears only one nested suspend request (<CODE
+CLASS="varname"
+>suscnt</CODE
+>). If <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> was issued more than once for the target task (<CODE
+CLASS="varname"
+>suscnt</CODE
+> ≧ 2), the target task remains in SUSPENDED state even after <A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> is executed.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4949"
+>Additional Notes</A
+></H3
+><P
+>After a task in RUNNING state or READY state is put in SUSPENDED state by <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> and then resumed by <A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> or <A
+HREF="task_dependent_synchronization_functions.html#tk_frsm_tsk"
+>tk_frsm_tsk</A
+>, the task has the lowest precedence among tasks of the same priority.</P
+><P
+>When, for example, the following system calls are executed for tasks A and B of the same priority, the result is as indicated below.</P
+><PRE
+CLASS="programlisting"
+>&#13;tk_sta_tsk (tskid=task_A, stacd_A);
+tk_sta_tsk (tskid=task_B, stacd_B);
+  /* By the rule of FCFS, precedence becomes task_A → task_B. */
+
+tk_sus_tsk (tskid=task_A);
+tk_rsm_tsk (tskid=task_A);
+  /* In this case precedence becomes task_B → task_A. */
+</PRE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_frsm_tsk"
+>tk_frsm_tsk - Force Resume Task</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4959"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN4961"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_frsm_tsk</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4968"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4970"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4983"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4985"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4998"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5000"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (the specified task is not in SUSPENDED state (including when this system call specifies the invoking task or a task in DORMANT state))</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5023"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5025"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5040"
+>Related Service Profile Items</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5043"
+>Description</A
+></H3
+><P
+>Releases the SUSPENDED state of the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>. If the target task was earlier put in SUSPENDED state by the <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> system call, this system call releases that SUSPENDED state and resumes the task execution.</P
+><P
+>When the target task is in a combined WAITING state and SUSPENDED state (WAITING-SUSPENDED state), executing <A
+HREF="task_dependent_synchronization_functions.html#tk_frsm_tsk"
+>tk_frsm_tsk</A
+> releases only the SUSPENDED state, putting the task in WAITING state (see <A
+HREF="task_states_and_scheduling_rules.html#figure_task_status"
+>Figure 1 in the Section called <I
+>Task States</I
+> in the Chapter called <I
+>μT-Kernel Concepts</I
+></A
+>).</P
+><P
+>This system call cannot be called for the invoking task. If the invoking task is specified, error code <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> is returned.</P
+><P
+>Executing <A
+HREF="task_dependent_synchronization_functions.html#tk_frsm_tsk"
+>tk_frsm_tsk</A
+> once clears all the nested suspend requests (<CODE
+CLASS="varname"
+>suscnt</CODE
+>) (<CODE
+CLASS="varname"
+>suscnt</CODE
+> = 0). Therefore, all suspend requests are released (<CODE
+CLASS="varname"
+>suscnt</CODE
+> is cleared to 0) even if <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> was issued more than once (<CODE
+CLASS="varname"
+>suscnt</CODE
+> ≧ 2). The SUSPENDED state is always cleared, and unless the task was in the WAITING-SUSPENDED state, its execution resumes.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5060"
+>Additional Notes</A
+></H3
+><P
+>After a task in RUNNING state or READY state is put in SUSPENDED state by <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> and then resumed by <A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> or <A
+HREF="task_dependent_synchronization_functions.html#tk_frsm_tsk"
+>tk_frsm_tsk</A
+>, the task has the lowest precedence among tasks of the same priority.</P
+><P
+>When, for example, the following system calls are executed for tasks A and B of the same priority, the result is as indicated below.</P
+><PRE
+CLASS="programlisting"
+>&#13;tk_sta_tsk (tskid=task_A, stacd_A);
+tk_sta_tsk (tskid=task_B, stacd_B);
+  /* By the rule of FCFS, precedence becomes task_A → task_B. */
+
+tk_sus_tsk (tskid=task_A);
+tk_frsm_tsk (tskid=task_A);
+  /* In this case precedence becomes task_B → task_A. */
+</PRE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_dly_tsk"
+>tk_dly_tsk - Delay Task</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5070"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN5072"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_dly_tsk</CODE
+>(RELTIM dlytim);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5079"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5081"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>RELTIM</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dlytim</CODE
+>
+              </TD
+><TD
+>Delay Time</TD
+><TD
+>Delay time (ms)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5094"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5096"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5109"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5111"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>dlytim</CODE
+> is invalid)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5138"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5140"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5155"
+>Related Service Profile Items</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5158"
+>Description</A
+></H3
+><P
+>Temporarily stops execution of the invoking task and waits for time <CODE
+CLASS="varname"
+>dlytim</CODE
+> to elapse.</P
+><P
+>The state while the task waits for the delay time to elapse is a WAITING state and is subject to release by <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+>.</P
+><P
+>If the task issuing this system call goes to SUSPENDED state or WAITING-SUSPENDED state while it is waiting for the delay time to elapse, the elapsed time continues to be counted in the SUSPENDED state.</P
+><P
+>The time unit for <CODE
+CLASS="varname"
+>dlytim</CODE
+> (time unit) is the same as that for system time (= 1 ms).</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5167"
+>Additional Notes</A
+></H3
+><P
+>This system call differs from <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> in that normal completion, not an error code, is returned when the specified delay time elapses. Moreover, the wait is not released even if <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> is executed during the delay time. The only way to terminate <A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk"
+>tk_dly_tsk</A
+> before the delay time elapses is by calling <A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+> or <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_dly_tsk_u"
+>tk_dly_tsk_u - Delay Task (Microseconds)</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5177"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN5179"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_dly_tsk_u</CODE
+>(RELTIM_U dlytim_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5186"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5188"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>RELTIM_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dlytim_u</CODE
+>
+              </TD
+><TD
+>Delay Time</TD
+><TD
+>Delay time (microseconds)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5201"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5203"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5216"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5218"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>dlytim_u</CODE
+> is invalid)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5245"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5247"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5262"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5265"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>Support of microsecond</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5274"
+>Description</A
+></H3
+><P
+>This system call takes 64-bit <CODE
+CLASS="varname"
+>dlytim_u</CODE
+> in microseconds instead of the parameter <CODE
+CLASS="varname"
+>dlytim</CODE
+> of <A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk"
+>tk_dly_tsk</A
+>.</P
+><P
+>The specification of this system call is same as that of <A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk"
+>tk_dly_tsk</A
+>, except that the parameter is replaced with <CODE
+CLASS="varname"
+>dlytim_u</CODE
+>. For more details, see the description of <A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk"
+>tk_dly_tsk</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_sig_tev"
+>tk_sig_tev - Signal Task Event</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5286"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN5288"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_sig_tev</CODE
+>(ID tskid, INT tskevt);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5297"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5299"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskevt</CODE
+>
+              </TD
+><TD
+>Task Event</TD
+><TD
+>Task event number (1 to 8)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5318"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5320"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5333"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5335"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (called for a task in DORMANT state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>tskevt</CODE
+> is invalid)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5363"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5365"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5380"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5383"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEVENT</TT
+>
+              </TD
+><TD
+>Support of task event</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5392"
+>Description</A
+></H3
+><P
+>Sends the task event specified in <CODE
+CLASS="varname"
+>tskevt</CODE
+> to the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>.</P
+><P
+>There are eight task event types stored for each task, specified by numbers 1 to 8.</P
+><P
+>The task event send count is not saved, only whether the event occurs or not.</P
+><P
+>The invoking task can be specified by setting <CODE
+CLASS="varname"
+>tskid</CODE
+> = <TT
+CLASS="literal"
+>TSK_SELF</TT
+> = 0. Note, however, that when <CODE
+CLASS="varname"
+>tskid</CODE
+> = <TT
+CLASS="literal"
+>TSK_SELF</TT
+> = 0 is specified in a system call issued from a task-independent portion, error code <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+> is returned.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5405"
+>Additional Notes</A
+></H3
+><P
+>The task event function is used for task synchronization much like <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> and <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+>, but differs from the use of these system calls in the following ways.<P
+></P
+><UL
+><LI
+><P
+>The wakeup request (task event) count is not kept.</P
+></LI
+><LI
+><P
+>Wakeup requests can be classified by the eight event types.</P
+></LI
+></UL
+></P
+><P
+>Using the same event type for synchronization in two or more places in the same task would cause confusion. Event type allocation should be clearly defined.</P
+><P
+>The task event function is intended for use in middleware, and as a rule should not be used in ordinary applications. Use of <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> and <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> is recommended for applications.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_wai_tev"
+>tk_wai_tev - Wait Task Event</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5421"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN5423"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT tevptn = tk_wai_tev</CODE
+>(UINT waiptn, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5432"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5434"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>waiptn</CODE
+>
+              </TD
+><TD
+>Wait Event Pattern</TD
+><TD
+>Task event pattern</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (ms)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5453"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5455"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tevptn</CODE
+>
+              </TD
+><TD
+>Task Event Pattern</TD
+><TD
+>Task event status when wait released</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5472"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5474"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>waiptn</CODE
+> or <CODE
+CLASS="varname"
+>tmout</CODE
+> is invalid)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5502"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5504"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5519"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5522"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEVENT</TT
+>
+              </TD
+><TD
+>Support of task event</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5531"
+>Description</A
+></H3
+><P
+>Waits for the occurrence of one of the task events specified in <CODE
+CLASS="varname"
+>waiptn</CODE
+>. When the wait is released by a task event, the task events specified in <CODE
+CLASS="varname"
+>waiptn</CODE
+> are cleared (raised task event &#38;= ~<CODE
+CLASS="varname"
+>waiptn</CODE
+>). The task event status when the wait was released (the state before clearing) is passed in the return code (<CODE
+CLASS="varname"
+>tevptn</CODE
+>).</P
+><P
+>The parameters <CODE
+CLASS="varname"
+>waiptn</CODE
+> and <CODE
+CLASS="varname"
+>tevptn</CODE
+> consist of logical OR values of the bits for each task event in the form 1 &#60;&#60; (task event number -1).</P
+><P
+>A maximum wait time (timeout) can be set in <CODE
+CLASS="varname"
+>tmout</CODE
+>. The time unit for <CODE
+CLASS="varname"
+>tmout</CODE
+> is the same as that for system time (= 1 ms). If the <CODE
+CLASS="varname"
+>tmout</CODE
+> time elapses before the wait release condition is met (<A
+HREF="task_dependent_synchronization_functions.html#tk_sig_tev"
+>tk_sig_tev</A
+> is not executed), the system call terminates, returning timeout error code <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>.</P
+><P
+>When <TT
+CLASS="literal"
+>TMO_POL</TT
+>＝0 is set in <CODE
+CLASS="varname"
+>tmout</CODE
+>, this means 0 was specified as the timeout value, and <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> is returned without entering WAITING state even if no task event occurs. When <TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1) is set in <CODE
+CLASS="varname"
+>tmout</CODE
+>, this means infinity was specified as the timeout value, and the task continues to wait for a task event without timing out.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_wai_tev_u"
+>tk_wai_tev_u - Wait Task Event (Microseconds)</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5555"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN5557"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT tevptn = tk_wai_tev_u</CODE
+>(UINT waiptn, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5566"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5568"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>waiptn</CODE
+>
+              </TD
+><TD
+>Wait Event Pattern</TD
+><TD
+>Task event pattern</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (in microseconds)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5587"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5589"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tevptn</CODE
+>
+              </TD
+><TD
+>Task Event Pattern</TD
+><TD
+>Task event status when wait released</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5606"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5608"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>waiptn</CODE
+> or <CODE
+CLASS="varname"
+>tmout_u</CODE
+> is invalid)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5636"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5638"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5653"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5656"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEVENT</TT
+>
+              </TD
+><TD
+>Support of task event</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>Support of microsecond</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5669"
+>Description</A
+></H3
+><P
+>This system call takes 64-bit <CODE
+CLASS="varname"
+>tmout_u</CODE
+> in microseconds instead of the parameter <CODE
+CLASS="varname"
+>tmout</CODE
+> of <A
+HREF="task_dependent_synchronization_functions.html#tk_wai_tev"
+>tk_wai_tev</A
+>.</P
+><P
+>The specification of this system call is same as that of <A
+HREF="task_dependent_synchronization_functions.html#tk_wai_tev"
+>tk_wai_tev</A
+>, except that the parameter is replaced with <CODE
+CLASS="varname"
+>tmout_u</CODE
+>. For more details, see the description of <A
+HREF="task_dependent_synchronization_functions.html#tk_wai_tev"
+>tk_wai_tev</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_dis_wai"
+>tk_dis_wai - Disable Task Wait</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5681"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN5683"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT tskwait = tk_dis_wai</CODE
+>(ID tskid, UW waitmask);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5692"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5694"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+><TR
+><TD
+>UW</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>waitmask</CODE
+>
+              </TD
+><TD
+>Wait Mask</TD
+><TD
+>Task wait disabled setting</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5713"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5715"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskwait</CODE
+>
+              </TD
+><TD
+>Task Wait</TD
+><TD
+>Task state after task wait is disabled</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5732"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5734"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>waitmask</CODE
+> is invalid)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5754"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5756"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5771"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5774"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>Support of disabling of wait of a task</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5783"
+>Description</A
+></H3
+><P
+>Disables waits for the wait factors set in <CODE
+CLASS="varname"
+>waitmask</CODE
+> by the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>. If the task is already waiting for a factor specified in <CODE
+CLASS="varname"
+>waitmask</CODE
+> , that wait is released.</P
+><P
+><CODE
+CLASS="varname"
+>waitmask</CODE
+> is specified as the logical OR of any combination of the following wait factors.</P
+><PRE
+CLASS="programlisting"
+>&#13;#define TTW_SLP         0x00000001      /* Wait caused by sleep */
+#define TTW_DLY         0x00000002      /* Wait for task delay */
+#define TTW_SEM         0x00000004      /* Wait for semaphore */
+#define TTW_FLG         0x00000008      /* Wait for event flag */
+#define TTW_MBX         0x00000040      /* Wait for mailbox */
+#define TTW_MTX         0x00000080      /* Wait for mutex */
+#define TTW_SMBF        0x00000100      /* Wait for message buffer send */
+#define TTW_RMBF        0x00000200      /* Wait for message buffer receive */
+#define TTW_CAL         0x00000400      /* (reserved) */
+#define TTW_ACP         0x00000800      /* (reserved) */
+#define TTW_RDV         0x00001000      /* (reserved) */
+#define TTW_MPF         0x00002000      /* Wait for fixed-size memory pool */
+#define TTW_MPL         0x00004000      /* Wait for variable-size memory pool */
+#define TTW_EV1         0x00010000      /* Wait for task event #1 */
+#define TTW_EV2         0x00020000      /* Wait for task event #2 */
+#define TTW_EV3         0x00040000      /* Wait for task event #3 */
+#define TTW_EV4         0x00080000      /* Wait for task event #4 */
+#define TTW_EV5         0x00100000      /* Wait for task event #5 */
+#define TTW_EV6         0x00200000      /* Wait for task event #6 */
+#define TTW_EV7         0x00400000      /* Wait for task event #7 */
+#define TTW_EV8         0x00800000      /* Wait for task event #8 */
+#define TTX_SVC         0x80000000      /* Extended SVC disabled */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TTX_SVC</TT
+> is a special value disabling not the task wait but the calling of an extended SVC. If <TT
+CLASS="literal"
+>TTX_SVC</TT
+> has been set when a task attempts to call an extended SVC, <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+> is returned without calling the extended SVC. This value does not have the effect of terminating an already called extended SVC.</P
+><P
+>The return value (<CODE
+CLASS="varname"
+>tskwait</CODE
+>) includes the waiting state of a task as a pattern of concatenated bits (bit width of INT data type - 1) after the waiting states are disabled by <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+>. If bit width of INT data type is 32, then this value is the same as the value <CODE
+CLASS="varname"
+>tskwait</CODE
+> returned by <A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+>. Information concerning <TT
+CLASS="literal"
+>TTX_SVC</TT
+> is not returned in <CODE
+CLASS="varname"
+>tskwait</CODE
+>. A <CODE
+CLASS="varname"
+>tskwait</CODE
+> value of 0 means the task has not entered WAITING state (or the wait was released). If <CODE
+CLASS="varname"
+>tskwait</CODE
+> is not 0, this means the task is in WAITING state for a cause other than those disabled in <CODE
+CLASS="varname"
+>waitmask</CODE
+>. If the bit width of INT data type is less than 32, the information represented by upper bits that will not fit into INT data are not returned. Hence, in this case, even if <CODE
+CLASS="varname"
+>tskwait</CODE
+> is zero, there is a possibility that the task is waiting for a cause that is not specified in <CODE
+CLASS="varname"
+>waitmask</CODE
+>.</P
+><P
+>When a task wait is cleared by <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> or the task is prevented from entering WAITING state after this system call has taken effect, <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+> is returned.</P
+><P
+>When a system call for which there is the possibility of entering the WAITING state is invoked during wait-disabled state, <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+> is returned even if the processing could be performed without waiting. For example, when message buffer space is available and it is possible to send message without entering the WAITING state, and if a message is sent to message buffer (<A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+> is called), the message is not sent and <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+> is returned.</P
+><P
+>Disabling of wait that is set during an extended SVC will be cleared automatically upon return from the extended SVC to its caller. It is automatically cleared also when an extended SVC is called, reverting to the original setting upon return from the extended SVC.</P
+><P
+>Disabling of wait that is set is cleared also when the task reverts to DORMANT state. The setting made while a task is in DORMANT state, however, is valid and the disabling of wait is applied the next time the task is started.</P
+><P
+>In the case of semaphores and most other objects, <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+> can be specified when the object is created. An object created with <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+> specified cannot have wait disabled, and rejects any attempt to disable wait by <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+>.</P
+><P
+>The invoking task can be specified by setting <CODE
+CLASS="varname"
+>tskid</CODE
+> = <TT
+CLASS="literal"
+>TSK_SELF</TT
+> = 0. Note, however, that when <CODE
+CLASS="varname"
+>tskid</CODE
+> = <TT
+CLASS="literal"
+>TSK_SELF</TT
+> = 0 is specified in a system call issued from a task-independent portion, error code <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+> is returned.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5827"
+>Additional Notes</A
+></H3
+><P
+>The function to disable wait is provided for aborting the execution of an extended SVC handler in midway, but it is not restricted to that purpose only.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5830"
+>Porting Guideline</A
+></H3
+><P
+>Note that the data type of return value of <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+>, (<CODE
+CLASS="varname"
+>tskwait</CODE
+>), is of type INT、and its value range is implementation-dependent, so care must be taken. For example, you can not receive information concerning waiting task events under an implementation on 16-bits CPU. If it is desired to obtain task wait status without regard to the CPU bit width under μT-Kernel, it is necessary to reference <CODE
+CLASS="varname"
+>tskwait</CODE
+> by invoking <A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+>. On the other hand, under T-Kernel, INT is defined to be 32 bits or wider, the return value of <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> can show all the details of the wait status of a task.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ena_wai"
+>tk_ena_wai - Enable Task Wait</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5840"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN5842"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ena_wai</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5849"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5851"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5864"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5866"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5879"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5881"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5900"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5902"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5917"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5920"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>Support of disabling of wait of a task</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5929"
+>Description</A
+></H3
+><P
+>Releases all disabling of waits set by <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> for the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>.</P
+><P
+>The invoking task can be specified by setting <CODE
+CLASS="varname"
+>tskid</CODE
+> = <TT
+CLASS="literal"
+>TSK_SELF</TT
+> = 0. Note, however, that when <CODE
+CLASS="varname"
+>tskid</CODE
+> = <TT
+CLASS="literal"
+>TSK_SELF</TT
+> = 0 is specified in a system call issued from a task-independent portion, error code <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+> is returned.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="task_exception_handling_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>μT-Kernel/OS Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Task Exception Handling Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

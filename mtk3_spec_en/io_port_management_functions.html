@@ -1,0 +1,2709 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>I/O Port Access Support Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/SM Functions"
+HREF="utk_sm_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Interrupt Management Functions"
+HREF="interrupt_management_functions_sm.html"><LINK
+REL="NEXT"
+TITLE="Power Management Functions"
+HREF="power_management_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="interrupt_management_functions_sm.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/SM Functions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="power_management_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="io_port_management_functions"
+>I/O Port Access Support Functions</A
+></H1
+><P
+>I/O port access support functions support accesses or operations to the I/O devices. These include functions that read from or write to the I/O port of the specified address using the unit of byte or word, and a function that realizes a wait for a short time (micro wait) which is used for I/O device operations.</P
+><P
+>I/O port access support functions are provided as library functions or C language macros. These can be called from a task-independent portion or while task dispatching and interrupts are disabled.</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="io_port_access"
+>I/O Port Access</A
+></H2
+><P
+>In a system with separate I/O space and memory space, I/O port access functions access I/O space. In a system with memory-mapped I/O only, I/O port access functions access memory space. Using these functions will improve software portability and readability even in a memory-mapped I/O system.</P
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="out_b"
+>out_b - Write to I/O Port (In Unit of Byte)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24535"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN24537"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void out_b</CODE
+>(INT port, UB data);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24546"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24548"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>port</CODE
+>
+              </TD
+><TD
+>I/O Port Address</TD
+><TD
+>I/O port address</TD
+></TR
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>data</CODE
+>
+              </TD
+><TD
+>Write Data</TD
+><TD
+>Data to be written (in unit of byte)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24567"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24570"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24573"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24575"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24590"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24593"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+>
+              </TD
+><TD
+>Support of I/O port access</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24602"
+>Description</A
+></H4
+><P
+>Writes <CODE
+CLASS="varname"
+>data</CODE
+> in byte (8-bit) to the I/O port pointed by the address <CODE
+CLASS="varname"
+>port</CODE
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="out_h"
+>out_h - Write to I/O Port (In Unit of Half-word)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24609"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN24611"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void out_h</CODE
+>(INT port, UH data);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24620"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24622"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>port</CODE
+>
+              </TD
+><TD
+>I/O Port Address</TD
+><TD
+>I/O port address</TD
+></TR
+><TR
+><TD
+>UH</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>data</CODE
+>
+              </TD
+><TD
+>Write Data</TD
+><TD
+>Data to be written (in unit of half-word)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24641"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24644"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24647"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24649"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24664"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24667"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+>
+              </TD
+><TD
+>Support of I/O port access</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24676"
+>Description</A
+></H4
+><P
+>Writes <CODE
+CLASS="varname"
+>data</CODE
+> in a half-word (16-bit) to the I/O port pointed by the address <CODE
+CLASS="varname"
+>port</CODE
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="out_w"
+>out_w - Write to I/O Port (In Unit of Word)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24683"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN24685"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void out_w</CODE
+>(INT port, UW data);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24694"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24696"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>port</CODE
+>
+              </TD
+><TD
+>I/O Port Address</TD
+><TD
+>I/O port address</TD
+></TR
+><TR
+><TD
+>UW</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>data</CODE
+>
+              </TD
+><TD
+>Write Data</TD
+><TD
+>Data to be written (in unit of word)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24715"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24718"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24721"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24723"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24738"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24741"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+>
+              </TD
+><TD
+>Support of I/O port access</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24750"
+>Description</A
+></H4
+><P
+>Writes <CODE
+CLASS="varname"
+>data</CODE
+> in a word (32-bit) to the I/O port pointed by the address <CODE
+CLASS="varname"
+>port</CODE
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="out_d"
+>out_d - Write to I/O Port (In Unit of Double-word)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24757"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN24759"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void out_d</CODE
+>(INT port, UD data);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24768"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24770"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>port</CODE
+>
+              </TD
+><TD
+>I/O Port Address</TD
+><TD
+>I/O port address</TD
+></TR
+><TR
+><TD
+>UD</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>data</CODE
+>
+              </TD
+><TD
+>Write Data</TD
+><TD
+>Data to be written (in unit of double-word)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24789"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24792"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24795"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24797"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24812"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24815"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+>
+              </TD
+><TD
+>Support of I/O port access</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_HAS_DOUBLEWORD</TT
+>
+              </TD
+><TD
+>Support of 64-bit data types (D, UD, VD)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24828"
+>Description</A
+></H4
+><P
+>Writes <CODE
+CLASS="varname"
+>data</CODE
+> in a double-word (64-bit) to the I/O port pointed by the address <CODE
+CLASS="varname"
+>port</CODE
+>.</P
+><P
+>Note that, in a system where I/O port cannot be accessed in double-word (64-bit) due to hardware constraint, <CODE
+CLASS="varname"
+>data</CODE
+> is separated into shorter units than double-word (64-bit) before they are written.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24835"
+>Rationale for the Specification</A
+></H4
+><P
+>There are many systems where I/O port cannot be accessed in double-word (64-bit) due to hardware constraint such as 32-bit or less I/O data bus. In such systems, the strict specification of <A
+HREF="io_port_management_functions.html#out_d"
+>out_d</A
+> and <A
+HREF="io_port_management_functions.html#in_d"
+>in_d</A
+> cannot be implemented; that is, they cannot process <CODE
+CLASS="varname"
+>data</CODE
+> in one chunk of the specified bit width. In terms of the original purpose of this API, it is preferable not to implement the <A
+HREF="io_port_management_functions.html#out_d"
+>out_d</A
+> and <A
+HREF="io_port_management_functions.html#in_d"
+>in_d</A
+> or return an error at runtime. However, it is not practical to detect an error by determining the bus configuration at runtime, and it is often harmless to separate 64-bit data into 32-bit or narrower units before writing.</P
+><P
+>This is why the specification of <A
+HREF="io_port_management_functions.html#out_d"
+>out_d</A
+> and <A
+HREF="io_port_management_functions.html#in_d"
+>in_d</A
+> allow for the case where 64-bit data cannot be processed in one chunk. Therefore, whether <A
+HREF="io_port_management_functions.html#out_d"
+>out_d</A
+> and <A
+HREF="io_port_management_functions.html#in_d"
+>in_d</A
+> support the block access to 64-bit I/O port or not is implementation-dependent. If the block access to 64-bit I/O port is needed, the system hardware configuration and handling of <A
+HREF="io_port_management_functions.html#out_d"
+>out_d</A
+> and <A
+HREF="io_port_management_functions.html#in_d"
+>in_d</A
+> should be checked.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="in_b"
+>in_b - Read from I/O Port (In Unit of Byte)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24852"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN24854"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>UB data = in_b</CODE
+>(INT port);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24861"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24863"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>port</CODE
+>
+              </TD
+><TD
+>I/O Port Address</TD
+><TD
+>I/O port address</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24876"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24878"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>data</CODE
+>
+              </TD
+><TD
+>Read Data</TD
+><TD
+>Data to be read (in unit of byte)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24891"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24894"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24896"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24911"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24914"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+>
+              </TD
+><TD
+>Support of I/O port access</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24923"
+>Description</A
+></H4
+><P
+>Reads data in a byte (8-bit) from the I/O port pointed by the address <CODE
+CLASS="varname"
+>port</CODE
+> and returns it in the return parameter <CODE
+CLASS="varname"
+>data</CODE
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="in_h"
+>in_h - Read from I/O Port (In Unit of Half-word)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24930"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN24932"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>UH data = in_h</CODE
+>(INT port);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24939"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24941"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>port</CODE
+>
+              </TD
+><TD
+>I/O Port Address</TD
+><TD
+>I/O port address</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24954"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24956"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UH</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>data</CODE
+>
+              </TD
+><TD
+>Read Data</TD
+><TD
+>Data to be read (in unit of half-word)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24969"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24972"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24974"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24989"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24992"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+>
+              </TD
+><TD
+>Support of I/O port access</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25001"
+>Description</A
+></H4
+><P
+>Reads data in a half-word (16-bit) from the I/O port pointed by the address <CODE
+CLASS="varname"
+>port</CODE
+> and returns it in the return parameter <CODE
+CLASS="varname"
+>data</CODE
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="in_w"
+>in_w - Read from I/O Port (In Unit of Word)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25008"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN25010"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>UW data = in_w</CODE
+>(INT port);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25017"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25019"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>port</CODE
+>
+              </TD
+><TD
+>I/O Port Address</TD
+><TD
+>I/O port address</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25032"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25034"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UW</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>data</CODE
+>
+              </TD
+><TD
+>Read Data</TD
+><TD
+>Data to be read (in unit of word)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25047"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25050"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25052"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25067"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25070"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+>
+              </TD
+><TD
+>Support of I/O port access</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25079"
+>Description</A
+></H4
+><P
+>Reads data in a word (32-bit) from the I/O port pointed by the address <CODE
+CLASS="varname"
+>port</CODE
+> and returns it in the return parameter <CODE
+CLASS="varname"
+>data</CODE
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="in_d"
+>in_d - Read from I/O Port (In Unit of Double-word)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25086"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN25088"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>UD data = in_d</CODE
+>(INT port);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25095"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25097"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>port</CODE
+>
+              </TD
+><TD
+>I/O Port Address</TD
+><TD
+>I/O port address</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25110"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25112"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UD</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>data</CODE
+>
+              </TD
+><TD
+>Read Data</TD
+><TD
+>Data to be read (in unit of double-word)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25125"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25128"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25130"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25145"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25148"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+>
+              </TD
+><TD
+>Support of I/O port access</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_HAS_DOUBLEWORD</TT
+>
+              </TD
+><TD
+>Support of 64-bit data types (D, UD, VD)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25161"
+>Description</A
+></H4
+><P
+>Reads data in a double-word (64-bit) from the I/O port pointed by the address <CODE
+CLASS="varname"
+>port</CODE
+> and returns it in the return parameter <CODE
+CLASS="varname"
+>data</CODE
+>.</P
+><P
+>Note that, in a system where I/O port cannot be accessed in one chunk of double-word (64-bit) due to hardware constraint, data is separated into shorter units than double-word (64-bit) before reading.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25167"
+>Rationale for the Specification</A
+></H4
+><P
+>See <A
+HREF="io_port_management_functions.html#out_d"
+>the Section called <I
+>out_d - Write to I/O Port (In Unit of Double-word)</I
+></A
+>.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="micro_wait"
+>Micro Wait</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="WaitUsec"
+>WaitUsec - Micro Wait (Microseconds)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25175"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN25177"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void WaitUsec</CODE
+>(UW usec);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25184"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25186"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UW</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>usec</CODE
+>
+              </TD
+><TD
+>Micro Seconds</TD
+><TD
+>Wait time (in microseconds)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25199"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25202"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25205"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25207"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25222"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25225"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_MICROWAIT</TT
+>
+              </TD
+><TD
+>Support of micro wait</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25234"
+>Description</A
+></H4
+><P
+>Performs a micro wait for the specified interval (in microseconds).</P
+><P
+>This wait is usually implemented as a busy loop. This means that the micro wait occurs in the task RUNNING state rather than WAITING state.</P
+><P
+>The micro wait is easily influenced by the runtime environment, such as execution in RAM, execution in ROM, memory cache on or off, etc. The wait time is therefore not very accurate.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="WaitNsec"
+>WaitNsec - Micro Wait (Nanoseconds)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25241"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN25243"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void WaitNsec</CODE
+>(UW nsec);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25250"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25252"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UW</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>nsec</CODE
+>
+              </TD
+><TD
+>Nanoseconds</TD
+><TD
+>Wait time (in nanoseconds)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25265"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25268"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25271"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25273"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25288"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25291"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_MICROWAIT</TT
+>
+              </TD
+><TD
+>Support of micro wait</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25300"
+>Description</A
+></H4
+><P
+>Performs a micro wait for the specified interval (in nanoseconds).</P
+><P
+>This wait is usually implemented as a busy loop. This means that the micro wait occurs in the task RUNNING state rather than WAITING state.</P
+><P
+>The micro wait is easily influenced by the runtime environment, such as execution in RAM, execution in ROM, memory cache on or off, etc. The wait time is therefore not very accurate.</P
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="interrupt_management_functions_sm.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="power_management_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Interrupt Management Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_sm_functions.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Power Management Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

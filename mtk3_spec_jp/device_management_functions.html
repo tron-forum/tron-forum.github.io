@@ -1,0 +1,13475 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>デバイス管理機能</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/SMの機能"
+HREF="utk_sm_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="μT-Kernel/SMの機能"
+HREF="utk_sm_functions.html"><LINK
+REL="NEXT"
+TITLE="割込み管理機能"
+HREF="interrupt_management_functions_sm.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="utk_sm_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/SMの機能</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="interrupt_management_functions_sm.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="device_management_functions"
+>デバイス管理機能</A
+></H1
+><P
+>デバイス管理機能は、μT-Kernel上で動作するデバイスドライバを管理するための機能である。</P
+><P
+>デバイスドライバとは、主としてハードウェアのデバイスの操作や入出力を行うために、μT-Kernel本体とは独立して実装されるプログラムである。アプリケーションやミドルウェアによるデバイスの操作や入出力を、デバイスドライバ経由で行うことにより、個々のデバイスの仕様の差異をデバイスドライバ側で吸収し、アプリケーションやミドルウェアのハードウェア非依存性や互換性を高めることができる。</P
+><P
+>デバイス管理機能には、デバイスドライバを定義するための機能、すなわちμT-Kernelにデバイスドライバを登録するための機能と、登録済みのデバイスドライバをアプリケーションやミドルウェアから利用するための機能が含まれる。</P
+><P
+>デバイスドライバの登録は、システム起動時の初期化処理の中で行う場合が多いが、システムの通常の動作中に動的に行うことも可能である。デバイスドライバの登録は <A
+HREF="device_management_functions.html#tk_def_dev"
+>tk_def_dev</A
+> によって行われ、このAPIのパラメータの一つであるデバイス登録情報(<CODE
+CLASS="varname"
+>ddev</CODE
+>)の中で、デバイスドライバの実際の処理を行うプログラムの関数(ドライバ処理関数)群を指定する。この中には、デバイスのオープン時に呼び出されるオープン関数(<A
+HREF="device_management_functions.html#openfn"
+>openfn</A
+>)、読込み時や書込みの処理開始時に呼び出される処理開始関数(<A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+>)、読込み時や書込みの処理の完了を待つ完了待ち関数(<A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+>)などがあり、これらのドライバ処理関数の中で、実際のデバイスの操作やデバイスとの入出力の処理を行う。</P
+><P
+>これらのドライバ処理関数は、準タスク部として保護レベル0で実行されるため、ハードウェアに直接アクセスすることも可能である。デバイスとの入出力などの処理は、これらのドライバ処理関数の中で直接行う場合もあるし、これらのドライバ処理関数の中から出された要求に応じて動作する別タスク等の中で行う場合もある。これらのドライバ処理関数が呼び出される際のパラメータ等の仕様は、デバイスドライバインタフェースとして規定される。デバイスドライバインタフェースは、デバイスドライバとμT-Kernelのデバイス管理機能との間のインタフェースである。</P
+><P
+>デバイスドライバのプログラムは、その保守性や移植性を高めるために、インタフェース層、論理層、物理層の3段階の階層分けを意識して実装することが推奨される。インタフェース層はμT-Kernelのデバイス管理機能とデバイスドライバとの間のインタフェースを処理する部分、論理層はデバイスの種類に応じて共通の処理を行う部分、物理層は実際のハードウェアや制御チップに依存した処理を行う部分である。ただし、インタフェース層、論理層、物理層の間のインタフェースについて、μT-Kernelで仕様を規定しているわけではなく、実際の階層分けについては、個々のデバイスドライバにおいて最適な実装を行うことができる。インタフェース層については、個々のデバイスに依存しない共通の処理が多いため、インタフェース層の処理を行うプログラムがライブラリとして提供される場合がある。</P
+><P
+>一方、登録済みのデバイスドライバをアプリケーションやミドルウェアから利用するために、オープン(<A
+HREF="device_management_functions.html#tk_opn_dev"
+>tk_opn_dev</A
+>)、クローズ(<A
+HREF="device_management_functions.html#tk_cls_dev"
+>tk_cls_dev</A
+>)、読込み(<A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+>)、書込み(<A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+>)などがAPIとして提供されている。これらのAPIの仕様をアプリケーションインタフェースと呼ぶ。たとえば、アプリケーションがデバイスをオープンするために <A
+HREF="device_management_functions.html#tk_opn_dev"
+>tk_opn_dev</A
+> を実行した場合、μT-Kernelは、対応するデバイスドライバのオープン関数(<A
+HREF="device_management_functions.html#openfn"
+>openfn</A
+>)を呼び出して、デバイスのオープンの処理を依頼する。</P
+><P
+>μT-Kernelのデバイス管理機能の位置付けと構成を<A
+HREF="device_management_functions.html#figure_basic_concepts_device_management"
+>図1</A
+>に示す。</P
+><DIV
+CLASS="figure"
+><A
+NAME="figure_basic_concepts_device_management"
+></A
+><P
+><B
+>図 1. デバイス管理機能</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_39s.png"></P
+></DIV
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>補足事項</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>デバイスドライバは、μT-Kernel本体とは独立して実装され、μT-Kernelの機能に対して拡張や追加を行うシステムプログラムであるという点で、サブシステムと共通の特徴を持つ。また、保護レベル0で動作し、ハードウェアへのアクセスが可能である点についても、両者とも共通である。一方、両者の相違点としては、デバイスドライバを呼び出す際のAPIがオープン／クローズ、リード／ライト型に固定されているのに対して、サブシステムを呼び出す際のAPIは自由に定義できる。</P
+><P
+>デバイス管理機能によって管理されるμT-Kernelのデバイスドライバは、物理的な意味でのデバイスやハードウェアに対するドライバを想定した機能であるが、物理的な意味でのデバイスやハードウェアを扱うことが必須ではない。一方、デバイスを操作するためのシステムプログラムであっても、オープン／クローズ、リード／ライト型のAPIが馴染まない場合など、デバイスドライバではなくサブシステムとして実装されることがある。</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="common_device_driver"
+>デバイスドライバに関する共通事項</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="basic_concepts_device_management"
+>デバイスの基本概念</A
+></H3
+><P
+>デバイスには、物理的なハードウェアとしてのデバイスを表す物理デバイスのほかに、ソフトウェアから見たデバイスの単位である論理デバイスがある。</P
+><P
+>多くのデバイスにおいて両者は一致するが、ハードディスクやストレージ系のデバイス(SDカード, USBストレージなど)の中に区画(パーティション)を作った場合には、デバイス全体が物理デバイス、1つの区画が論理デバイスとなる。</P
+><P
+>同種類の物理デバイスは「ユニット」により区別され、1つの物理デバイス内の論理デバイスは「サブユニット」により区別される。たとえば、1台目のハードディスクと2台目のハードディスクを区別する情報が「ユニット」であり、1台目のハードディスク内の1つ目の区画と2つ目の区画を区別する情報が「サブユニット」である。</P
+><P
+>デバイス管理機能で使用するデータの定義は、以下の通りである。なお、以下の説明のうち、具体的なデバイス名やデバイスに依存した属性などに言及した部分は、μT-Kernelの仕様ではなく、デバイスドライバの仕様に対する共通的なガイドラインを定めたものである。各デバイスドライバは、必ずしもここに定められたすべての機能を実装する必要はないが、各デバイスドライバの説明は、以下の仕様と矛盾のないように定める必要がある。</P
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18962"
+>デバイス名 (UB*型)</A
+></H4
+><P
+>デバイス名は、デバイス毎につけられた最大8文字の文字列であり、文字コードはUS-ASCIIを使用する。デバイス名は次の要素により構成される。</P
+><PRE
+CLASS="programlisting"
+>&#13;#define L_DEVNM         8       /* デバイス名の長さ */
+</PRE
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>種別</DT
+><DD
+><P
+>デバイスの種別を示す名前</P
+><P
+>使用可能な文字は a～z A～Z</P
+></DD
+><DT
+>ユニット</DT
+><DD
+><P
+>物理的なデバイスを示す英字1文字</P
+><P
+>a～zでユニットごとにaから順に割り当てる</P
+></DD
+><DT
+>サブユニット</DT
+><DD
+><P
+>論理的なデバイスを示す数字最大3文字</P
+><P
+>0～254でサブユニットごとに0から順に割り当てる</P
+></DD
+></DL
+></DIV
+><P
+>デバイス名は、種別＋ユニット＋サブユニットの形式で表すが、ユニット、サブユニットはデバイスによっては存在しない場合もあり、その場合はそれぞれのフィールドは存在しない。</P
+><P
+>サブユニットは、ハードディスクなどの区画(パーティション)を区別するために使用するが、それ以外のデバイスにおいても、1つの物理デバイスの中に複数の論理的なデバイスを設けたい場合に使用できる。</P
+><P
+>種別＋ユニットの形式を物理デバイス名と呼ぶ。また、種別＋ユニット＋サブユニットを論理デバイス名と呼ぶ。サブユニットがない場合は、物理デバイス名と論理デバイス名は同じになる。単にデバイス名と言ったときは、論理デバイス名を指す。</P
+><DIV
+CLASS="example"
+><A
+NAME="AEN18985"
+></A
+><P
+><B
+>例 1. デバイス名の例</B
+></P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18987"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>デバイス名</TH
+><TH
+>対象デバイス</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>hda</TD
+><TD
+>ハードディスク(ディスク全体)</TD
+></TR
+><TR
+><TD
+>hda0</TD
+><TD
+>ハードディスク(先頭の区画)</TD
+></TR
+><TR
+><TD
+>fda</TD
+><TD
+>フロッピーディスク</TD
+></TR
+><TR
+><TD
+>rsa</TD
+><TD
+>シリアルポート</TD
+></TR
+><TR
+><TD
+>kbpd</TD
+><TD
+>キーボード／ポインティングデバイス</TD
+></TR
+><TR
+><TD
+>fla</TD
+><TD
+>フラッシュメモリ</TD
+></TR
+><TR
+><TD
+>neta</TD
+><TD
+>ネットワーク</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19015"
+>デバイスID (ID型)</A
+></H4
+><P
+>デバイス(デバイスドライバ)を μT-Kernel/SMに登録することにより、デバイス(物理デバイス名)に対してデバイスID(&#62;0)が割り当てられる。デバイスIDは物理デバイスごとに割り当てられ、論理デバイスのデバイスIDは物理デバイスに割り当てられたデバイスIDにサブユニット番号+1(1～255)を加えたものとなる。</P
+><PRE
+CLASS="synopsis"
+>&#13;devid: 登録時に割り当てられたデバイスID
+
+devid           物理デバイス
+devid + n+1     n 番目のサブユニット(論理デバイス)
+</PRE
+><DIV
+CLASS="example"
+><A
+NAME="AEN19019"
+></A
+><P
+><B
+>例 2. デバイスIDの例</B
+></P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19021"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>デバイス名</TH
+><TH
+>デバイスID</TH
+><TH
+>説明</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>hda</TD
+><TD
+>devid</TD
+><TD
+>ハードディスク(ディスク全体)</TD
+></TR
+><TR
+><TD
+>hda0</TD
+><TD
+>devid + 1</TD
+><TD
+>ハードディスクの先頭の区画</TD
+></TR
+><TR
+><TD
+>hda1</TD
+><TD
+>devid + 2</TD
+><TD
+>ハードディスクの２番目の区画</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19041"
+>デバイス属性 (ATR型)</A
+></H4
+><P
+>各デバイスの特徴を表すとともに、デバイスの種類分けを行うため、デバイス属性を定義する。デバイス属性は、デバイスドライバを登録する際に指定する。</P
+><P
+>デバイス属性の指定方法は、次の通りである。</P
+><PRE
+CLASS="synopsis"
+>&#13;IIII IIII IIII IIII PRxx xxxx KKKK KKKK
+</PRE
+><P
+>上位16ビットは、デバイス依存属性で、デバイスごとに定義される。下位16ビットは、標準属性で、下記のように定義される。
+<PRE
+CLASS="programlisting"
+>&#13;#define TD_PROTECT      0x8000  /* P: 書込み禁止 */
+#define TD_REMOVABLE    0x4000  /* R: メディアの取り外し可能 */
+
+#define TD_DEVKIND      0x00ff  /* K: デバイス/メディア種別 */
+#define TD_DEVTYPE      0x00f0  /*    デバイスタイプ */
+
+                                /* デバイスタイプ */
+#define TDK_UNDEF       0x0000  /* 未定義/不明 */
+#define TDK_DISK        0x0010  /* ディスクデバイス */
+</PRE
+>
+
+</P
+><P
+>μT-Kernelの範囲では、ディスクタイプ以外のデバイスタイプは定義されておらず、ディスクタイプ以外のデバイスタイプを定義しても、μT-Kernelの動作には影響しない。未定義のデバイスは、未定義 <TT
+CLASS="literal"
+>TDK_UNDEF</TT
+> とする。</P
+><P
+>ディスクデバイスの場合には、さらに、ディスク種別が定義される。代表的なディスク種別は以下の通りである。
+<PRE
+CLASS="programlisting"
+>&#13;/* ディスク種別 */
+#define TDK_DISK_UNDEF  0x0010  /* その他のディスク */
+#define TDK_DISK_RAM    0x0011  /* RAMディスク(主メモリ使用) */
+#define TDK_DISK_ROM    0x0012  /* ROMディスク(主メモリ使用) */
+#define TDK_DISK_FLA    0x0013  /* Flash ROM、その他のシリコンディスク */
+#define TDK_DISK_FD     0x0014  /* フロッピーディスク */
+#define TDK_DISK_HD     0x0015  /* ハードディスク */
+#define TDK_DISK_CDROM  0x0016  /* CD-ROM */
+</PRE
+>
+</P
+><P
+>ディスク種別の定義は、μT-Kernelの動作には影響しない。これらの定義は、デバイスドライバやアプリケーションにおいて、必要な場合にのみ利用する。たとえば、アプリケーションがデバイスやメディアの種類によって処理内容を変える必要がある場合に、ディスク種別の情報を利用する。特に明確な区別をする必要がないデバイスやメディアに対しては、必ずしもディスク種別を割り当てる必要はない。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19053"
+>デバイスディスクリプタ (ID型)</A
+></H4
+><P
+>デバイスディスクリプタは、デバイスをアクセスするための識別子である。</P
+><P
+>デバイスディスクリプタは、デバイスをオープンしたときに、μT-Kernel/SMによって正の値(&#62;0)が割り当てられる。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19057"
+>リクエストID (ID型)</A
+></H4
+><P
+>デバイスに対する入出力を要求したときには、その要求の識別子として、リクエストID(&#62;0)が割り当てられる。このリクエストIDにより入出力の完了を待つことができる。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19060"
+>データ番号 (W型, D型)</A
+></H4
+><P
+>デバイスから入出力するデータはデータ番号により指定する。データは固有データと属性データに大別される。</P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>固有データ：データ番号≧0</DT
+><DD
+><P
+>デバイス固有のデータで、データ番号はデバイスごとに定義される。<DIV
+CLASS="example"
+><A
+NAME="AEN19068"
+></A
+><P
+><B
+>例 3. 固有データの例</B
+></P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19070"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>デバイス</TH
+><TH
+>データ番号</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>ディスク</TD
+><TD
+>データ番号＝物理ブロック番号</TD
+></TR
+><TR
+><TD
+>シリアル回線</TD
+><TD
+>データ番号は0のみ使用</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></P
+></DD
+><DT
+>属性データ：データ番号＜0</DT
+><DD
+><P
+>ドライバやデバイスの状態の取得や設定、特殊機能などを指定する。</P
+><P
+>データ番号のいくつかは共通で定義されているが、デバイス独自にも定義できる。詳細は<A
+HREF="device_management_functions.html#attribute_data_device_management"
+><I
+>属性データ</I
+>項</A
+>を参照。</P
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="attribute_data_device_management"
+>属性データ</A
+></H3
+><P
+>属性データは大きく次の3つに分類される。<P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>共通属性</DT
+><DD
+><P
+>すべてのデバイス(デバイスドライバ)に共通に定義する属性。</P
+></DD
+><DT
+>デバイス種別属性</DT
+><DD
+><P
+>同じ種類に分類されるデバイス(デバイスドライバ)に共通に定義する属性。</P
+></DD
+><DT
+>デバイス個別属性</DT
+><DD
+><P
+>各デバイス(デバイスドライバ)ごとに独自に定義される属性。</P
+></DD
+></DL
+></DIV
+></P
+><P
+>デバイス種別属性およびデバイス個別属性については、デバイスドライバの仕様書で定める。ここでは、共通属性のみ定義する。</P
+><P
+>共通属性の属性データ番号は -1～-99 の範囲となる。共通属性のデータ番号はすべてのデバイスで共通となるが、すべてのデバイスが必ずしもすべての共通属性に対応しているとは限らない。対応していないデータ番号を指定されたときは、エラー <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> とする。</P
+><P
+>共通属性の定義は、以下の通りである。
+<PRE
+CLASS="programlisting"
+>&#13;#define TDN_EVENT       (-1)    /* RW:事象通知用メッセージバッファID */
+#define TDN_DISKINFO    (-2)    /* R-:ディスク情報 */
+#define TDN_DISPSPEC    (-3)    /* reserved */
+#define TDN_PCMCIAINFO  (-4)    /* reserved */
+#define TDN_DISKINFO_D  (-5)    /* R-:ディスク情報(64ビットデバイス) */
+</PRE
+>
+
+            <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>RW: 読込み(<A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+>)/書込み(<A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+>)可能</TD
+></TR
+><TR
+><TD
+>R-: 読込み(<A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+>)のみ可能</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+            <P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+><TT
+CLASS="literal"
+>TDN_EVENT</TT
+></DT
+><DD
+><P
+>事象通知用メッセージバッファID</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19122"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="67%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>データ形式</TD
+><TD
+>ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>デバイス事象通知用のメッセージバッファのIDである。</P
+><P
+>デバイスドライバの起動時には、<A
+HREF="device_management_functions.html#tk_def_dev"
+>tk_def_dev</A
+> によってデバイスの登録を行うが、このAPIのリターンパラメータとしてシステムデフォルトの事象通知用メッセージバッファID(<CODE
+CLASS="varname"
+>evtmbfid</CODE
+>)が返されるので、その値をデバイスドライバ内で保持し、本属性データの初期値とする。</P
+><P
+>0が設定されている場合は、デバイス事象通知を行わない。デバイス事象通知については、<A
+HREF="device_management_functions.html#device_event_notification_device_management"
+><I
+>デバイス事象通知</I
+>項</A
+>を参照。</P
+></DD
+><DT
+><TT
+CLASS="literal"
+>TDN_DISKINFO</TT
+></DT
+><DD
+><P
+>32ビットデバイス・ディスク情報</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19141"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="67%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>データ形式</TD
+><TD
+>DiskInfo</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><PRE
+CLASS="programlisting"
+>&#13;typedef enum {
+        DiskFmt_STD     = 0,            /* 標準(HDなど) */
+        DiskFmt_CDROM   = 4             /* CD-ROM 640MB */
+} DiskFormat;
+</PRE
+><PRE
+CLASS="programlisting"
+>&#13;typedef struct {
+        DiskFormat format;              /* フォーマット形式 */
+        UW      protect:1;              /* プロテクト状態 */
+        UW      removable:1;            /* 取り外し可否 */
+        UW      rsv:30;                 /* 予約 (常に0) */
+        W       blocksize;              /* ブロックバイト数 */
+        W       blockcont;              /* 総ブロック数 */
+} DiskInfo;
+</PRE
+><P
+>上記の記載以外のDiskFormatの定義については、デバイスドライバ関連の仕様書を参照のこと。</P
+></DD
+><DT
+><TT
+CLASS="literal"
+>TDN_DISPSPEC</TT
+></DT
+><DD
+><P
+>表示デバイス仕様</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19157"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="67%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>データ形式</TD
+><TD
+>DEV_SPEC</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>DEV_SPECの定義については、デバイスドライバ関連の仕様書を参照のこと。</P
+></DD
+><DT
+><TT
+CLASS="literal"
+>TDN_DISKINFO_D</TT
+></DT
+><DD
+><P
+>64ビットデバイス・ディスク情報</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19171"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="67%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>データ形式</TD
+><TD
+>DiskInfo_D</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><PRE
+CLASS="programlisting"
+>&#13;typedef struct diskinfo_d {
+        DiskFormat format;      /* フォーマット形式 */
+        BOOL    protect:1;      /* プロテクト状態 */
+        BOOL    removable:1;    /* 取り外し可否 */
+        UW      rsv:30;         /* 予約 (0) */
+        W       blocksize;      /* ブロックバイト数 */
+        D       blockcont_d;    /* 64ビットの総ブロック数 */
+} DiskInfo_D;
+</PRE
+><P
+>DiskInfo_DとDiskInfoとの差異は、<CODE
+CLASS="varname"
+>blockcont</CODE
+> あるいは <CODE
+CLASS="varname"
+>blockcont_d</CODE
+> の部分の名称およびデータタイプのみである。</P
+><P
+>μT-Kernel/SMは、DiskInfoとDiskInfo_Dの間の変換は行わない。<TT
+CLASS="literal"
+>TDN_DISKINFO</TT
+> も <TT
+CLASS="literal"
+>TDN_DISKINFO_D</TT
+> も、デバイスドライバへの要求をそのまま渡すのみである。</P
+><P
+>ディスクドライバは、<TT
+CLASS="literal"
+>TDN_DISKINFO</TT
+> または <TT
+CLASS="literal"
+>TDN_DISKINFO_D</TT
+> のいずれか一方、または両方に対応する必要がある。<TT
+CLASS="literal"
+>TDN_DISKINFO</TT
+> は可能な限り対応することを推奨する。</P
+><P
+>ディスク全体の総ブロック数がWに収まらない場合でも、個々の区画のブロック数はWに収まることがある。そのような場合、Wに収まる区画は <TT
+CLASS="literal"
+>TDN_DISKINFO</TT
+> に対応し、Wに収まらないもののみ <TT
+CLASS="literal"
+>TDN_DISKINFO</TT
+> はエラー(<SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>)とするような実装が望ましい。また、ブロック数がWに収まる場合であっても、<TT
+CLASS="literal"
+>TDN_DISKINFO_D</TT
+> に対応することは望ましいことである。</P
+><P
+><TT
+CLASS="literal"
+>TDN_DISKINFO_D</TT
+> への対応とデバイスドライバ属性の <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> には直接の依存関係がない。<TT
+CLASS="literal"
+>TDN_DISKINFO_D</TT
+> に対応しているからといって <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> 属性のデバイスドライバであるとは限らないし、<TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> 属性のデバイスドライバであっても <TT
+CLASS="literal"
+>TDN_DISKINFO_D</TT
+> に対応しているとは限らない。</P
+></DD
+></DL
+></DIV
+></P
+><P
+>なお、上記の共通属性の定義は、μT-Kernelではなくデバイスドライバの仕様の一部を定めるものであり、μT-Kernelの動作には直接影響しない。また、各デバイスドライバは、共通属性に定義されたすべての機能を実装する必要はない。しかし、共通属性の定義はすべてのデバイスドライバに対して有効であり、各デバイスドライバの仕様は、これらの定義と矛盾のないように定める必要がある。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="io_operation_of_device"
+>デバイスの入出力操作</A
+></H2
+><P
+>登録済みのデバイスドライバをアプリケーションやミドルウェアから利用するためには、アプリケーションインタフェースを使用する。アプリケーションインタフェースには下記の関数がある。これらの関数は、タスク独立部およびディスパッチ禁止中、割込み禁止中に呼び出すことはできない(<SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>)。</P
+><PRE
+CLASS="programlisting"
+>&#13;ID  tk_opn_dev( CONST UB *devnm, UINT omode )
+ER  tk_cls_dev( ID dd, UINT option )
+ID  tk_rea_dev( ID dd, W start, void *buf, SZ size, TMO tmout )
+ID  tk_rea_dev_du( ID dd, D start_d, void *buf, SZ size, TMO_U tmout_u )
+ER  tk_srea_dev( ID dd, W start, void *buf, SZ size, SZ *asize )
+ER  tk_srea_dev_d( ID dd, D start_d, void *buf, SZ size, SZ *asize )
+ID  tk_wri_dev( ID dd, W start, CONST void *buf, SZ size, TMO tmout )
+ID  tk_wri_dev_du( ID dd, D start_d, CONST void *buf, SZ size, TMO_U tmout_u )
+ER  tk_swri_dev( ID dd, W start, CONST void *buf, SZ size, SZ *asize )
+ER  tk_swri_dev_d( ID dd, D start_d, CONST void *buf, SZ size, SZ *asize )
+ID  tk_wai_dev( ID dd, ID reqid, SZ *asize, ER *ioer, TMO tmout )
+ID  tk_wai_dev_u( ID dd, ID reqid, SZ *asize, ER *ioer, TMO_U tmout_u )
+INT tk_sus_dev( UINT mode )
+ID  tk_get_dev( ID devid, UB *devnm )
+ID  tk_ref_dev( CONST UB *devnm, T_RDEV *rdev )
+ID  tk_oref_dev( ID dd, T_RDEV *rdev )
+INT tk_lst_dev( T_LDEV *ldev, INT start, INT ndev )
+INT tk_evt_dev( ID devid, INT evttyp, void *evtinf )
+</PRE
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_opn_dev"
+>tk_opn_dev - デバイスのオープン</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19210"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN19212"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID dd = tk_opn_dev</CODE
+>(CONST UB *devnm, UINT omode);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19221"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19223"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST UB*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devnm</CODE
+>
+              </TD
+><TD
+>Device Name</TD
+><TD
+>デバイス名</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>omode</CODE
+>
+              </TD
+><TD
+>Open Mode</TD
+><TD
+>オープンモード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19242"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19244"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dd</CODE
+>
+              </TD
+><TD
+>Device Descriptor</TD
+><TD
+>デバイスディスクリプタ</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19261"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19263"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_BUSY</SPAN
+>
+              </TD
+><TD
+>デバイスは使用中(排他オープン中)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>デバイスは存在しない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>オープン可能な最大数を超えた</TD
+></TR
+><TR
+><TD
+>その他</TD
+><TD
+>デバイスドライバから返されたエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19283"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19285"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19300"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19303"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>devnm</CODE
+> で指定したデバイスを <CODE
+CLASS="varname"
+>omode</CODE
+> で指定したモードでオープンし、デバイスへのアクセスを準備する。戻値に、デバイスディスクリプタを返す。</P
+><PRE
+CLASS="synopsis"
+>&#13;omode := (TD_READ || TD_WRITE || TD_UPDATE) | [TD_EXCL || TD_WEXCL || TD_REXCL]
+</PRE
+><PRE
+CLASS="programlisting"
+>&#13;#define TD_READ         0x0001          /* 読込み専用 */
+#define TD_WRITE        0x0002          /* 書込み専用 */
+#define TD_UPDATE       0x0003          /* 読込みおよび書込み */
+#define TD_EXCL         0x0100          /* 排他 */
+#define TD_WEXCL        0x0200          /* 排他書込み */
+#define TD_REXCL        0x0400          /* 排他読込み */
+</PRE
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+><TT
+CLASS="literal"
+>TD_READ</TT
+></DT
+><DD
+><P
+>読込み専用</P
+></DD
+><DT
+><TT
+CLASS="literal"
+>TD_WRITE</TT
+></DT
+><DD
+><P
+>書込み専用</P
+></DD
+><DT
+><TT
+CLASS="literal"
+>TD_UPDATE</TT
+></DT
+><DD
+><P
+>読込みおよび書込み</P
+><P
+>アクセスモードを指定する。</P
+><P
+><TT
+CLASS="literal"
+>TD_READ</TT
+> の場合は、<A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+> は使用できない。</P
+><P
+><TT
+CLASS="literal"
+>TD_WRITE</TT
+> の場合は、<A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+> は使用できない。</P
+></DD
+><DT
+><TT
+CLASS="literal"
+>TD_EXCL</TT
+></DT
+><DD
+><P
+>排他</P
+></DD
+><DT
+><TT
+CLASS="literal"
+>TD_WEXCL</TT
+></DT
+><DD
+><P
+>排他書込み</P
+></DD
+><DT
+><TT
+CLASS="literal"
+>TD_REXCL</TT
+></DT
+><DD
+><P
+>排他読込み</P
+><P
+>排他モードを指定する。</P
+><P
+><TT
+CLASS="literal"
+>TD_EXCL</TT
+> は、一切の同時オープンを禁止する。</P
+><P
+><TT
+CLASS="literal"
+>TD_WEXCL</TT
+> は、書込みモード(<TT
+CLASS="literal"
+>TD_WRITE</TT
+> または <TT
+CLASS="literal"
+>TD_UPDATE</TT
+>)による同時オープンを禁止する。</P
+><P
+><TT
+CLASS="literal"
+>TD_REXCL</TT
+> は、読込みモード(<TT
+CLASS="literal"
+>TD_READ</TT
+> または <TT
+CLASS="literal"
+>TD_UPDATE</TT
+>)による同時オープンを禁止する。</P
+><DIV
+CLASS="table"
+><A
+NAME="table_tk_opn_dev"
+></A
+><P
+><B
+>表 1. 同じデバイスを同時にオープンしようとしたときの可否</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="19%"
+TITLE="c1"><COL
+WIDTH="6%"
+TITLE="c2"><COL
+WIDTH="6%"
+TITLE="c3"><COL
+WIDTH="6%"
+TITLE="c4"><COL
+WIDTH="6%"
+TITLE="c5"><COL
+WIDTH="6%"
+TITLE="c6"><COL
+WIDTH="6%"
+TITLE="c7"><COL
+WIDTH="6%"
+TITLE="c8"><COL
+WIDTH="6%"
+TITLE="c9"><COL
+WIDTH="6%"
+TITLE="c10"><COL
+WIDTH="6%"
+TITLE="c11"><COL
+WIDTH="6%"
+TITLE="c12"><COL
+WIDTH="6%"
+TITLE="c13"><COL
+WIDTH="6%"
+TITLE="c14"><TBODY
+VALIGN="top"
+><TR
+><TD
+COLSPAN="2"
+ROWSPAN="3"
+VALIGN="middle"
+>現在オープンモード</TD
+><TD
+COLSPAN="12"
+ALIGN="center"
+>同時オープンモード</TD
+></TR
+><TR
+><TD
+COLSPAN="3"
+ALIGN="center"
+>排他指定なし</TD
+><TD
+COLSPAN="3"
+ALIGN="center"
+>TD_WEXCL</TD
+><TD
+COLSPAN="3"
+ALIGN="center"
+>TD_REXCL</TD
+><TD
+COLSPAN="3"
+ALIGN="center"
+>TD_EXCL</TD
+></TR
+><TR
+><TD
+ALIGN="center"
+>R</TD
+><TD
+ALIGN="center"
+>U</TD
+><TD
+ALIGN="center"
+>W</TD
+><TD
+ALIGN="center"
+>R</TD
+><TD
+ALIGN="center"
+>U</TD
+><TD
+ALIGN="center"
+>W</TD
+><TD
+ALIGN="center"
+>R</TD
+><TD
+ALIGN="center"
+>U</TD
+><TD
+ALIGN="center"
+>W</TD
+><TD
+ALIGN="center"
+>R</TD
+><TD
+ALIGN="center"
+>U</TD
+><TD
+ALIGN="center"
+>W</TD
+></TR
+><TR
+><TD
+ROWSPAN="3"
+VALIGN="middle"
+>排他指定なし</TD
+><TD
+ALIGN="center"
+>R</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+><TR
+><TD
+ALIGN="center"
+>Ｕ</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+><TR
+><TD
+ALIGN="center"
+>Ｗ</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+><TR
+><TD
+ROWSPAN="3"
+VALIGN="middle"
+>TD_WEXCL</TD
+><TD
+ALIGN="center"
+>R</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+><TR
+><TD
+ALIGN="center"
+>Ｕ</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+><TR
+><TD
+ALIGN="center"
+>Ｗ</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+><TR
+><TD
+ROWSPAN="3"
+VALIGN="middle"
+>TD_REXCL</TD
+><TD
+ALIGN="center"
+>R</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+><TR
+><TD
+ALIGN="center"
+>Ｕ</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+><TR
+><TD
+ALIGN="center"
+>Ｗ</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+><TR
+><TD
+ROWSPAN="3"
+VALIGN="middle"
+>TD_EXCL</TD
+><TD
+ALIGN="center"
+>R</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+><TR
+><TD
+ALIGN="center"
+>Ｕ</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+><TR
+><TD
+ALIGN="center"
+>Ｗ</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><PRE
+CLASS="synopsis"
+>&#13;R = TD_READ
+W = TD_WRITE
+U = TD_UPDATE
+○ = オープン可
+× = オープン不可(E_BUSY)
+</PRE
+></DD
+></DL
+></DIV
+><P
+>なお、物理デバイスをオープンした場合、その物理デバイスに属する論理デバイスをすべて同じモードでオープンしたのと同様に扱い、排他オープンの処理が行われる。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_cls_dev"
+>tk_cls_dev - デバイスのクローズ</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19574"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN19576"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_cls_dev</CODE
+>(ID dd, UINT option);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19585"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19587"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dd</CODE
+>
+              </TD
+><TD
+>Device Descriptor</TD
+><TD
+>デバイスディスクリプタ</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>option</CODE
+>
+              </TD
+><TD
+>Close Option</TD
+><TD
+>クローズオプション</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19606"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19608"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19621"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19623"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>dd</CODE
+> が不正またはオープンされていない</TD
+></TR
+><TR
+><TD
+>その他</TD
+><TD
+>デバイスドライバから返されたエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19636"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19638"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19653"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19656"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>dd</CODE
+> のデバイスディスクリプタをクローズする。処理中の要求があった場合は、その処理を中止させてクローズする。</P
+><PRE
+CLASS="synopsis"
+>&#13;option := [TD_EJECT]
+</PRE
+><PRE
+CLASS="programlisting"
+>&#13;#define TD_EJECT        0x0001          /* メディア排出 */
+</PRE
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+><TT
+CLASS="literal"
+>TD_EJECT</TT
+></DT
+><DD
+><P
+>メディア排出</P
+><P
+>同一デバイスが他からオープンされていなければ、メディアを排出する。ただし、メディアの排出ができないデバイスでは無視される。</P
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_rea_dev"
+>tk_rea_dev - デバイスの読込み開始</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19671"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN19673"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID reqid = tk_rea_dev</CODE
+>(ID dd, W start, void *buf, SZ size, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19688"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19690"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dd</CODE
+>
+              </TD
+><TD
+>Device Descriptor</TD
+><TD
+>デバイスディスクリプタ</TD
+></TR
+><TR
+><TD
+>W</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>start</CODE
+>
+              </TD
+><TD
+>Start Location</TD
+><TD
+>読込み開始位置(≧0:固有データ, ＜0:属性データ)</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>buf</CODE
+>
+              </TD
+><TD
+>Buffer</TD
+><TD
+>読み込んだデータを格納するバッファ</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>size</CODE
+>
+              </TD
+><TD
+>Read Size</TD
+><TD
+>読み込むサイズ</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>要求受付待ちタイムアウト時間(ミリ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19727"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19729"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>reqid</CODE
+>
+              </TD
+><TD
+>Request ID</TD
+><TD
+>リクエストID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19746"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19748"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>dd</CODE
+> が不正またはオープンされていない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OACV</SPAN
+>
+              </TD
+><TD
+>オープンモードが不正(読込みが許可されていない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>最大リクエスト数を超えた</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>他の要求を処理中で受け付けられない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ABORT</SPAN
+>
+              </TD
+><TD
+>処理中止</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>その他</SPAN
+>
+              </TD
+><TD
+>デバイスドライバから返されたエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19778"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19780"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19795"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19798"
+>解説</A
+></H4
+><P
+>デバイスから固有データまたは属性データの読込みを開始する。読込みを開始するのみで、読込み完了を待たずに呼出元へ戻る。読込みが完了するまで、<CODE
+CLASS="varname"
+>buf</CODE
+> を保持しなければならない。読込み完了は <A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> により待つ。読込み開始のための処理にかかる時間はデバイスドライバにより異なる。必ずしも即座に戻るとは限らない。</P
+><P
+>固有データの場合、<CODE
+CLASS="varname"
+>start</CODE
+> および <CODE
+CLASS="varname"
+>size</CODE
+> の単位はデバイスごとに決められる。属性データの場合、<CODE
+CLASS="varname"
+>start</CODE
+> は属性データ番号、<CODE
+CLASS="varname"
+>size</CODE
+> はバイト数となり、<CODE
+CLASS="varname"
+>start</CODE
+> のデータ番号の属性データを読み込む。通常、<CODE
+CLASS="varname"
+>size</CODE
+> は読み込む属性データのサイズ以上でなければならない。複数の属性データを一度に読み込むことはできない。<CODE
+CLASS="varname"
+>size</CODE
+>＝0を指定した場合、実際の読込みは行わず、現時点で読込み可能なサイズを調べる。</P
+><P
+>読込みまたは書込みの動作中である場合、新たな要求を受け付けられるか否かはデバイスドライバによる。新たな要求を受け付けられない状態の場合、要求受付待ちとなる。要求受付待ちのタイムアウト時間を <CODE
+CLASS="varname"
+>tmout</CODE
+> に指定する。<CODE
+CLASS="varname"
+>tmout</CODE
+> には <TT
+CLASS="literal"
+>TMO_POL</TT
+> または <TT
+CLASS="literal"
+>TMO_FEVR</TT
+> を指定することもできる。なお、タイムアウトするのは要求受付までである。要求が受け付けられた後にはタイムアウトしない。</P
+><P
+><TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> や <TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> 属性のデバイスドライバに対して、本APIを使用しても構わない。その場合、μT-Kernel/SMの中でパラメータを適切に変換する。たとえば、デバイスドライバの属性が <TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> の場合、本APIの <CODE
+CLASS="varname"
+>tmout</CODE
+> で指定されたミリ秒単位のタイムアウト時間が、マイクロ秒単位の時間に換算された上で、<TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> 属性のデバイスドライバに渡される。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_rea_dev_du"
+>tk_rea_dev_du - デバイスの読込み開始(64ビットマイクロ秒単位)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19824"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN19826"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID reqid = tk_rea_dev_du</CODE
+>(ID dd, D start_d, void *buf, SZ size, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19841"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19843"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dd</CODE
+>
+              </TD
+><TD
+>Device Descriptor</TD
+><TD
+>デバイスディスクリプタ</TD
+></TR
+><TR
+><TD
+>D</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>start_d</CODE
+>
+              </TD
+><TD
+>Start Location</TD
+><TD
+>読込み開始位置(64ビット, ≧0:固有データ, ＜0:属性データ)</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>buf</CODE
+>
+              </TD
+><TD
+>Buffer</TD
+><TD
+>読み込んだデータを格納するバッファ</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>size</CODE
+>
+              </TD
+><TD
+>Read Size</TD
+><TD
+>読み込むサイズ</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>要求受付待ちタイムアウト時間(マイクロ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19880"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19882"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>reqid</CODE
+>
+              </TD
+><TD
+>Request ID</TD
+><TD
+>リクエストID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19899"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19901"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>dd</CODE
+> が不正またはオープンされていない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OACV</SPAN
+>
+              </TD
+><TD
+>オープンモードが不正(読込みが許可されていない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>最大リクエスト数を超えた</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>他の要求を処理中で受け付けられない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ABORT</SPAN
+>
+              </TD
+><TD
+>処理中止</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>その他</SPAN
+>
+              </TD
+><TD
+>デバイスドライバから返されたエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19931"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19933"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19948"
+>関連するサービスプロファイル</A
+></H4
+><P
+>以下のすべてのサービスプロファイルが有効に設定されている場合に限り、本APIはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN19951"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_LARGEDEV</TT
+>
+              </TD
+><TD
+>大容量デバイス(64ビット)のサポート</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>マイクロ秒のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19964"
+>解説</A
+></H4
+><P
+><A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+> のパラメータである <CODE
+CLASS="varname"
+>start</CODE
+> および <CODE
+CLASS="varname"
+>tmout</CODE
+> を、64ビットの <CODE
+CLASS="varname"
+>start_d</CODE
+> および64ビットマイクロ秒単位の <CODE
+CLASS="varname"
+>tmout_u</CODE
+> としたAPIである。</P
+><P
+>パラメータが <CODE
+CLASS="varname"
+>start_d</CODE
+> および <CODE
+CLASS="varname"
+>tmout_u</CODE
+> となった点を除き、本APIの仕様は <A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+> と同じである。詳細は <A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+> の説明を参照のこと。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19977"
+>補足事項</A
+></H4
+><P
+>対応するデバイスドライバが <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> 属性のデバイスドライバでない場合に、開始位置 <CODE
+CLASS="varname"
+>start_d</CODE
+> としてWに入りきらない値を指定すると、<SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> のエラーになる。</P
+><P
+>また、対応するデバイスドライバが <TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> 属性のデバイスドライバでない(マイクロ秒単位に対応していない)場合には、デバイスドライバがマイクロ秒単位のタイムアウトを扱うことができない。この場合は、本APIの <CODE
+CLASS="varname"
+>tmout_u</CODE
+> で指定されたマイクロ秒単位のタイムアウト時間が、ミリ秒単位の時間に切り上げられた上で、デバイスドライバに渡される。</P
+><P
+>このように、μT-Kernel/SMの中でパラメータの適切な変換を行うので、アプリケーション側では、デバイスドライバの属性が <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> かどうか、すなわちデバイスドライバが64ビット対応かどうかに関して意識する必要はない。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_srea_dev"
+>tk_srea_dev - デバイスの同期読込み</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN19990"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN19992"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_srea_dev</CODE
+>(ID dd, W start, void *buf, SZ size, SZ *asize);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20007"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20009"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dd</CODE
+>
+              </TD
+><TD
+>Device Descriptor</TD
+><TD
+>デバイスディスクリプタ</TD
+></TR
+><TR
+><TD
+>W</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>start</CODE
+>
+              </TD
+><TD
+>Start Location</TD
+><TD
+>読込み開始位置(≧0:固有データ, ＜0:属性データ)</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>buf</CODE
+>
+              </TD
+><TD
+>Buffer</TD
+><TD
+>読み込んだデータを格納するバッファ</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>size</CODE
+>
+              </TD
+><TD
+>Read Size</TD
+><TD
+>読み込むサイズ</TD
+></TR
+><TR
+><TD
+>SZ*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>asize</CODE
+>
+              </TD
+><TD
+>Actual Size</TD
+><TD
+>読込みサイズを返す領域へのポインタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20046"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20048"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>asize</CODE
+>
+              </TD
+><TD
+>Actual Size</TD
+><TD
+>実際の読込みサイズ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20067"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20069"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>dd</CODE
+> が不正またはオープンされていない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OACV</SPAN
+>
+              </TD
+><TD
+>オープンモードが不正(読込みが許可されていない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>最大リクエスト数を超えた</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ABORT</SPAN
+>
+              </TD
+><TD
+>処理中止</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>その他</SPAN
+>
+              </TD
+><TD
+>デバイスドライバから返されたエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20095"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20097"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20112"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20115"
+>解説</A
+></H4
+><P
+>同期読込み。以下と等価である。</P
+><PRE
+CLASS="programlisting"
+>&#13;ER tk_srea_dev( ID dd, W start, void *buf, SZ size, SZ *asize )
+{
+        ER      er, ioer;
+
+        er = tk_rea_dev(dd, start, buf, size, TMO_FEVR);
+        if ( er &#62; 0 ) {
+                er = tk_wai_dev(dd, er, asize, &#38;ioer, TMO_FEVR);
+                if ( er &#62; 0 ) er = ioer;
+        }
+
+        return er;
+}
+</PRE
+><P
+><TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> 属性のデバイスドライバに対して、本APIを使用しても構わない。その場合、μT-Kernel/SMの中でパラメータを適切に変換する。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_srea_dev_d"
+>tk_srea_dev_d - デバイスの同期読込み(64ビット)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20123"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN20125"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_srea_dev_d</CODE
+>(ID dd, D start_d, void *buf, SZ size, SZ *asize);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20140"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20142"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dd</CODE
+>
+              </TD
+><TD
+>Device Descriptor</TD
+><TD
+>デバイスディスクリプタ</TD
+></TR
+><TR
+><TD
+>D</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>start_d</CODE
+>
+              </TD
+><TD
+>Start Location</TD
+><TD
+>読込み開始位置(64ビット, ≧0:固有データ, ＜0:属性データ)</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>buf</CODE
+>
+              </TD
+><TD
+>Buffer</TD
+><TD
+>読み込んだデータを格納するバッファ</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>size</CODE
+>
+              </TD
+><TD
+>Read Size</TD
+><TD
+>読み込むサイズ</TD
+></TR
+><TR
+><TD
+>SZ*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>asize</CODE
+>
+              </TD
+><TD
+>Actual Size</TD
+><TD
+>読込みサイズを返す領域へのポインタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20179"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20181"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>asize</CODE
+>
+              </TD
+><TD
+>Actual Size</TD
+><TD
+>実際の読込みサイズ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20200"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20202"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>dd</CODE
+> が不正またはオープンされていない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OACV</SPAN
+>
+              </TD
+><TD
+>オープンモードが不正(読込みが許可されていない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>最大リクエスト数を超えた</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ABORT</SPAN
+>
+              </TD
+><TD
+>処理中止</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>その他</SPAN
+>
+              </TD
+><TD
+>デバイスドライバから返されたエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20228"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20230"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20245"
+>関連するサービスプロファイル</A
+></H4
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本APIはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20248"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_LARGEDEV</TT
+>
+              </TD
+><TD
+>大容量デバイス(64ビット)のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20257"
+>解説</A
+></H4
+><P
+><A
+HREF="device_management_functions.html#tk_srea_dev"
+>tk_srea_dev</A
+> のパラメータである <CODE
+CLASS="varname"
+>start</CODE
+> を、64ビットの <CODE
+CLASS="varname"
+>start_d</CODE
+> としたAPIである。</P
+><P
+>パラメータが <CODE
+CLASS="varname"
+>start_d</CODE
+> となった点を除き、本APIの仕様は <A
+HREF="device_management_functions.html#tk_srea_dev"
+>tk_srea_dev</A
+> と同じである。詳細は <A
+HREF="device_management_functions.html#tk_srea_dev"
+>tk_srea_dev</A
+> の説明を参照のこと。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20267"
+>補足事項</A
+></H4
+><P
+>対応するデバイスドライバが <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> 属性のデバイスドライバでない場合に、開始位置 <CODE
+CLASS="varname"
+>start_d</CODE
+> としてWに入りきらない値を指定すると、<SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> のエラーになる。</P
+><P
+>このように、μT-Kernel/SMの中でパラメータの適切な変換を行うので、アプリケーション側では、デバイスドライバの属性が <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> かどうか、すなわちデバイスドライバが64ビット対応かどうかに関して意識する必要はない。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_wri_dev"
+>tk_wri_dev - デバイスの書込み開始</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20277"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN20279"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID reqid = tk_wri_dev</CODE
+>(ID dd, W start, CONST void *buf, SZ size, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20294"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20296"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dd</CODE
+>
+              </TD
+><TD
+>Device Descriptor</TD
+><TD
+>デバイスディスクリプタ</TD
+></TR
+><TR
+><TD
+>W</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>start</CODE
+>
+              </TD
+><TD
+>Start Location</TD
+><TD
+>書込み開始位置(≧0:固有データ, ＜0:属性データ)</TD
+></TR
+><TR
+><TD
+>CONST void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>buf</CODE
+>
+              </TD
+><TD
+>Buffer</TD
+><TD
+>書き込むデータを格納したバッファ</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>size</CODE
+>
+              </TD
+><TD
+>Write Size</TD
+><TD
+>書き込むサイズ</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>要求受付待ちタイムアウト時間(ミリ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20333"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20335"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>reqid</CODE
+>
+              </TD
+><TD
+>Request ID</TD
+><TD
+>リクエストID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20352"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20354"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>dd</CODE
+> が不正またはオープンされていない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OACV</SPAN
+>
+              </TD
+><TD
+>オープンモードが不正(書込みが許可されていない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RONLY</SPAN
+>
+              </TD
+><TD
+>書き込めないデバイス</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>最大リクエスト数を超えた</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>他の要求を処理中で受け付けられない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ABORT</SPAN
+>
+              </TD
+><TD
+>処理中止</TD
+></TR
+><TR
+><TD
+>その他</TD
+><TD
+>デバイスドライバから返されたエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20387"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20389"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20404"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20407"
+>解説</A
+></H4
+><P
+>デバイスへ固有データまたは属性データの書込みを開始する。書込みを開始するのみで、書込み完了を待たずに呼出元へ戻る。書込みが完了するまで、<CODE
+CLASS="varname"
+>buf</CODE
+> を保持しなければならない。書込み完了は <A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> により待つ。書込み開始のための処理にかかる時間はデバイスドライバにより異なる。必ずしも即座に戻るとは限らない。</P
+><P
+>固有データの場合、<CODE
+CLASS="varname"
+>start</CODE
+> および <CODE
+CLASS="varname"
+>size</CODE
+> の単位はデバイスごとに決められる。属性データの場合、<CODE
+CLASS="varname"
+>start</CODE
+> は属性データ番号、<CODE
+CLASS="varname"
+>size</CODE
+> はバイト数となり、<CODE
+CLASS="varname"
+>start</CODE
+> のデータ番号の属性データに書き込む。通常、<CODE
+CLASS="varname"
+>size</CODE
+> は書き込む属性データのサイズと同じでなければならない。複数の属性データを一度に書き込むことはできない。<CODE
+CLASS="varname"
+>size</CODE
+>＝0を指定した場合、実際の書込みは行わず、現時点で書込み可能なサイズを調べる。</P
+><P
+>読込みまたは書込みの動作中である場合、新たな要求を受け付けられるか否かはデバイスドライバによる。新たな要求を受け付けられない状態の場合、要求受付待ちとなる。要求受付待ちのタイムアウト時間を <CODE
+CLASS="varname"
+>tmout</CODE
+> に指定する。<CODE
+CLASS="varname"
+>tmout</CODE
+> には <TT
+CLASS="literal"
+>TMO_POL</TT
+> または <TT
+CLASS="literal"
+>TMO_FEVR</TT
+> を指定することもできる。なお、タイムアウトするのは要求受付までである。要求が受け付けられた後にはタイムアウトしない。</P
+><P
+><TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> や <TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> 属性のデバイスドライバに対して、本APIを使用しても構わない。その場合、μT-Kernel/SMの中でパラメータを適切に変換する。たとえば、デバイスドライバの属性が <TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> の場合、本APIの <CODE
+CLASS="varname"
+>tmout</CODE
+> で指定されたミリ秒単位のタイムアウト時間が、マイクロ秒単位の時間に換算された上で、<TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> 属性のデバイスドライバに渡される。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_wri_dev_du"
+>tk_wri_dev_du - デバイスの書込み開始(64ビットマイクロ秒単位)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20433"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN20435"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID reqid = tk_wri_dev_du</CODE
+>(ID dd, D start_d, CONST void *buf, SZ size, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20450"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20452"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dd</CODE
+>
+              </TD
+><TD
+>Device Descriptor</TD
+><TD
+>デバイスディスクリプタ</TD
+></TR
+><TR
+><TD
+>D</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>start_d</CODE
+>
+              </TD
+><TD
+>Start Location</TD
+><TD
+>書込み開始位置(64ビット, ≧0:固有データ, ＜0:属性データ)</TD
+></TR
+><TR
+><TD
+>CONST void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>buf</CODE
+>
+              </TD
+><TD
+>Buffer</TD
+><TD
+>書き込むデータを格納したバッファ</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>size</CODE
+>
+              </TD
+><TD
+>Write Size</TD
+><TD
+>書き込むサイズ</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>要求受付待ちタイムアウト時間(マイクロ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20489"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20491"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>reqid</CODE
+>
+              </TD
+><TD
+>Request ID</TD
+><TD
+>リクエストID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20508"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20510"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>dd</CODE
+> が不正またはオープンされていない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OACV</SPAN
+>
+              </TD
+><TD
+>オープンモードが不正(書込みが許可されていない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RONLY</SPAN
+>
+              </TD
+><TD
+>書き込めないデバイス</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>最大リクエスト数を超えた</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>他の要求を処理中で受け付けられない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ABORT</SPAN
+>
+              </TD
+><TD
+>処理中止</TD
+></TR
+><TR
+><TD
+>その他</TD
+><TD
+>デバイスドライバから返されたエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20543"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20545"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20560"
+>関連するサービスプロファイル</A
+></H4
+><P
+>以下のすべてのサービスプロファイルが有効に設定されている場合に限り、本APIはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20563"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_LARGEDEV</TT
+>
+              </TD
+><TD
+>大容量デバイス(64ビット)のサポート</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>マイクロ秒のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20576"
+>解説</A
+></H4
+><P
+><A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+> のパラメータである <CODE
+CLASS="varname"
+>start</CODE
+> および <CODE
+CLASS="varname"
+>tmout</CODE
+> を、64ビットの <CODE
+CLASS="varname"
+>start_d</CODE
+> および64ビットマイクロ秒単位の <CODE
+CLASS="varname"
+>tmout_u</CODE
+> としたAPIである。</P
+><P
+>パラメータが <CODE
+CLASS="varname"
+>start_d</CODE
+> および <CODE
+CLASS="varname"
+>tmout_u</CODE
+> となった点を除き、本APIの仕様は <A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+> と同じである。詳細は <A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+> の説明を参照のこと。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20589"
+>補足事項</A
+></H4
+><P
+>対応するデバイスドライバが <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> 属性のデバイスドライバでない場合に、開始位置 <CODE
+CLASS="varname"
+>start_d</CODE
+> としてWに入りきらない値を指定すると、<SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> のエラーになる。</P
+><P
+>また、対応するデバイスドライバが <TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> 属性のデバイスドライバでない(マイクロ秒単位に対応していない)場合には、デバイスドライバがマイクロ秒単位のタイムアウトを扱うことができない。この場合は、本APIの <CODE
+CLASS="varname"
+>tmout_u</CODE
+> で指定されたマイクロ秒単位のタイムアウト時間が、ミリ秒単位の時間に切り上げられた上で、デバイスドライバに渡される。</P
+><P
+>このように、μT-Kernel/SMの中でパラメータの適切な変換を行うので、アプリケーション側では、デバイスドライバの属性が <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> かどうか、すなわちデバイスドライバが64ビット対応かどうかに関して意識する必要はない。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_swri_dev"
+>tk_swri_dev - デバイスの同期書込み</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20602"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN20604"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_swri_dev</CODE
+>(ID dd, W start, CONST void *buf, SZ size, SZ *asize);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20619"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20621"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dd</CODE
+>
+              </TD
+><TD
+>Device Descriptor</TD
+><TD
+>デバイスディスクリプタ</TD
+></TR
+><TR
+><TD
+>W</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>start</CODE
+>
+              </TD
+><TD
+>Start Location</TD
+><TD
+>書込み開始位置(≧0:固有データ,＜0:属性データ)</TD
+></TR
+><TR
+><TD
+>CONST void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>buf</CODE
+>
+              </TD
+><TD
+>Buffer</TD
+><TD
+>書き込むデータを格納したバッファ</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>size</CODE
+>
+              </TD
+><TD
+>Write Size</TD
+><TD
+>書き込むサイズ</TD
+></TR
+><TR
+><TD
+>SZ*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>asize</CODE
+>
+              </TD
+><TD
+>Actual Size</TD
+><TD
+>書込みサイズを返す領域へのポインタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20658"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20660"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>asize</CODE
+>
+              </TD
+><TD
+>Actual Size</TD
+><TD
+>実際の書込みサイズ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20679"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20681"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>dd</CODE
+> が不正またはオープンされていない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OACV</SPAN
+>
+              </TD
+><TD
+>オープンモードが不正(書込みが許可されていない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RONLY</SPAN
+>
+              </TD
+><TD
+>書き込めないデバイス</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>最大リクエスト数を超えた</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ABORT</SPAN
+>
+              </TD
+><TD
+>処理中止</TD
+></TR
+><TR
+><TD
+>その他</TD
+><TD
+>デバイスドライバから返されたエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20710"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20712"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20727"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20730"
+>解説</A
+></H4
+><P
+>同期書込み。以下と等価である。</P
+><PRE
+CLASS="programlisting"
+>&#13;ER tk_swri_dev( ID dd, W start, void *buf, SZ size, SZ *asize )
+{
+        ER      er, ioer;
+
+        er = tk_wri_dev(dd, start, buf, size, TMO_FEVR);
+        if ( er &#62; 0 ) {
+                er = tk_wai_dev(dd, er, asize, &#38;ioer, TMO_FEVR);
+                if ( er &#62; 0 ) er = ioer;
+        }
+
+        return er;
+}
+</PRE
+><P
+><TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> 属性のデバイスドライバに対して、本APIを使用しても構わない。その場合、μT-Kernel/SMの中でパラメータを適切に変換する。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_swri_dev_d"
+>tk_swri_dev_d - デバイスの同期書込み(64ビット)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20738"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN20740"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_swri_dev_d</CODE
+>(ID dd, D start_d, CONST void *buf, SZ size, SZ *asize);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20755"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20757"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dd</CODE
+>
+              </TD
+><TD
+>Device Descriptor</TD
+><TD
+>デバイスディスクリプタ</TD
+></TR
+><TR
+><TD
+>D</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>start_d</CODE
+>
+              </TD
+><TD
+>Start Location</TD
+><TD
+>書込み開始位置(64ビット, ≧0:固有データ, ＜0:属性データ)</TD
+></TR
+><TR
+><TD
+>CONST void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>buf</CODE
+>
+              </TD
+><TD
+>Buffer</TD
+><TD
+>書き込むデータを格納したバッファ</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>size</CODE
+>
+              </TD
+><TD
+>Write Size</TD
+><TD
+>書き込むサイズ</TD
+></TR
+><TR
+><TD
+>SZ*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>asize</CODE
+>
+              </TD
+><TD
+>Actual Size</TD
+><TD
+>書込みサイズを返す領域へのポインタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20794"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20796"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>asize</CODE
+>
+              </TD
+><TD
+>Actual Size</TD
+><TD
+>実際の書込みサイズ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20815"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20817"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>dd</CODE
+> が不正またはオープンされていない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OACV</SPAN
+>
+              </TD
+><TD
+>オープンモードが不正(書込みが許可されていない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RONLY</SPAN
+>
+              </TD
+><TD
+>書き込めないデバイス</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>最大リクエスト数を超えた</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ABORT</SPAN
+>
+              </TD
+><TD
+>処理中止</TD
+></TR
+><TR
+><TD
+>その他</TD
+><TD
+>デバイスドライバから返されたエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20846"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20848"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20863"
+>関連するサービスプロファイル</A
+></H4
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本APIはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20866"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_LARGEDEV</TT
+>
+              </TD
+><TD
+>大容量デバイス(64ビット)のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20875"
+>解説</A
+></H4
+><P
+><A
+HREF="device_management_functions.html#tk_swri_dev"
+>tk_swri_dev</A
+> のパラメータである <CODE
+CLASS="varname"
+>start</CODE
+> を、64ビットの <CODE
+CLASS="varname"
+>start_d</CODE
+> としたAPIである。</P
+><P
+>パラメータが <CODE
+CLASS="varname"
+>start_d</CODE
+> となった点を除き、本APIの仕様は <A
+HREF="device_management_functions.html#tk_swri_dev"
+>tk_swri_dev</A
+> と同じである。詳細は <A
+HREF="device_management_functions.html#tk_swri_dev"
+>tk_swri_dev</A
+> の説明を参照のこと。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20885"
+>補足事項</A
+></H4
+><P
+>対応するデバイスドライバが <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> 属性のデバイスドライバでない場合に、開始位置 <CODE
+CLASS="varname"
+>start_d</CODE
+> としてWに入りきらない値を指定すると、<SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> のエラーになる。</P
+><P
+>このように、μT-Kernel/SMの中でパラメータの適切な変換を行うので、アプリケーション側では、デバイスドライバの属性が <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> かどうか、すなわちデバイスドライバが64ビット対応かどうかに関して意識する必要はない。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_wai_dev"
+>tk_wai_dev - デバイスの要求完了待ち</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20895"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN20897"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID creqid = tk_wai_dev</CODE
+>(ID dd, ID reqid, SZ *asize, ER *ioer, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20912"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20914"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dd</CODE
+>
+              </TD
+><TD
+>Device Descriptor</TD
+><TD
+>デバイスディスクリプタ</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>reqid</CODE
+>
+              </TD
+><TD
+>Request ID</TD
+><TD
+>リクエストID</TD
+></TR
+><TR
+><TD
+>SZ*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>asize</CODE
+>
+              </TD
+><TD
+>Read/Write Actual Size</TD
+><TD
+>読込み/書込みサイズを返す領域へのポインタ</TD
+></TR
+><TR
+><TD
+>ER*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ioer</CODE
+>
+              </TD
+><TD
+>I/O Error</TD
+><TD
+>入出力エラーを返す領域へのポインタ</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト時間(ミリ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20951"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20953"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>creqid</CODE
+>
+              </TD
+><TD
+>Completed Request ID</TD
+><TD
+>完了したリクエストID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>asize</CODE
+>
+              </TD
+><TD
+>Read/Write Actual Size</TD
+><TD
+>実際の読込み/書込みサイズ</TD
+></TR
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ioer</CODE
+>
+              </TD
+><TD
+>I/O Error</TD
+><TD
+>入出力エラー</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN20982"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN20984"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>dd</CODE
+> が不正またはオープンされていない、<CODE
+CLASS="varname"
+>reqid</CODE
+> が不正または <CODE
+CLASS="varname"
+>dd</CODE
+> に対する要求ではない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>reqid</CODE
+> の要求は他のタスクで完了待ちしている</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>処理中の要求はない(<CODE
+CLASS="varname"
+>reqid</CODE
+>＝0の場合のみ)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>タイムアウト(処理継続中)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ABORT</SPAN
+>
+              </TD
+><TD
+>処理中止</TD
+></TR
+><TR
+><TD
+>その他</TD
+><TD
+>デバイスドライバから返されたエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21017"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21019"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21034"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21037"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>dd</CODE
+> に対する <CODE
+CLASS="varname"
+>reqid</CODE
+> の要求の完了を待つ。<CODE
+CLASS="varname"
+>reqid</CODE
+>＝0 の場合は、<CODE
+CLASS="varname"
+>dd</CODE
+> に対する要求の内のいずれかが完了するのを待つ。なお、現時点で処理中の要求のみが完了待ちの対象となる。<A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> の呼出後に要求された処理は完了待ちの対象とならない。</P
+><P
+>複数の要求を同時に処理している場合、その要求の完了の順序は必ずしも要求した順序ではなく、デバイスドライバに依存する。ただし、要求した順序で処理した場合と結果が矛盾しないような順序で処理されることは保証される。例えば、ディスクからの読込みの場合、次のような処理順序の変更が考えられる。</P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>要求順ブロック番号</DT
+><DD
+><P
+>1 4 3 2 5</P
+></DD
+><DT
+>処理順ブロック番号</DT
+><DD
+><P
+>1 2 3 4 5</P
+></DD
+></DL
+></DIV
+><P
+>このように順序を入れ替えて処理することにより、シークや回転待ちを減らすことができ、より効率的にディスクアクセスができる。</P
+><P
+><CODE
+CLASS="varname"
+>tmout</CODE
+> に完了待ちのタイムアウト時間を指定する。<TT
+CLASS="literal"
+>TMO_POL</TT
+> または <TT
+CLASS="literal"
+>TMO_FEVR</TT
+> を指定することもできる。タイムアウト(<SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>)した場合は要求された処理を継続中なので、再度 <A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> により完了を待つ必要がある。<CODE
+CLASS="varname"
+>reqid</CODE
+> &#62; 0かつ <CODE
+CLASS="varname"
+>tmout</CODE
+>＝<TT
+CLASS="literal"
+>TMO_FEVR</TT
+> の場合はタイムアウトすることはなく、必ず処理が完了する。</P
+><P
+>要求された処理に対して、デバイスドライバから処理結果のエラー(入出力エラーなど)が返った場合、そのエラーコードは、戻値ではなく <CODE
+CLASS="varname"
+>ioer</CODE
+> に格納される。具体的には、<A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> の処理のために呼び出された完了待ち関数 <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> の中で、要求パケットT_DEVREQの <CODE
+CLASS="varname"
+>error</CODE
+> に格納されたエラーコードが、処理結果のエラーとして <CODE
+CLASS="varname"
+>ioer</CODE
+> に返される。</P
+><P
+>一方、戻値には、要求の完了待ちが正しくできなかった場合にエラーを返す。戻値にエラーが返された場合、<CODE
+CLASS="varname"
+>ioer</CODE
+> の内容は無意味である。また、戻値にエラーが返された場合は処理を継続中なので、再度 <A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> により完了を待つ必要がある。詳細は「<A
+HREF="device_management_functions.html#waitfn"
+><I
+>waitfn - 完了待ち関数</I
+>項</A
+>」を参照のこと。</P
+><P
+><A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> で完了待ち中にタスク例外が発生すると、<CODE
+CLASS="varname"
+>reqid</CODE
+> の要求を中止して処理を完了させる。中止した処理の結果がどのようになるかは、デバイスドライバに依存する。ただし、<CODE
+CLASS="varname"
+>reqid</CODE
+>＝0の場合は、要求を中止することなくタイムアウトと同様に扱われる。この場合は、<SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> ではなく <SPAN
+CLASS="errorname"
+>E_ABORT</SPAN
+> を返す。</P
+><P
+>同じリクエストIDに対して、複数のタスクから同時に完了待ちすることはできない。<CODE
+CLASS="varname"
+>reqid</CODE
+>＝0で待っているタスクがあれば、同じ <CODE
+CLASS="varname"
+>dd</CODE
+> に対して他のタスクは完了待ちできない。同様に、<CODE
+CLASS="varname"
+>reqid</CODE
+> &#62; 0で待っているタスクがあれば、他のタスクで <CODE
+CLASS="varname"
+>reqid</CODE
+>＝0の完了待ちはできない。</P
+><P
+><TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> 属性のデバイスドライバに対して、本APIを使用しても構わない。その場合、μT-Kernel/SMの中でパラメータを適切に変換する。たとえば、デバイスドライバの属性が <TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> の場合、本APIの <CODE
+CLASS="varname"
+>tmout</CODE
+> で指定されたミリ秒単位のタイムアウト時間が、マイクロ秒単位の時間に換算された上で、<TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> 属性のデバイスドライバに渡される。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_wai_dev_u"
+>tk_wai_dev_u - デバイスの要求完了待ち(マイクロ秒単位)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21093"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN21095"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID creqid = tk_wai_dev_u</CODE
+>(ID dd, ID reqid, SZ *asize, ER *ioer, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21110"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21112"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dd</CODE
+>
+              </TD
+><TD
+>Device Descriptor</TD
+><TD
+>デバイスディスクリプタ</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>reqid</CODE
+>
+              </TD
+><TD
+>Request ID</TD
+><TD
+>リクエストID</TD
+></TR
+><TR
+><TD
+>SZ*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>asize</CODE
+>
+              </TD
+><TD
+>Read/Write Actual Size</TD
+><TD
+>読込み/書込みサイズを返す領域へのポインタ</TD
+></TR
+><TR
+><TD
+>ER*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ioer</CODE
+>
+              </TD
+><TD
+>I/O Error</TD
+><TD
+>入出力エラーを返す領域へのポインタ</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト時間(マイクロ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21149"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21151"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>creqid</CODE
+>
+              </TD
+><TD
+>Completed Request ID</TD
+><TD
+>完了したリクエストID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>asize</CODE
+>
+              </TD
+><TD
+>Read/Write Actual Size</TD
+><TD
+>実際の読込み/書込みサイズ</TD
+></TR
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ioer</CODE
+>
+              </TD
+><TD
+>I/O Error</TD
+><TD
+>入出力エラー</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21180"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21182"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>dd</CODE
+> が不正またはオープンされていない、<CODE
+CLASS="varname"
+>reqid</CODE
+> が不正または <CODE
+CLASS="varname"
+>dd</CODE
+> に対する要求ではない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>reqid</CODE
+> の要求は他のタスクで完了待ちしている</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>処理中の要求はない(<CODE
+CLASS="varname"
+>reqid</CODE
+>＝0の場合のみ)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>タイムアウト(処理継続中)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ABORT</SPAN
+>
+              </TD
+><TD
+>処理中止</TD
+></TR
+><TR
+><TD
+>その他</TD
+><TD
+>デバイスドライバから返されたエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21215"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21217"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21232"
+>関連するサービスプロファイル</A
+></H4
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本APIはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21235"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>マイクロ秒のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21244"
+>解説</A
+></H4
+><P
+><A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> のパラメータである <CODE
+CLASS="varname"
+>tmout</CODE
+> を、64ビットマイクロ秒単位の <CODE
+CLASS="varname"
+>tmout_u</CODE
+> としたAPIである。</P
+><P
+>パラメータが <CODE
+CLASS="varname"
+>tmout_u</CODE
+> となった点を除き、本APIの仕様は <A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> と同じである。詳細は <A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> の説明を参照のこと。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21254"
+>補足事項</A
+></H4
+><P
+>対応するデバイスドライバが <TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> 属性のデバイスドライバでない(マイクロ秒単位に対応していない)場合には、デバイスドライバがマイクロ秒単位のタイムアウトを扱うことができない。この場合は、本APIの <CODE
+CLASS="varname"
+>tmout_u</CODE
+> で指定されたマイクロ秒単位のタイムアウト時間が、ミリ秒単位の時間に切り上げられた上で、デバイスドライバに渡される。</P
+><P
+>このように、μT-Kernel/SMの中でパラメータの適切な変換を行うので、アプリケーション側では、デバイスドライバの属性が <TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> かどうか、すなわちデバイスドライバがマイクロ秒単位に対応かどうかに関して意識する必要はない。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_sus_dev"
+>tk_sus_dev - デバイスのサスペンド</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21263"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN21265"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT dissus = tk_sus_dev</CODE
+>(UINT mode);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21272"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21274"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mode</CODE
+>
+              </TD
+><TD
+>Mode</TD
+><TD
+>モード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21287"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21289"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dissus</CODE
+>
+              </TD
+><TD
+>Suspend Disable Request Count</TD
+><TD
+>サスペンド禁止要求カウント数</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21306"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21308"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_BUSY</SPAN
+>
+              </TD
+><TD
+>サスペンド禁止中</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_QOVR</SPAN
+>
+              </TD
+><TD
+>サスペンド禁止要求カウントオーバー</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21321"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21323"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21338"
+>関連するサービスプロファイル</A
+></H4
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本APIはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21341"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_LOWPOWER</TT
+>
+              </TD
+><TD
+>省電力機能のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21350"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>mode</CODE
+> にしたがって処理を行い、その処理を行ったあとのサスペンド禁止要求カウント数を戻値に返す。</P
+><PRE
+CLASS="synopsis"
+>&#13;mode := ( (TD_SUSPEND | [TD_FORCE]) || TD_DISSUS || TD_ENASUS || TD_CHECK)
+</PRE
+><PRE
+CLASS="programlisting"
+>&#13;#define TD_SUSPEND      0x0001      /* サスペンド */
+#define TD_DISSUS       0x0002      /* サスペンドを禁止 */
+#define TD_ENASUS       0x0003      /* サスペンドを許可 */
+#define TD_CHECK        0x0004      /* サスペンド禁止要求カウント取得 */
+#define TD_FORCE        0x8000      /* 強制サスペンド指定 */
+</PRE
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+><TT
+CLASS="literal"
+>TD_SUSPEND</TT
+></DT
+><DD
+><P
+>サスペンド</P
+><P
+>サスペンド許可状態であればサスペンドする。</P
+><P
+>サスペンド禁止状態であれば <SPAN
+CLASS="errorname"
+>E_BUSY</SPAN
+> を返す。</P
+></DD
+><DT
+><TT
+CLASS="literal"
+>TD_SUSPEND|TD_FORCE</TT
+></DT
+><DD
+><P
+>強制サスペンド</P
+><P
+>サスペンド禁止状態であってもサスペンドする。</P
+></DD
+><DT
+><TT
+CLASS="literal"
+>TD_DISSUS</TT
+></DT
+><DD
+><P
+>サスペンド禁止</P
+><P
+>サスペンドを禁止する。</P
+></DD
+><DT
+><TT
+CLASS="literal"
+>TD_ENASUS</TT
+></DT
+><DD
+><P
+>サスペンド許可</P
+><P
+>サスペンドを許可する。</P
+></DD
+><DT
+><TT
+CLASS="literal"
+>TD_CHECK</TT
+></DT
+><DD
+><P
+>サスペンド禁止カウント取得</P
+><P
+>サスペンド禁止要求を行っている回数の取得のみ行う。</P
+></DD
+></DL
+></DIV
+><P
+>サスペンドは、次の手順によって行われる。</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>各サブシステムのサスペンド開始前の処理</P
+><P
+><A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+>(0, <TT
+CLASS="literal"
+>TSEVT_SUSPEND_BEGIN</TT
+>, 0)</P
+></LI
+><LI
+><P
+>各デバイスのサスペンド処理</P
+></LI
+><LI
+><P
+>各サブシステムのサスペンド完了後の処理</P
+><P
+><A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+>(0, <TT
+CLASS="literal"
+>TSEVT_SUSPEND_DONE</TT
+>, 0)</P
+></LI
+><LI
+><P
+>サスペンド状態へ移行</P
+><P
+><A
+HREF="system_management_functions.html#tk_set_pow"
+>tk_set_pow</A
+>(<TT
+CLASS="literal"
+>TPW_DOSUSPEND</TT
+>)</P
+></LI
+></OL
+><P
+>リジューム(サスペンドからの復帰)は、次の手順によって行われる。</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>サスペンド状態から復帰</P
+><P
+><A
+HREF="system_management_functions.html#tk_set_pow"
+>tk_set_pow</A
+>(<TT
+CLASS="literal"
+>TPW_DOSUSPEND</TT
+>) から戻る</P
+></LI
+><LI
+><P
+>各サブシステムのリジューム開始前の処理</P
+><P
+><A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+>(0, <TT
+CLASS="literal"
+>TSEVT_RESUME_BEGIN</TT
+>, 0)</P
+></LI
+><LI
+><P
+>各デバイスのリジューム処理</P
+></LI
+><LI
+><P
+>各サブシステムのリジューム完了後の処理</P
+><P
+><A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+>(0, <TT
+CLASS="literal"
+>TSEVT_RESUME_DONE</TT
+>, 0)</P
+></LI
+></OL
+><P
+>サスペンド禁止は、その要求回数がカウントされる。同じ回数だけサスペンド許可を要求しないとサスペンドは許可されない。システム起動時はサスペンド許可(サスペンド禁止要求カウント＝0)である。サスペンド禁止要求カウントの上限は実装依存だが、最低255回まではカウントできるものとする。上限を超えた場合は <SPAN
+CLASS="errorname"
+>E_QOVR</SPAN
+> を返す。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_get_dev"
+>tk_get_dev - デバイスのデバイス名取得</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21431"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN21433"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID pdevid = tk_get_dev</CODE
+>(ID devid, UB *devnm);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21442"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21444"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devid</CODE
+>
+              </TD
+><TD
+>Device ID</TD
+><TD
+>デバイスID</TD
+></TR
+><TR
+><TD
+>UB*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devnm</CODE
+>
+              </TD
+><TD
+>Device Name</TD
+><TD
+>デバイス名の格納領域へのポインタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21463"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21465"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pdevid</CODE
+>
+              </TD
+><TD
+>Device ID of Physical Device</TD
+><TD
+>物理デバイスのデバイスID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devnm</CODE
+>
+              </TD
+><TD
+>Device Name</TD
+><TD
+>デバイス名</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21488"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21490"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>devid</CODE
+> のデバイスは存在しない</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21500"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21502"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21517"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21520"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>devid</CODE
+> で示すデバイスのデバイス名を取得し <CODE
+CLASS="varname"
+>devnm</CODE
+> に格納する。</P
+><P
+><CODE
+CLASS="varname"
+>devid</CODE
+> は物理デバイスのデバイスIDまたは論理デバイスのデバイスIDである。</P
+><P
+><CODE
+CLASS="varname"
+>devid</CODE
+> が物理デバイスであれば、<CODE
+CLASS="varname"
+>devnm</CODE
+> には物理デバイス名が格納される。</P
+><P
+><CODE
+CLASS="varname"
+>devid</CODE
+> が論理デバイスであれば、<CODE
+CLASS="varname"
+>devnm</CODE
+> には論理デバイス名が格納される。</P
+><P
+><CODE
+CLASS="varname"
+>devnm</CODE
+> は <TT
+CLASS="literal"
+>L_DEVNM</TT
+>+1 バイト以上の領域が必要である。</P
+><P
+>戻値には、<CODE
+CLASS="varname"
+>devid</CODE
+> のデバイスが属する物理デバイスのデバイスIDを返す。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_ref_dev"
+>tk_ref_dev - デバイスのデバイス情報取得</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21540"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN21542"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID devid = tk_ref_dev</CODE
+>(CONST UB *devnm, T_RDEV *rdev);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21551"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21553"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST UB*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devnm</CODE
+>
+              </TD
+><TD
+>Device Name</TD
+><TD
+>デバイス名</TD
+></TR
+><TR
+><TD
+>T_RDEV*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>rdev</CODE
+>
+              </TD
+><TD
+>Packet to Refer Device Information</TD
+><TD
+>デバイス情報を返す領域へのポインタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21572"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21574"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devid</CODE
+>
+              </TD
+><TD
+>Device ID</TD
+><TD
+>デバイスID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>rdev</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21593"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devatr</CODE
+>
+              </TD
+><TD
+>Device Attribute</TD
+><TD
+>デバイス属性</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>blksz</CODE
+>
+              </TD
+><TD
+>Block Size of Device-specific Data</TD
+><TD
+>固有データのブロックサイズ(-1:不明)</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>nsub</CODE
+>
+              </TD
+><TD
+>Subunit Count</TD
+><TD
+>サブユニット数</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>subno</CODE
+>
+              </TD
+><TD
+>Subunit Number</TD
+><TD
+>0:物理デバイス 1～nsub:サブユニット番号+1</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21626"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21628"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>devnm</CODE
+> のデバイスは存在しない</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21638"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21640"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21655"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21658"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>devnm</CODE
+> で示すデバイスのデバイス情報を取得し、<CODE
+CLASS="varname"
+>rdev</CODE
+> に格納する。<CODE
+CLASS="varname"
+>rdev</CODE
+>＝<TT
+CLASS="literal"
+>NULL</TT
+> とした場合には、デバイス情報は格納されない。</P
+><P
+><CODE
+CLASS="varname"
+>nsub</CODE
+> は、<CODE
+CLASS="varname"
+>devnm</CODE
+> で示すデバイスが属する物理デバイスのサブユニット数である。</P
+><P
+>戻値に <CODE
+CLASS="varname"
+>devnm</CODE
+> のデバイスのデバイスIDを返す。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_oref_dev"
+>tk_oref_dev - デバイスのデバイス情報取得</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21672"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN21674"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID devid = tk_oref_dev</CODE
+>(ID dd, T_RDEV *rdev);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21683"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21685"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dd</CODE
+>
+              </TD
+><TD
+>Device Descriptor</TD
+><TD
+>デバイスディスクリプタ</TD
+></TR
+><TR
+><TD
+>T_RDEV*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>rdev</CODE
+>
+              </TD
+><TD
+>Packet to Refer Device Information</TD
+><TD
+>デバイス情報を返す領域へのポインタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21704"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21706"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devid</CODE
+>
+              </TD
+><TD
+>Device ID</TD
+><TD
+>デバイスID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>rdev</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21725"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devatr</CODE
+>
+              </TD
+><TD
+>Device Attribute</TD
+><TD
+>デバイス属性</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>blksz</CODE
+>
+              </TD
+><TD
+>Block Size of Device-specific Data</TD
+><TD
+>固有データのブロックサイズ(-1:不明)</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>nsub</CODE
+>
+              </TD
+><TD
+>Subunit Count</TD
+><TD
+>サブユニット数</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>subno</CODE
+>
+              </TD
+><TD
+>Subunit Number</TD
+><TD
+>0:物理デバイス 1～nsub:サブユニット番号+1</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21758"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21760"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>dd</CODE
+> が不正またはオープンされていない</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21770"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21772"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21787"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21790"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>dd</CODE
+> で示すデバイスのデバイス情報を取得し、<CODE
+CLASS="varname"
+>rdev</CODE
+> に格納する。<CODE
+CLASS="varname"
+>rdev</CODE
+>＝<TT
+CLASS="literal"
+>NULL</TT
+> とした場合には、デバイス情報は格納されない。</P
+><P
+><CODE
+CLASS="varname"
+>nsub</CODE
+> は、<CODE
+CLASS="varname"
+>dd</CODE
+> で示すデバイスが属する物理デバイスのサブユニット数である。</P
+><P
+>戻値に <CODE
+CLASS="varname"
+>dd</CODE
+> のデバイスのデバイスIDを返す。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_lst_dev"
+>tk_lst_dev - 登録済みデバイス一覧の取得</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21804"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN21806"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT remcnt = tk_lst_dev</CODE
+>(T_LDEV *ldev, INT start, INT ndev);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21817"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21819"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>T_LDEV*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ldev</CODE
+>
+              </TD
+><TD
+>List of Devices</TD
+><TD
+>登録デバイス情報の格納領域(配列)</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>start</CODE
+>
+              </TD
+><TD
+>Starting Number</TD
+><TD
+>開始番号</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ndev</CODE
+>
+              </TD
+><TD
+>Number of Devices</TD
+><TD
+>取得数</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21844"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21846"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>remcnt</CODE
+>
+              </TD
+><TD
+>Remaining Device Count</TD
+><TD
+>残りの登録数</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>ldev</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21865"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devatr</CODE
+>
+              </TD
+><TD
+>Device Attribute</TD
+><TD
+>デバイス属性</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>blksz</CODE
+>
+              </TD
+><TD
+>Block Size of Device-specific Data</TD
+><TD
+>固有データのブロックサイズ(-1:不明)</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>nsub</CODE
+>
+              </TD
+><TD
+>Subunit Count</TD
+><TD
+>サブユニット数</TD
+></TR
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devnm[L_DEVNM]</CODE
+>
+              </TD
+><TD
+>Physical Device Name</TD
+><TD
+>物理デバイス名</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21898"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21900"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>start</CODE
+> が登録数を超えている</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21910"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21912"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21927"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21930"
+>解説</A
+></H4
+><P
+>登録済みのデバイスの情報を取得する。登録デバイスは物理デバイス単位で管理される。したがって、登録デバイス情報も物理デバイス単位で取得される。</P
+><P
+>登録デバイスの数がNの時、登録デバイスに0～N-1の連番を振る。この連番にしたがって、<CODE
+CLASS="varname"
+>start</CODE
+> 番目から <CODE
+CLASS="varname"
+>ndev</CODE
+> 個の登録情報を取得し、<CODE
+CLASS="varname"
+>ldev</CODE
+> に格納する。<CODE
+CLASS="varname"
+>ldev</CODE
+> は <CODE
+CLASS="varname"
+>ndev</CODE
+> 個の情報を格納するのに十分な大きさの領域でなければならない。戻値には、<CODE
+CLASS="varname"
+>start</CODE
+> 以降の残りの登録数(N-<CODE
+CLASS="varname"
+>start</CODE
+>)を返す。</P
+><P
+><CODE
+CLASS="varname"
+>start</CODE
+> 以降の残りが <CODE
+CLASS="varname"
+>ndev</CODE
+> 個に満たない場合は、残りのすべてを格納する。戻値≦<CODE
+CLASS="varname"
+>ndev</CODE
+> であれば、すべての登録情報が取得できたことを示す。なお、この連番はデバイスの登録・抹消があると変化する。したがって、複数回に分けて取得すると、正確な情報が得られない場合がある。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_evt_dev"
+>tk_evt_dev - デバイスにドライバ要求イベントを送信</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21947"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN21949"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT retcode = tk_evt_dev</CODE
+>(ID devid, INT evttyp, void *evtinf);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21960"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21962"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devid</CODE
+>
+              </TD
+><TD
+>Device ID</TD
+><TD
+>イベント送信先デバイスID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>evttyp</CODE
+>
+              </TD
+><TD
+>Event Type</TD
+><TD
+>ドライバ要求イベントタイプ</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>evtinf</CODE
+>
+              </TD
+><TD
+>Event Information</TD
+><TD
+>イベントタイプ別の情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN21987"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN21989"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>retcode</CODE
+>
+              </TD
+><TD
+>Return Code from eventfn</TD
+><TD
+><A
+HREF="device_management_functions.html#eventfn"
+>eventfn</A
+> からの戻値</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN22007"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22009"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>devid</CODE
+> のデバイスは存在しない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>デバイス管理内部イベント(<CODE
+CLASS="varname"
+>evttyp</CODE
+> &#60; 0)は指定できない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>その他</SPAN
+>
+              </TD
+><TD
+>デバイスドライバから返されたエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN22028"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22030"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN22045"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN22048"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>devid</CODE
+> のデバイス(デバイスドライバ)に、ドライバ要求イベントを送信する。</P
+><P
+>ドライバ要求イベントの機能(処理内容)および <CODE
+CLASS="varname"
+>evtinf</CODE
+> の内容はイベントタイプごとに定義される。ドライバ要求イベントについては、「<A
+HREF="device_management_functions.html#eventfn"
+><I
+>eventfn - イベント関数</I
+>項</A
+>」を参照のこと。</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="registration_of_device_driver"
+>デバイスドライバの登録</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="device_registration_device_management"
+>デバイスドライバの登録方法</A
+></H3
+><P
+>デバイスドライバは、物理デバイスごとに登録する。</P
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="tk_def_dev"
+>tk_def_dev - デバイスの登録</A
+></H4
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22062"
+>C言語インタフェース</A
+></H5
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN22064"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID devid = tk_def_dev</CODE
+>(CONST UB *devnm, CONST T_DDEV *ddev, T_IDEV *idev);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22075"
+>パラメータ</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22077"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST UB*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devnm</CODE
+>
+              </TD
+><TD
+>Physical Device Name</TD
+><TD
+>物理デバイス名</TD
+></TR
+><TR
+><TD
+>CONST T_DDEV*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ddev</CODE
+>
+              </TD
+><TD
+>Define Device</TD
+><TD
+>デバイス登録情報</TD
+></TR
+><TR
+><TD
+>T_IDEV*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>idev</CODE
+>
+              </TD
+><TD
+>Initial Device Information</TD
+><TD
+>デバイス初期情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22102"
+>リターンパラメータ</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22104"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devid</CODE
+>
+              </TD
+><TD
+>Device ID</TD
+><TD
+>デバイスID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>idev</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22123"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>evtmbfid</CODE
+>
+              </TD
+><TD
+>Event Notification Message Buffer ID</TD
+><TD
+>事象通知用メッセージバッファID</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22138"
+>エラーコード</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22140"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>登録可能な最大数を超えた</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>devnm</CODE
+> のデバイスは存在しない(<CODE
+CLASS="varname"
+>ddev</CODE
+>＝<TT
+CLASS="literal"
+>NULL</TT
+> の場合)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22156"
+>利用可能なコンテキスト</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22158"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22173"
+>関連するサービスプロファイル</A
+></H5
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22176"
+>解説</A
+></H5
+><P
+><CODE
+CLASS="varname"
+>devnm</CODE
+> のデバイス名でデバイス(デバイスドライバ)を登録し、登録したデバイスのデバイスIDを戻値に返す。<CODE
+CLASS="varname"
+>devnm</CODE
+> のデバイスがすでに登録されているときは、新しい登録情報で更新する。更新の場合は、デバイスIDは変更されない。</P
+><P
+><CODE
+CLASS="varname"
+>ddev</CODE
+> でデバイス登録情報を指定する。<CODE
+CLASS="varname"
+>ddev</CODE
+>＝<TT
+CLASS="literal"
+>NULL</TT
+> の場合は、<CODE
+CLASS="varname"
+>devnm</CODE
+> のデバイス登録を抹消する。</P
+><P
+><CODE
+CLASS="varname"
+>ddev</CODE
+> は次の形式の構造体である。
+<PRE
+CLASS="programlisting"
+>&#13;typedef struct t_ddev {
+        void    *exinf;   /* 拡張情報 */
+        ATR     drvatr;   /* ドライバ属性 */
+        ATR     devatr;   /* デバイス属性 */
+        INT     nsub;     /* サブユニット数 */
+        SZ      blksz;    /* 固有データのブロックサイズ (-1:不明) */
+        FP      openfn;   /* オープン関数 */
+        FP      closefn;  /* クローズ関数 */
+        FP      execfn;   /* 処理開始関数 */
+        FP      waitfn;   /* 完了待ち関数 */
+        FP      abortfn;  /* 中止処理関数 */
+        FP      eventfn;  /* イベント関数 */
+        /* 以下に実装独自の情報が追加される場合がある */
+} T_DDEV;
+</PRE
+>
+</P
+><P
+><CODE
+CLASS="varname"
+>exinf</CODE
+> は、任意の情報の格納に使用できる。この値は、各処理関数に渡される。内容に関してデバイス管理では関知しない。</P
+><P
+><CODE
+CLASS="varname"
+>drvatr</CODE
+> は、デバイスドライバの属性に関する情報を設定する。下位側がシステム属性を表し、上位側が実装独自属性を表す。実装独自属性は、T_DDEVに実装独自データを追加する場合に有効フラグを定義するためなどに使用する。
+<PRE
+CLASS="synopsis"
+>&#13;drvatr := [TDA_OPENREQ] ｜ [TDA_TMO_U] ｜ [TDA_DEV_D]
+</PRE
+>
+
+
+<PRE
+CLASS="programlisting"
+>&#13;#define TDA_OPENREQ     0x0001  /* 毎回オープン/クローズ */
+#define TDA_TMO_U       0x0002  /* マイクロ秒単位タイムアウト時間使用 */
+#define TDA_DEV_D       0x0004  /* 64ビットデバイス */
+</PRE
+>
+</P
+><P
+><CODE
+CLASS="varname"
+>drvatr</CODE
+> では、以下のドライバ属性を組み合わせて指定することができる。</P
+><P
+>&#13;        <TT
+CLASS="literal"
+>TDA_OPENREQ</TT
+>
+      </P
+><P
+>デバイスが多重オープンされた場合、通常は最初のオープン時に <A
+HREF="device_management_functions.html#openfn"
+>openfn</A
+> が呼び出され、最後のクローズ時に <A
+HREF="device_management_functions.html#closefn"
+>closefn</A
+> が呼び出される。<TT
+CLASS="literal"
+>TDA_OPENREQ</TT
+> を指定した場合、多重オープンの場合でもすべてのオープン／クローズ時に <A
+HREF="device_management_functions.html#openfn"
+>openfn</A
+>/<A
+HREF="device_management_functions.html#closefn"
+>closefn</A
+> が呼び出される。</P
+><P
+>&#13;        <TT
+CLASS="literal"
+>TDA_TMO_U</TT
+>
+      </P
+><P
+>マイクロ秒単位タイムアウト時間を使用することを示す。</P
+><P
+>この場合、ドライバ処理関数のタイムアウト指定 <CODE
+CLASS="varname"
+>tmout</CODE
+> がTMO_U型(マイクロ秒単位)となる。</P
+><P
+>&#13;        <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+>
+      </P
+><P
+>64ビットデバイスを使用することを示す。この場合、ドライバ処理関数の要求パケット <CODE
+CLASS="varname"
+>devreq</CODE
+> の型がT_DEVREQ_Dとなる。</P
+><P
+><TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> および <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> を指定した場合、ドライバ処理関数の一部の引数の型が変化する。このような引数の型を変化させるドライバ属性を複数組み合わせて指定した場合は、指定されたすべての型変化を行った引数を持つドライバ処理関数となる。</P
+><P
+><CODE
+CLASS="varname"
+>devatr</CODE
+> は、デバイス属性を設定する。デバイス属性の詳細については前述。</P
+><P
+><CODE
+CLASS="varname"
+>nsub</CODE
+> は、サブユニット数を設定する。サブユニットがない場合は0とする。</P
+><P
+><CODE
+CLASS="varname"
+>blksz</CODE
+> は、固有データのブロックサイズをバイト数で設定する。ディスクデバイスの場合は、物理ブロックサイズとなる。シリアル回線などは１バイトとなる。固有データのないデバイスでは0とする。未フォーマットのディスクなど、ブロックサイズが不明の場合は-1とする。<CODE
+CLASS="varname"
+>blksz</CODE
+>≦0の場合は、固有データにアクセスできない。<A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+>, <A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+> で固有データをアクセスする場合に、<CODE
+CLASS="varname"
+>size</CODE
+> * <CODE
+CLASS="varname"
+>blksz</CODE
+> がアクセスする領域サイズ、つまり <CODE
+CLASS="varname"
+>buf</CODE
+> のサイズとならなければならない。</P
+><P
+><A
+HREF="device_management_functions.html#openfn"
+>openfn</A
+>, <A
+HREF="device_management_functions.html#closefn"
+>closefn</A
+>, <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+>, <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+>, <A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+>, <A
+HREF="device_management_functions.html#eventfn"
+>eventfn</A
+> は、ドライバ処理関数のエントリーアドレスを設定する。ドライバ処理関数の詳細については、「<A
+HREF="device_management_functions.html#device_driver_interface_device_management"
+><I
+>デバイスドライバインタフェース</I
+>項</A
+>」を参照。</P
+><P
+><CODE
+CLASS="varname"
+>idev</CODE
+> にデバイス初期情報が返される。ここには、デバイスドライバ起動時のデフォルトとして設定するための情報などが返されるので、必要に応じて利用する。<CODE
+CLASS="varname"
+>idev</CODE
+>＝<TT
+CLASS="literal"
+>NULL</TT
+> とした場合には、デバイス初期情報は格納されない。</P
+><P
+><CODE
+CLASS="varname"
+>evtmbfid</CODE
+> は、システムデフォルトの事象通知用メッセージバッファIDである。システムデフォルトの事象通知用メッセージバッファがない場合は0が設定される。</P
+><P
+>デバイス登録および抹消が行われたとき、各サブシステムに対して次のように通知が行われる。<CODE
+CLASS="varname"
+>devid</CODE
+> は登録・抹消された、物理デバイスのデバイスIDである。</P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>デバイス登録・更新時</DT
+><DD
+><P
+><A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+>(0, <TT
+CLASS="literal"
+>TSEVT_DEVICE_REGIST</TT
+>, <CODE
+CLASS="varname"
+>devid</CODE
+>)</P
+></DD
+><DT
+>デバイス抹消時</DT
+><DD
+><P
+><A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+>(0, <TT
+CLASS="literal"
+>TSEVT_DEVICE_DELETE</TT
+>, <CODE
+CLASS="varname"
+>devid</CODE
+>)</P
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="tk_ref_idv"
+>tk_ref_idv - デバイス初期情報の取得</A
+></H4
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22262"
+>C言語インタフェース</A
+></H5
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN22264"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_idv</CODE
+>(T_IDEV *idev);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22271"
+>パラメータ</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22273"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>T_IDEV*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>idev</CODE
+>
+              </TD
+><TD
+>Packet to Refer Initial Device Information</TD
+><TD
+>デバイス初期情報を返す領域へのポインタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22286"
+>リターンパラメータ</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22288"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>idev</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22303"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>evtmbfid</CODE
+>
+              </TD
+><TD
+>Event Notification Message Buffer ID</TD
+><TD
+>事象通知用メッセージバッファID</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22318"
+>エラーコード</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22320"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_MACV</SPAN
+>
+              </TD
+><TD
+>メモリアクセス権違反</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22329"
+>利用可能なコンテキスト</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22331"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22346"
+>関連するサービスプロファイル</A
+></H5
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22349"
+>解説</A
+></H5
+><P
+>デバイス初期情報を取得する。<A
+HREF="device_management_functions.html#tk_def_dev"
+>tk_def_dev</A
+> で得られるものと同じ内容である。</P
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22353"
+>補足事項</A
+></H5
+><P
+><SPAN
+CLASS="errorname"
+>E_MACV</SPAN
+> のエラーは、多くのシステムコールで共通に発生する可能性があり、通常はシステムコール別のエラーコードには記載していない。しかし、本APIの場合は代表的なエラーが <SPAN
+CLASS="errorname"
+>E_MACV</SPAN
+> のみであるため、エラーコード欄にこのエラーを記載している。</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="device_driver_interface_device_management"
+>デバイスドライバインタフェース</A
+></H3
+><P
+>デバイスドライバインタフェースは、デバイス登録時に指定した処理関数(ドライバ処理関数)群によって構成される。</P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>オープン関数</DT
+><DD
+><P
+>ER <A
+HREF="device_management_functions.html#openfn"
+>openfn</A
+>(ID <CODE
+CLASS="varname"
+>devid</CODE
+>, UINT <CODE
+CLASS="varname"
+>omode</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+>);</P
+></DD
+><DT
+>クローズ関数</DT
+><DD
+><P
+>ER <A
+HREF="device_management_functions.html#closefn"
+>closefn</A
+>(ID <CODE
+CLASS="varname"
+>devid</CODE
+>, UINT <CODE
+CLASS="varname"
+>option</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+>);</P
+></DD
+><DT
+>処理開始関数</DT
+><DD
+><P
+>ER <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+>(T_DEVREQ *<CODE
+CLASS="varname"
+>devreq</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+>);</P
+></DD
+><DT
+>完了待ち関数</DT
+><DD
+><P
+>INT <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+>(T_DEVREQ *<CODE
+CLASS="varname"
+>devreq</CODE
+>, INT <CODE
+CLASS="varname"
+>nreq</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+>);</P
+></DD
+><DT
+>中止処理関数</DT
+><DD
+><P
+>ER <A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+>(ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, T_DEVREQ *<CODE
+CLASS="varname"
+>devreq</CODE
+>, INT <CODE
+CLASS="varname"
+>nreq</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+>);</P
+></DD
+><DT
+>イベント関数</DT
+><DD
+><P
+>INT <A
+HREF="device_management_functions.html#eventfn"
+>eventfn</A
+>(INT <CODE
+CLASS="varname"
+>evttyp</CODE
+>, void *<CODE
+CLASS="varname"
+>evtinf</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+>);</P
+></DD
+></DL
+></DIV
+><P
+>ドライバ属性に <TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> を指定した場合、次のドライバ処理関数のタイムアウト指定 <CODE
+CLASS="varname"
+>tmout</CODE
+> がTMO_U型(マイクロ秒単位)となる。</P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>処理開始関数</DT
+><DD
+><P
+>ER <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+>(T_DEVREQ *<CODE
+CLASS="varname"
+>devreq</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+>);</P
+></DD
+><DT
+>完了待ち関数</DT
+><DD
+><P
+>INT <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+>(T_DEVREQ *<CODE
+CLASS="varname"
+>devreq</CODE
+>, INT <CODE
+CLASS="varname"
+>nreq</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+>);</P
+></DD
+></DL
+></DIV
+><P
+>ドライバ属性に <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> を指定した場合、次のドライバ処理関数の要求パケット <CODE
+CLASS="varname"
+>devreq</CODE
+> の型がT_DEVREQ_Dとなる。</P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>処理開始関数</DT
+><DD
+><P
+>ER <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+>(T_DEVREQ_D *<CODE
+CLASS="varname"
+>devreq_d</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+>);</P
+></DD
+><DT
+>完了待ち関数</DT
+><DD
+><P
+>INT <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+>(T_DEVREQ_D *<CODE
+CLASS="varname"
+>devreq_d</CODE
+>, INT <CODE
+CLASS="varname"
+>nreq</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+>);</P
+></DD
+><DT
+>中止処理関数</DT
+><DD
+><P
+>ER <A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+>(ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, T_DEVREQ_D *<CODE
+CLASS="varname"
+>devreq_d</CODE
+>, INT <CODE
+CLASS="varname"
+>nreq</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+>);</P
+></DD
+></DL
+></DIV
+><P
+>ドライバ属性に <TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> と <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> を指定した場合、指定されたすべての型変化を行った引数を持つドライバ処理関数となる。</P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>処理開始関数</DT
+><DD
+><P
+>ER <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+>(T_DEVREQ_D *<CODE
+CLASS="varname"
+>devreq_d</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+>);</P
+></DD
+><DT
+>完了待ち関数</DT
+><DD
+><P
+>INT <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+>(T_DEVREQ_D *<CODE
+CLASS="varname"
+>devreq_d</CODE
+>, INT <CODE
+CLASS="varname"
+>nreq</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+>);</P
+></DD
+></DL
+></DIV
+><P
+>ドライバ処理関数は、デバイス管理によって呼び出され、準タスク部として実行される。これらのドライバ処理関数は、再入可能(reentrant)でなければならない。また、ドライバ処理関数が排他的に呼び出されることは保証されない。例えば、複数のタスクから同じデバイスに対して同時に要求があった場合、それぞれのタスクが同時にドライバ処理関数を呼び出すことがある。デバイスドライバ側は、必要に応じて排他制御などを行う必要がある。</P
+><P
+>デバイスドライバへの入出力要求は、リクエストIDに対応した下記の要求パケットにより行う。</P
+><PRE
+CLASS="programlisting"
+>&#13;/*
+ * デバイス要求パケット: 32ビット用
+ * In:  ドライバ処理関数への入力パラメータ(μT-Kernel/SMのデバイス管理で設定)
+ * Out: ドライバ処理関数からの出力パラメータ(ドライバ処理関数で設定)
+ * X:   上記以外のパラメータ
+ */
+typedef struct t_devreq {
+        struct t_devreq *next;    /* In:要求パケットのリンク (NULL:終端) */
+        void     *exinf;          /* X:拡張情報 */
+        ID       devid;           /* In:対象デバイスID */
+        INT      cmd:4;           /* In:要求コマンド */
+        BOOL     abort:1;         /* In:中止要求を行った時 TRUE */
+        W        start;           /* In:開始データ番号 */
+        SZ       size;            /* In:要求サイズ */
+        void     *buf;            /* In:入出力バッファアドレス */
+        SZ       asize;           /* Out:結果サイズ */
+        ER       error;           /* Out:結果エラー */
+        /* 以下に実装独自の情報が追加される場合がある */
+} T_DEVREQ;
+</PRE
+><PRE
+CLASS="programlisting"
+>&#13;/*
+ * デバイス要求パケット: 64ビット用
+ * In:  ドライバ処理関数への入力パラメータ(μT-Kernel/SMのデバイス管理で設定)
+ * Out: ドライバ処理関数からの出力パラメータ(ドライバ処理関数で設定)
+ * X:   上記以外のパラメータ
+ */
+typedef struct t_devreq_d {
+        struct t_devreq_d *next;  /* In:要求パケットのリンク (NULL:終端) */
+        void     *exinf;          /* X:拡張情報 */
+        ID       devid;           /* In:対象デバイスID */
+        INT      cmd:4;           /* In:要求コマンド */
+        BOOL     abort:1;         /* In:中止要求を行った時 TRUE */
+        D        start_d;         /* In:開始データ番号, 64ビット */
+        SZ       size;            /* In:要求サイズ */
+        void     *buf;            /* In:入出力バッファアドレス */
+        SZ       asize;           /* Out:結果サイズ */
+        ER       error;           /* Out:結果エラー */
+        /* 以下に実装独自の情報が追加される場合がある */
+} T_DEVREQ_D;
+</PRE
+><P
+>In: はドライバ処理関数への入力パラメータであり、μT-Kernel/SMのデバイス管理で設定され、デバイスドライバ側で変更してはならない。入力パラメータ(In:)以外は、デバイス管理により最初に0クリアされる。その後はデバイス管理は変更しない。Out: はドライバ処理関数から戻る際の出力パラメータであり、ドライバ処理関数の中で設定する。</P
+><P
+><CODE
+CLASS="varname"
+>next</CODE
+> は、要求パケットをリンクするために使用する。デバイス管理内の要求パケットの管理に使用される他、完了待ち関数(<A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+>),中止処理関数(<A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+>)でも使用する。</P
+><P
+><CODE
+CLASS="varname"
+>exinf</CODE
+> は、デバイスドライバ側で任意に使用できる。デバイス管理では内容には関知しない。</P
+><P
+><CODE
+CLASS="varname"
+>devid</CODE
+> は、要求対象のデバイスIDが設定される。</P
+><P
+><CODE
+CLASS="varname"
+>cmd</CODE
+> は、要求コマンドが設定される。
+<PRE
+CLASS="synopsis"
+>&#13;cmd := (TDC_READ || TDC_WRITE)
+</PRE
+>
+
+
+<PRE
+CLASS="programlisting"
+>&#13;#define TDC_READ        1       /* 読込み要求 */
+#define TDC_WRITE       2       /* 書込み要求 */
+</PRE
+>
+</P
+><P
+><CODE
+CLASS="varname"
+>abort</CODE
+> は中止処理を行う場合、中止処理関数(<A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+>)を呼び出す直前に <TT
+CLASS="literal"
+>TRUE</TT
+> を設定する。<CODE
+CLASS="varname"
+>abort</CODE
+> は中止処理を要求したことを示すフラグであり、処理が中止されたことを示すものではない。また、中止処理関数(<A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+>)を呼び出さない場合でも <CODE
+CLASS="varname"
+>abort</CODE
+> が <TT
+CLASS="literal"
+>TRUE</TT
+> に設定される場合がある。<CODE
+CLASS="varname"
+>abort</CODE
+> が <TT
+CLASS="literal"
+>TRUE</TT
+> に設定された要求がデバイスドライバに渡された場合は、中止処理を行う。</P
+><P
+><CODE
+CLASS="varname"
+>start</CODE
+>, <CODE
+CLASS="varname"
+>start_d</CODE
+>, <CODE
+CLASS="varname"
+>size</CODE
+> は、<A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+>, <A
+HREF="device_management_functions.html#tk_rea_dev_du"
+>tk_rea_dev_du</A
+>, <A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+>, <A
+HREF="device_management_functions.html#tk_wri_dev_du"
+>tk_wri_dev_du</A
+> で指定された <CODE
+CLASS="varname"
+>start</CODE
+>, <CODE
+CLASS="varname"
+>start_d</CODE
+>, <CODE
+CLASS="varname"
+>size</CODE
+> がそのまま設定される。</P
+><P
+><CODE
+CLASS="varname"
+>buf</CODE
+> は、<A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+>, <A
+HREF="device_management_functions.html#tk_rea_dev_du"
+>tk_rea_dev_du</A
+>, <A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+>, <A
+HREF="device_management_functions.html#tk_wri_dev_du"
+>tk_wri_dev_du</A
+> で指定された <CODE
+CLASS="varname"
+>buf</CODE
+> がそのまま設定される。仮想記憶をサポートするシステムでは、bufの指す領域が非常駐である場合や、タスク固有空間の場合があるため、取り扱いに注意が必要である。</P
+><P
+><CODE
+CLASS="varname"
+>asize</CODE
+> は、<A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> の <CODE
+CLASS="varname"
+>asize</CODE
+> に返す値をデバイスドライバが設定する。</P
+><P
+><CODE
+CLASS="varname"
+>error</CODE
+> は、<A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> の戻値として返すエラーコードをデバイスドライバが設定する。正常であれば <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+> を設定する。</P
+><P
+>T_DEVREQとT_DEVREQ_Dとの差異は、<CODE
+CLASS="varname"
+>start</CODE
+> あるいは <CODE
+CLASS="varname"
+>start_d</CODE
+> の部分の名称およびデータタイプのみである。</P
+><P
+>デバイス要求パケットの種類(T_DEVREQまたはT_DEVREQ_D)は、デバイス登録時のドライバ属性 <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> によって選択される。したがって、1つのドライバに対する要求パケットにT_DEVREQとT_DEVREQ_Dが混在することはない。</P
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="openfn"
+>openfn - オープン関数</A
+></H4
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22544"
+>C言語インタフェース</A
+></H5
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN22546"
+></A
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = openfn</CODE
+>(ID devid, UINT omode, void *exinf);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22556"
+>パラメータ</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22558"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devid</CODE
+>
+              </TD
+><TD
+>Device ID</TD
+><TD
+>オープンするデバイスのデバイスID</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>omode</CODE
+>
+              </TD
+><TD
+>Open Mode</TD
+><TD
+>オープンモード(<A
+HREF="device_management_functions.html#tk_opn_dev"
+>tk_opn_dev</A
+> と同じ)</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>デバイス登録時に指定した拡張情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22584"
+>リターンパラメータ</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22586"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22599"
+>エラーコード</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22601"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>その他</SPAN
+>
+              </TD
+><TD
+>デバイスドライバの返すエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22610"
+>解説</A
+></H5
+><P
+><A
+HREF="device_management_functions.html#tk_opn_dev"
+>tk_opn_dev</A
+> が呼び出されたときに、オープン関数 <A
+HREF="device_management_functions.html#openfn"
+>openfn</A
+> が呼び出される。</P
+><P
+><A
+HREF="device_management_functions.html#openfn"
+>openfn</A
+> では、デバイスの使用開始のための処理を行う。処理内容はデバイスに依存し、何もする必要がなければ何もしなくてもよい。また、オープンされているか否かをデバイスドライバで記憶する必要もなく、オープンされていない(<A
+HREF="device_management_functions.html#openfn"
+>openfn</A
+> が呼び出されていない)という理由だけで、他の処理関数が呼び出されたときエラーにする必要もない。オープンされていない状態で他の処理関数が呼び出された場合でも、デバイスドライバの動作に問題がなければ要求を処理してしまって構わない。</P
+><P
+><A
+HREF="device_management_functions.html#openfn"
+>openfn</A
+> でデバイスの初期化等を行う場合でも、待ちを伴うような処理は原則として行わない。できる限り速やかに処理を行い <A
+HREF="device_management_functions.html#openfn"
+>openfn</A
+> から戻らなければならない。例えば、シリアル回線のように通信モードを設定する必要があるようなデバイスでは、<A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+> により通信モードが設定されたときにデバイスの初期化を行えばよい。<A
+HREF="device_management_functions.html#openfn"
+>openfn</A
+> ではデバイスの初期化を行う必要はない。</P
+><P
+>同じデバイスが多重オープンされた場合、通常は最初のオープン時のみ呼び出されるが、デバイス登録時にドライバ属性として <TT
+CLASS="literal"
+>TDA_OPENREQ</TT
+> が指定された場合は、すべてのオープン時に呼び出される。</P
+><P
+>多重オープンやオープンモードに関する処理はデバイス管理で行われるため、<A
+HREF="device_management_functions.html#openfn"
+>openfn</A
+> ではそれらに関する処理は特に必要ない。<CODE
+CLASS="varname"
+>omode</CODE
+> も参考情報として渡されるだけで、<CODE
+CLASS="varname"
+>omode</CODE
+> に関する処理を行う必要はない。</P
+><P
+><A
+HREF="device_management_functions.html#openfn"
+>openfn</A
+> は、<A
+HREF="device_management_functions.html#tk_opn_dev"
+>tk_opn_dev</A
+> の発行タスクの準タスク部として実行される。すなわち、<A
+HREF="device_management_functions.html#tk_opn_dev"
+>tk_opn_dev</A
+> の発行タスクを要求タスクとする準タスク部のコンテキストで実行される。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="closefn"
+>closefn - クローズ関数</A
+></H4
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22635"
+>C言語インタフェース</A
+></H5
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN22637"
+></A
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = closefn</CODE
+>(ID devid, UINT option, void *exinf);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22647"
+>パラメータ</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22649"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devid</CODE
+>
+              </TD
+><TD
+>Device ID</TD
+><TD
+>クローズするデバイスのデバイスID</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>option</CODE
+>
+              </TD
+><TD
+>Close Option</TD
+><TD
+>クローズオプション(<A
+HREF="device_management_functions.html#tk_cls_dev"
+>tk_cls_dev</A
+> と同じ)</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>デバイス登録時に指定した拡張情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22675"
+>リターンパラメータ</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22677"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22690"
+>エラーコード</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22692"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>その他</SPAN
+>
+              </TD
+><TD
+>デバイスドライバの返すエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22701"
+>解説</A
+></H5
+><P
+><A
+HREF="device_management_functions.html#tk_cls_dev"
+>tk_cls_dev</A
+> が呼び出されたときに、クローズ関数 <A
+HREF="device_management_functions.html#closefn"
+>closefn</A
+> が呼び出される。</P
+><P
+><A
+HREF="device_management_functions.html#closefn"
+>closefn</A
+> では、デバイスの使用終了のための処理を行う。処理内容はデバイスに依存し、何もする必要がなければ何もしなくてもよい。</P
+><P
+>メディアの取り外しが可能なデバイスの場合、<CODE
+CLASS="varname"
+>option</CODE
+> に <TT
+CLASS="literal"
+>TD_EJECT</TT
+> が指定されていたならメディアの排出を行う。</P
+><P
+><A
+HREF="device_management_functions.html#closefn"
+>closefn</A
+> でデバイスの終了処理やメディアの排出を行う場合でも、待ちを伴うような処理は原則として行わない。できる限り速やかに処理を行い <A
+HREF="device_management_functions.html#closefn"
+>closefn</A
+> から戻らなければならない。メディアの排出に時間がかかる場合、排出の完了を待たずに <A
+HREF="device_management_functions.html#closefn"
+>closefn</A
+> から戻っても構わない。</P
+><P
+>同じデバイスが多重オープンされていた場合、通常は最後のクローズ時のみ呼び出されるが、デバイス登録時にドライバ属性として <TT
+CLASS="literal"
+>TDA_OPENREQ</TT
+> が指定された場合は、すべてのクローズ時に呼び出される。ただし、この場合も最後のクローズにしか <CODE
+CLASS="varname"
+>option</CODE
+> に <TT
+CLASS="literal"
+>TD_EJECT</TT
+> が指定されることはない。</P
+><P
+>多重オープンやオープンモードに関する処理はデバイス管理で行われるため、<A
+HREF="device_management_functions.html#closefn"
+>closefn</A
+> ではそれらに関する処理は特に必要ない。</P
+><P
+><A
+HREF="device_management_functions.html#closefn"
+>closefn</A
+> は、<A
+HREF="device_management_functions.html#tk_cls_dev"
+>tk_cls_dev</A
+> の発行タスクの準タスク部として実行される。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="execfn"
+>execfn - 処理開始関数</A
+></H4
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22726"
+>C言語インタフェース</A
+></H5
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN22728"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>/* 処理開始関数(32ビット要求パケット、ミリ秒タイムアウト) */</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = execfn</CODE
+>(T_DEVREQ *devreq, TMO tmout, void *exinf);</CODE
+></P
+><P
+></P
+></DIV
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN22739"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>/* 処理開始関数(64ビット要求パケット、ミリ秒タイムアウト) */</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = execfn</CODE
+>(T_DEVREQ_D *devreq_d, TMO tmout, void *exinf);</CODE
+></P
+><P
+></P
+></DIV
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN22750"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>/* 処理開始関数(32ビット要求パケット、マイクロ秒タイムアウト) */</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = execfn</CODE
+>(T_DEVREQ *devreq, TMO_U tmout_u, void *exinf);</CODE
+></P
+><P
+></P
+></DIV
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN22761"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>/* 処理開始関数(64ビット要求パケット、マイクロ秒タイムアウト) */</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = execfn</CODE
+>(T_DEVREQ_D *devreq_d, TMO_U tmout_u, void *exinf);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22772"
+>パラメータ</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22774"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>T_DEVREQ*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devreq</CODE
+>
+              </TD
+><TD
+>Device Request Packet</TD
+><TD
+>要求パケット(32ビット)</TD
+></TR
+><TR
+><TD
+>T_DEVREQ_D*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devreq_d</CODE
+>
+              </TD
+><TD
+>Device Request Packet</TD
+><TD
+>要求パケット(64ビット)</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>要求受付待ちタイムアウト時間(ミリ秒)</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>要求受付待ちタイムアウト時間(マイクロ秒)</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>デバイス登録時に指定した拡張情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22811"
+>リターンパラメータ</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22813"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22826"
+>エラーコード</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22828"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>その他</SPAN
+>
+              </TD
+><TD
+>デバイスドライバの返すエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22837"
+>解説</A
+></H5
+><P
+><A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+> または <A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+> が呼び出されたときに、処理開始関数 <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> が呼び出される。</P
+><P
+><CODE
+CLASS="varname"
+>devreq</CODE
+> の要求の処理を開始する。処理を開始するのみで、完了を待たずに呼出元へ戻る。処理開始のためにかかる時間はデバイスドライバに依存する。必ずしも即座に完了するとは限らない。</P
+><P
+>新たな要求を受け付けられない状態のときは、要求受付待ちとなる。<CODE
+CLASS="varname"
+>tmout</CODE
+> に指定した時間以内に新たな要求を受け付けられなければ、タイムアウトする。<CODE
+CLASS="varname"
+>tmout</CODE
+> には、<TT
+CLASS="literal"
+>TMO_POL</TT
+> または <TT
+CLASS="literal"
+>TMO_FEVR</TT
+> を指定することもできる。タイムアウトした場合、<A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> の戻値に <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> を返す。要求パケットの <CODE
+CLASS="varname"
+>error</CODE
+> は変更しない。タイムアウトするのは要求を受け付けるまでで、要求を受け付けた後はタイムアウトしない。</P
+><P
+><A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> の戻値にエラーを返した場合は、要求が受け付けられなかったものとして、要求パケットは消滅する。</P
+><P
+>処理を中止する場合、その要求の受け付け前(処理開始前)であれば <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> の戻値に <SPAN
+CLASS="errorname"
+>E_ABORT</SPAN
+> を返す。この場合、要求パケットは消滅する。要求受け付け後(処理開始後)の場合は、<SPAN
+CLASS="errorname"
+>E_OK</SPAN
+> を返す。この場合、要求パケットは <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> を実行し処理完了が確認されるまで消滅しない。</P
+><P
+>中止要求があった場合、<A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> からできる限り速やかに戻らなければならない。処理を中止しなくてもすぐに終るのであれば中止しなくてもよい。</P
+><P
+><A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> は、<A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+>, <A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+>, <A
+HREF="device_management_functions.html#tk_srea_dev"
+>tk_srea_dev</A
+>, <A
+HREF="device_management_functions.html#tk_swri_dev"
+>tk_swri_dev</A
+> の発行タスクの準タスク部として実行される。</P
+><P
+>デバイス登録時のドライバ属性として <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> が指定されたデバイスドライバにおいて、<A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+> または <A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+> が呼び出されたときに、処理開始関数(64ビット要求パケット、ミリ秒タイムアウト) <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> が呼び出される。この場合、パラメータの要求パケットが64ビットのT_DEVREQ_D* <CODE
+CLASS="varname"
+>devreq_d</CODE
+> となった点を除き、関数の仕様は32ビット要求パケット、ミリ秒タイムアウトの <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> と同じである。</P
+><P
+>デバイス登録時のドライバ属性として <TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> が指定されたデバイスドライバにおいて、<A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+> または <A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+> が呼び出されたときに、処理開始関数(32ビット要求パケット、マイクロ秒タイムアウト) <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> が呼び出される。この場合、パラメータのタイムアウト指定がマイクロ秒単位のTMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> となった点を除き、関数の仕様は32ビット要求パケット、ミリ秒タイムアウトの <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> と同じである。</P
+><P
+>デバイス登録時のドライバ属性として <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> および <TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> が指定されたデバイスドライバにおいて、<A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+> または <A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+> が呼び出されたときに、処理開始関数(64ビット要求パケット、マイクロ秒タイムアウト) <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> が呼び出される。この場合、パラメータの要求パケットが64ビットのT_DEVREQ_D* <CODE
+CLASS="varname"
+>devreq_d</CODE
+>、パラメータのタイムアウト指定がマイクロ秒単位のTMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> となった点を除き、関数の仕様は32ビット要求パケット、ミリ秒タイムアウトの <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> と同じである。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="waitfn"
+>waitfn - 完了待ち関数</A
+></H4
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22893"
+>C言語インタフェース</A
+></H5
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN22895"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>/* 完了待ち関数(32ビット要求パケット、ミリ秒タイムアウト) */</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT creqno = waitfn</CODE
+>(T_DEVREQ *devreq, INT nreq, TMO tmout, void *exinf);</CODE
+></P
+><P
+></P
+></DIV
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN22908"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>/* 完了待ち関数(64ビット要求パケット、ミリ秒タイムアウト) */</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT creqno = waitfn</CODE
+>(T_DEVREQ_D *devreq_d, INT nreq, TMO tmout, void *exinf);</CODE
+></P
+><P
+></P
+></DIV
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN22921"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>/* 完了待ち関数(32ビット要求パケット、マイクロ秒タイムアウト) */</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT creqno = waitfn</CODE
+>(T_DEVREQ *devreq, INT nreq, TMO_U tmout_u, void *exinf);</CODE
+></P
+><P
+></P
+></DIV
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN22934"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>/* 完了待ち関数(64ビット要求パケット、マイクロ秒タイムアウト) */</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT creqno = waitfn</CODE
+>(T_DEVREQ_D *devreq_d, INT nreq, TMO_U tmout_u, void *exinf);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22947"
+>パラメータ</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22949"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>T_DEVREQ*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devreq</CODE
+>
+              </TD
+><TD
+>Device Request Packet</TD
+><TD
+>要求パケットのリスト(32ビット)</TD
+></TR
+><TR
+><TD
+>T_DEVREQ_D*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devreq_d</CODE
+>
+              </TD
+><TD
+>Device Request Packet</TD
+><TD
+>要求パケットのリスト(64ビット)</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>nreq</CODE
+>
+              </TD
+><TD
+>Number of Requests</TD
+><TD
+>要求パケットの数</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト時間(ミリ秒)</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト時間(マイクロ秒)</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>デバイス登録時に指定した拡張情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN22992"
+>リターンパラメータ</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN22994"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>creqno</CODE
+>
+              </TD
+><TD
+>Completed Request Packet Number</TD
+><TD
+>完了した要求パケットの番号</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN23011"
+>エラーコード</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23013"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>その他</SPAN
+>
+              </TD
+><TD
+>デバイスドライバの返すエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN23022"
+>解説</A
+></H5
+><P
+><A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> が呼び出されたときに、完了待ち関数 <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> が呼び出される。</P
+><P
+><CODE
+CLASS="varname"
+>devreq</CODE
+> は <CODE
+CLASS="varname"
+>devreq</CODE
+>-&#62;<CODE
+CLASS="varname"
+>next</CODE
+> で接続された要求パケットのリストで、<CODE
+CLASS="varname"
+>devreq</CODE
+> から <CODE
+CLASS="varname"
+>nreq</CODE
+> 個分の要求パケットについて、その内のいずれかが完了するのを待つ。リストの最後の <CODE
+CLASS="varname"
+>next</CODE
+> は必ずしも <TT
+CLASS="literal"
+>NULL</TT
+> になっているとは限らないため、必ず <CODE
+CLASS="varname"
+>nreq</CODE
+> の指定に従う。戻値に完了した要求パケットの番号(<CODE
+CLASS="varname"
+>devreq</CODE
+> から何番目か)を返す。最初が0番目で最後が <CODE
+CLASS="varname"
+>nreq</CODE
+>-1番目となる。なお、完了とは、正常終了／異常(エラー)終了／中止のいずれかである。</P
+><P
+><CODE
+CLASS="varname"
+>tmout</CODE
+> に完了待ちのタイムアウト時間を指定する。<TT
+CLASS="literal"
+>TMO_POL</TT
+> または <TT
+CLASS="literal"
+>TMO_FEVR</TT
+> を指定することもできる。タイムアウトした場合は、要求された処理は継続中である。タイムアウトの場合、<A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> の戻値に <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> を返す。要求パケットの <CODE
+CLASS="varname"
+>error</CODE
+> は変更しない。なお、要求された処理を継続中で <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> から戻るときは、<A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> の戻値に必ずエラーを返す。戻値にエラーを返したにもかかわらず処理が完了していてはいけないし、処理継続中であればエラー以外を返してもいけない。<A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> の戻値にエラーが返されている限り、その要求は処理中として要求パケットは消滅しない。<A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> の戻値に処理を完了した要求パケットの番号が返されたとき、その要求の処理は完了したものとして要求パケットは消滅する。</P
+><P
+>入出力エラーなどデバイスに関するエラーを、要求パケットの <CODE
+CLASS="varname"
+>error</CODE
+> に格納する。<A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> の戻値には、完了待ちが正しくできなかった場合のエラーを返す。<A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> の戻値が <A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> の戻値となり、要求パケットの <CODE
+CLASS="varname"
+>error</CODE
+> が <CODE
+CLASS="varname"
+>ioer</CODE
+> に戻される。</P
+><P
+><A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> による完了待ちの間に中止処理関数 <A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> が実行された時の中止の処理は、単一要求の完了待ちだった場合(<A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> の <CODE
+CLASS="varname"
+>nreq</CODE
+>＝1)と、複数要求の完了待ちだった場合(<A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> の <CODE
+CLASS="varname"
+>nreq</CODE
+> &#62; 1)で異なっている。単一要求の完了待ちだった場合は、処理中の要求を中止する。一方、複数要求の完了待ちだった場合は、特別な扱いとして、<A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> による待ちの解除のみを行い、要求に対する処理自体は中止しない。すなわち、中止処理関数 <A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> が実行されても、要求パケットの <CODE
+CLASS="varname"
+>abort</CODE
+> は <TT
+CLASS="literal"
+>FALSE</TT
+> のままであり、要求に対する処理は継続する。待ち解除となった <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> からは、戻値に <SPAN
+CLASS="errorname"
+>E_ABORT</SPAN
+> を返す。</P
+><P
+>完了待ち要求の中には、中止要求が要求パケットの <CODE
+CLASS="varname"
+>abort</CODE
+> にセットされている場合がある。このような場合、単一要求の完了待ちではその要求の中止処理を行わなければならない。複数要求の完了待ちでも中止処理を行うのが望ましいが、<CODE
+CLASS="varname"
+>abort</CODE
+> フラグを無視しても構わない。</P
+><P
+>なお、中止処理では <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> からできる限り速やかに戻ることが重要であり、処理を中止しなくてもすぐに処理が終るのであれば中止しなくてもよい。</P
+><P
+>処理が中止された場合は、要求パケットの <CODE
+CLASS="varname"
+>error</CODE
+> に <SPAN
+CLASS="errorname"
+>E_ABORT</SPAN
+> を返すことを原則とするが、そのデバイスの特性に合わせて <SPAN
+CLASS="errorname"
+>E_ABORT</SPAN
+> 以外のエラーを返してもよい。また、中止される直前までの処理を有効として <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+> としてもよい。なお、中止要求があっても正常に最後まで処理したのなら <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+> を返す。</P
+><P
+><A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> は、<A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+>, <A
+HREF="device_management_functions.html#tk_srea_dev"
+>tk_srea_dev</A
+>, <A
+HREF="device_management_functions.html#tk_swri_dev"
+>tk_swri_dev</A
+> の発行タスクの準タスク部として実行される。</P
+><P
+>デバイス登録時のドライバ属性として <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> が指定されたデバイスドライバにおいて、<A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> が呼び出されたときに、完了待ち関数(64ビット要求パケット、ミリ秒タイムアウト) <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> が呼び出される。この場合、パラメータの要求パケットが64ビットのT_DEVREQ_D* <CODE
+CLASS="varname"
+>devreq_d</CODE
+> となった点を除き、関数の仕様は32ビット要求パケット、ミリ秒タイムアウトの <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> と同じである。</P
+><P
+>デバイス登録時のドライバ属性として <TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> が指定されたデバイスドライバにおいて、<A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> が呼び出されたときに、完了待ち関数(32ビット要求パケット、マイクロ秒タイムアウト) <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> が呼び出される。この場合、パラメータのタイムアウト指定がマイクロ秒単位のTMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> となった点を除き、関数の仕様は32ビット要求パケット、ミリ秒タイムアウトの <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> と同じである。</P
+><P
+>デバイス登録時のドライバ属性として <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> および <TT
+CLASS="literal"
+>TDA_TMO_U</TT
+> が指定されたデバイスドライバにおいて、<A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> が呼び出されたときに、完了待ち関数(64ビット要求パケット、マイクロ秒タイムアウト) <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> が呼び出される。この場合、パラメータの要求パケットが64ビットのT_DEVREQ_D* <CODE
+CLASS="varname"
+>devreq_d</CODE
+>、パラメータのタイムアウト指定がマイクロ秒単位のTMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> となった点を除き、関数の仕様は32ビット要求パケット、ミリ秒タイムアウトの <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> と同じである。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="abortfn"
+>abortfn - 中止処理関数</A
+></H4
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN23107"
+>C言語インタフェース</A
+></H5
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN23109"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>/* 中止処理関数(32ビット要求パケット) */</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = abortfn</CODE
+>(ID tskid, T_DEVREQ *devreq, INT nreq, void *exinf);</CODE
+></P
+><P
+></P
+></DIV
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN23122"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>/* 中止処理関数(64ビット要求パケット) */</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = abortfn</CODE
+>(ID tskid, T_DEVREQ_D *devreq_d, INT nreq, void *exinf);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN23135"
+>パラメータ</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23137"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+><A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+>, <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> を実行しているタスクのタスクID</TD
+></TR
+><TR
+><TD
+>T_DEVREQ*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devreq</CODE
+>
+              </TD
+><TD
+>Device Request Packet</TD
+><TD
+>要求パケットのリスト(32ビット)</TD
+></TR
+><TR
+><TD
+>T_DEVREQ_D*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>devreq_d</CODE
+>
+              </TD
+><TD
+>Device Request Packet</TD
+><TD
+>要求パケットのリスト(64ビット)</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>nreq</CODE
+>
+              </TD
+><TD
+>Number of Requests</TD
+><TD
+>要求パケットの数</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>デバイス登録時に指定した拡張情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN23176"
+>リターンパラメータ</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23178"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN23191"
+>エラーコード</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23193"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>その他</SPAN
+>
+              </TD
+><TD
+>デバイスドライバの返すエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN23202"
+>解説</A
+></H5
+><P
+>現在実行中の処理開始関数 <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> や完了待ち関数 <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> から速やかに戻らせたいときに、中止処理関数 <A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> が呼び出される。通常は、処理中の要求を中止して戻らせる。ただし、中止しなくてもすぐに処理が終るのであれば、必ずしも中止しなくてもよい。重要なのは、できる限り速やかに <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+>, <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> から戻ることである。</P
+><P
+><A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> は、次のような場合に呼び出される。</P
+><P
+></P
+><UL
+><LI
+><P
+>タスク例外の発生によるブレーク関数の実行時に、タスク例外の発生したタスクによる処理中の要求があった場合、そのタスクによる処理中の要求を中止する。</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_cls_dev"
+>tk_cls_dev</A
+> によるデバイスクローズ時に、クローズするデバイスディスクリプタによる処理中の要求があった場合、そのデバイスディスクリプタによる処理中の要求を中止する。</P
+></LI
+></UL
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> は、<CODE
+CLASS="varname"
+>devreq</CODE
+> で指定した要求を実行中のタスクである。つまり、<A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+>, <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> を実行しているタスクである。<CODE
+CLASS="varname"
+>devreq</CODE
+>, <CODE
+CLASS="varname"
+>nreq</CODE
+> は、<A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+>, <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> の引数として指定したものと同じである。ただし、<A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> の場合は常に <CODE
+CLASS="varname"
+>nreq</CODE
+>＝1である。</P
+><P
+><A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> は、<A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+>, <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> を実行しているタスクとは別のタスクから呼び出される。両者は並行して実行されるため、必要に応じて排他制御等を行う必要がある。また、<A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+>, <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> の呼出直前や <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+>, <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> から戻る途中に <A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> が呼び出される可能性もある。このような場合においても正しく動作するように配慮する必要がある。<A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> を呼び出す前に、中止処理対象の要求パケットの <CODE
+CLASS="varname"
+>abort</CODE
+> フラグに <TT
+CLASS="literal"
+>TRUE</TT
+> が設定されるので、<A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+>, <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> はこれにより中止要求の有無を知ることもできる。また、<A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> では、任意のオブジェクトに対する <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> を使用することができる。</P
+><P
+>複数要求待ち(<CODE
+CLASS="varname"
+>nreq</CODE
+> &#62; 1)の <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> 実行中の場合は、特別な扱いとなり他の場合とは次の点で異なる。</P
+><P
+></P
+><UL
+><LI
+><P
+>要求の処理を中止することはせず、完了待ちのみ中止(待ちを解除)する。</P
+></LI
+><LI
+><P
+>要求パケットの <CODE
+CLASS="varname"
+>abort</CODE
+> フラグはセットされない(<CODE
+CLASS="varname"
+>abort</CODE
+>＝<TT
+CLASS="literal"
+>FALSE</TT
+> のまま)。</P
+></LI
+></UL
+><P
+>なお、<A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+>, <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> の実行中でないときに要求を中止させる場合には、<A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> を呼び出すことなく、要求パケットの <CODE
+CLASS="varname"
+>abort</CODE
+> フラグがセットされる。<CODE
+CLASS="varname"
+>abort</CODE
+> フラグがセットされた状態で <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> が呼び出されたときは、要求を受け付けない。<A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> が呼び出されたときは、<A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> が呼び出された場合と同様の中止処理を行う。</P
+><P
+><A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> により処理を開始した要求が、<A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> による完了待ちでない状態で中止された場合は、後で <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> が呼び出されたときに中止されて処理が完了したことを知らせる。処理が中止されても、<A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> により完了が確認されるまでは要求自体は消滅しない。</P
+><P
+><A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> は中止処理を開始するのみで、中止が完了するまで待たずに速やかに戻る。</P
+><P
+>タスク例外の際に実行される <A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> は、タスク例外を発生させた <A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+> の発行タスクの準タスク部として実行される。また、デバイスクローズ時に実行される <A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> は、<A
+HREF="device_management_functions.html#tk_cls_dev"
+>tk_cls_dev</A
+> の発行タスクの準タスク部として実行される。</P
+><P
+>デバイス登録時のドライバ属性として <TT
+CLASS="literal"
+>TDA_DEV_D</TT
+> が指定されたデバイスドライバにおいて、現在実行中の処理開始関数 <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> や完了待ち関数 <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> から速やかに戻らせたいときに、中止処理関数(64ビット要求パケット) <A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> が呼び出される。この場合、パラメータの要求パケットが64ビットのT_DEVREQ_D* <CODE
+CLASS="varname"
+>devreq_d</CODE
+> となった点を除き、関数の仕様は32ビット要求パケットの <A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> と同じである。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="eventfn"
+>eventfn - イベント関数</A
+></H4
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN23286"
+>C言語インタフェース</A
+></H5
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN23288"
+></A
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT retcode = eventfn</CODE
+>(INT evttyp, void *evtinf, void *exinf);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN23298"
+>パラメータ</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23300"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>evttyp</CODE
+>
+              </TD
+><TD
+>Event Type</TD
+><TD
+>ドライバ要求イベントタイプ</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>evtinf</CODE
+>
+              </TD
+><TD
+>Event Information</TD
+><TD
+>イベントタイプ別の情報</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>デバイス登録時に指定した拡張情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN23325"
+>リターンパラメータ</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23327"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>retcode</CODE
+>
+              </TD
+><TD
+>Return Code</TD
+><TD
+>イベントタイプ別に定義された戻値</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN23344"
+>エラーコード</A
+></H5
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23346"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>その他</SPAN
+>
+              </TD
+><TD
+>デバイスドライバの返すエラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN23355"
+>解説</A
+></H5
+><P
+>アプリケーションインタフェースによる通常のデバイス入出力処理とは別の要因によって、デバイスやシステムの状態変化が発生し、それに対してデバイスドライバ側で何らかの処理を要する場合に、ドライバ要求イベントが発生し、イベント関数 <A
+HREF="device_management_functions.html#eventfn"
+>eventfn</A
+> が呼び出される。</P
+><P
+>ドライバ要求イベントは、電源管理のためのサスペンド／リジューム時(<A
+HREF="device_management_functions.html#tk_sus_dev"
+>tk_sus_dev</A
+> 参照)や、USBのような活線挿抜可能な機器の接続時に発生する。</P
+><P
+>たとえば、<A
+HREF="device_management_functions.html#tk_sus_dev"
+>tk_sus_dev</A
+> によってシステムがサスペンドする時には、μT-Kernelの内部で(<A
+HREF="device_management_functions.html#tk_sus_dev"
+>tk_sus_dev</A
+> の処理の中で)、サスペンドのドライバ要求イベント(<TT
+CLASS="literal"
+>TDV_SUSPEND</TT
+>)を発生し、<CODE
+CLASS="varname"
+>evttyp</CODE
+>＝<TT
+CLASS="literal"
+>TDV_SUSPEND</TT
+> として各デバイスのイベント関数を呼び出す。各デバイスのイベント関数の中では、この呼出に応じて、サスペンド時に必要な状態保存などの処理を行う。</P
+><P
+>ドライバ要求イベントタイプには下記のものがある。</P
+><PRE
+CLASS="programlisting"
+>&#13;#define TDV_SUSPEND   (-1)   /* サスペンド */
+#define TDV_RESUME    (-2)   /* リジューム */
+#define TDV_CARDEVT     1    /* reserved */
+#define TDV_USBEVT      2    /* USBイベント */
+</PRE
+><P
+>上記の値が負のドライバ要求イベントは、サスペンド／リジューム時の処理など、μT-Kernel/SMのデバイス管理内部からの呼出によるものである。</P
+><P
+>一方、上記の値が正のドライバ要求イベント(<TT
+CLASS="literal"
+>TDV_USBEVT</TT
+>)は、<A
+HREF="device_management_functions.html#tk_evt_dev"
+>tk_evt_dev</A
+> の呼出によって発生するものであり、μT-Kernelの動作とは直接関係しない参考仕様である。これらのドライバ要求イベントは、USBなどのバスドライバを実装するために、必要に応じて利用する。</P
+><P
+>イベント関数で行う処理は、イベントタイプごとに定義される。サスペンド／リジュームについては「<A
+HREF="device_management_functions.html#device_suspend_resume_processing_device_management"
+><I
+>各デバイスのサスペンド／リジューム処理</I
+>項</A
+>」を参照。</P
+><P
+><A
+HREF="device_management_functions.html#tk_evt_dev"
+>tk_evt_dev</A
+> による呼出の場合、<A
+HREF="device_management_functions.html#eventfn"
+>eventfn</A
+> の戻値はそのまま <A
+HREF="device_management_functions.html#tk_evt_dev"
+>tk_evt_dev</A
+> の戻値となる。</P
+><P
+>イベント関数への要求は、他の要求の処理中であっても受け付け、できる限り速やかに処理しなければならない。</P
+><P
+><A
+HREF="device_management_functions.html#eventfn"
+>eventfn</A
+> は、イベント発生の原因となった <A
+HREF="device_management_functions.html#tk_evt_dev"
+>tk_evt_dev</A
+> や <A
+HREF="device_management_functions.html#tk_sus_dev"
+>tk_sus_dev</A
+> の発行タスクの準タスク部として実行される。</P
+></DIV
+><DIV
+CLASS="section"
+><H5
+CLASS="section"
+><A
+NAME="AEN23384"
+>補足事項</A
+></H5
+><P
+>USBイベントで想定している動作は以下のとおりである。</P
+><P
+>ただし、以下の説明はUSBの機器を扱うデバイスドライバの実装例の説明であり、μT-Kernelの仕様の範囲には含まれない。</P
+><P
+>USB機器の接続時には、そのUSB機器に対して、実際の入出力処理を行うクラスドライバを動的に対応付ける必要がある。</P
+><P
+>たとえば、USBメモリなどのストレージを接続した場合には、マスストレージクラス用のデバイスドライバがその機器の入出力処理を行うが、USBカメラを接続した場合には、ビデオクラス用のデバイスドライバがその機器の入出力処理を行う。どのデバイスドライバを使うべきかは、USB機器が接続されるまで分からない。</P
+><P
+>この時、USB機器とクラスドライバとの対応付けの処理を行うための手段として、USB接続のドライバ要求イベントと、各デバイスドライバのイベント関数を利用する。具体的には、USBポートを監視していたUSBバスドライバ(USBマネージャ)が、新しいUSB機器の接続を検出した場合に、クラスドライバの候補となる各デバイスドライバに対して、USB接続のドライバ要求イベント(<TT
+CLASS="literal"
+>TDV_USBEVT</TT
+>)を送り、各デバイスのイベント関数を呼び出す。</P
+><P
+>各デバイスのイベント関数では、この <TT
+CLASS="literal"
+>TDV_USBEVT</TT
+> に応答する形で、新しく接続されたUSB機器への対応の可否を返す。USBバスドライバでは、その戻値を見て、実際のクラスドライバとの対応付けを決定する。</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="device_event_notification_device_management"
+>デバイス事象通知</A
+></H3
+><P
+>デバイスドライバは、各デバイスで発生した事象を、デバイス事象通知のメッセージとして特定のメッセージバッファ(事象通知用メッセージバッファ)へ送信する。事象通知用メッセージバッファのIDは、各デバイスに対する <TT
+CLASS="literal"
+>TDN_EVENT</TT
+> の属性データとして参照あるいは設定される。</P
+><P
+>デバイス登録の直後には、システムデフォルトの事象通知用メッセージバッファを使用する。デバイスドライバの起動時には、<A
+HREF="device_management_functions.html#tk_def_dev"
+>tk_def_dev</A
+> によってデバイスの登録を行うが、このAPIのリターンパラメータとしてシステムデフォルトの事象通知用メッセージバッファのID値が返されるので、デバイスドライバではその値を保持し、属性データ <TT
+CLASS="literal"
+>TDN_EVENT</TT
+> の初期値とする。</P
+><P
+>なお、システムデフォルトの事象通知用メッセージバッファは、システム起動時に生成され、そのサイズとメッセージ最大長は、システム構成情報の <TT
+CLASS="literal"
+>TDEvtMbfSz</TT
+> により定義される。</P
+><P
+>デバイス事象通知で使用するメッセージの形式は以下のようになる。事象通知のメッセージの内容やサイズは、事象タイプごとに異なる。</P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>◇デバイス事象通知の基本形式</DT
+><DD
+><PRE
+CLASS="programlisting"
+>&#13;typedef struct t_devevt {
+        TDEvtTyp        evttyp;         /* 事象タイプ */
+        /* 以下に事象タイプ別の情報が付加される */
+} T_DEVEVT;
+</PRE
+></DD
+><DT
+>◇デバイスID付きのデバイス事象通知の形式</DT
+><DD
+><PRE
+CLASS="programlisting"
+>&#13;typedef struct t_devevt_id {
+        TDEvtTyp        evttyp;         /* 事象タイプ */
+        ID              devid;          /* デバイスID */
+        /* 以下に事象タイプ別の情報が付加される */
+} T_DEVEVT_ID;
+</PRE
+></DD
+><DT
+>◇拡張情報付きのデバイス事象通知の形式</DT
+><DD
+><PRE
+CLASS="programlisting"
+>&#13;typedef struct t_devevt_ex {
+        TDEvtTyp        evttyp;         /* 事象タイプ */
+        ID              devid;          /* デバイスID */
+        UB              exdat[16];      /* 拡張情報 */
+        /* 以下に事象タイプ別の情報が付加される */
+} T_DEVEVT_EX;
+</PRE
+></DD
+></DL
+></DIV
+><P
+>デバイス事象通知の事象タイプは、以下のように大分類される。</P
+><P
+></P
+><OL
+TYPE="a"
+><LI
+><P
+>基本事象通知(事象タイプ 0x0001～0x002F)</P
+><P
+>デバイスからの基本的な事象の通知</P
+></LI
+><LI
+><P
+>システム事象通知(事象タイプ 0x0030～0x007F)</P
+><P
+>電源制御などシステム全体に関係する事象の通知</P
+></LI
+><LI
+><P
+>拡張情報付き事象通知(事象タイプ 0x0080～0x00FF)</P
+><P
+>拡張情報を持つデバイスからの事象の通知</P
+></LI
+><LI
+><P
+>ユーザ定義事象通知(事象タイプ 0x0100～0xFFFF)</P
+><P
+>ユーザが内容を任意に定義可能な事象の通知</P
+></LI
+></OL
+><P
+>事象タイプのうち、代表的なものは以下の通りである。
+<PRE
+CLASS="programlisting"
+>&#13;typedef enum tdevttyp {
+        TDE_unknown     = 0,            /* 未定義 */
+        TDE_MOUNT       = 0x01,         /* メディア挿入 */
+        TDE_EJECT       = 0x02,         /* メディア排出 */
+        TDE_POWEROFF    = 0x31,         /* 電源スイッチオフ */
+        TDE_POWERLOW    = 0x32,         /* 電源残量警告 */
+        TDE_POWERFAIL   = 0x33,         /* 電源異常 */
+        TDE_POWERSUS    = 0x34          /* 自動サスペンド */
+} TDEvtTyp;
+</PRE
+>
+</P
+><P
+>事象通知用メッセージバッファが一杯で事象通知を送信できない場合は、その事象が通知されないことで事象通知の受信側の動作に悪影響が出ないようにしなければならない。メッセージバッファが空くまで待ってから事象通知を行ってもよいが、その場合も原則として事象通知以外のデバイスドライバの処理が滞ってはならない。なお、事象通知の受信側は、できる限りメッセージバッファが溢れることがないように処理しなければならない。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="device_suspend_resume_processing_device_management"
+>各デバイスのサスペンド／リジューム処理</A
+></H3
+><P
+>イベント関数(<A
+HREF="device_management_functions.html#eventfn"
+>eventfn</A
+>)へのサスペンド／リジュームイベント(<TT
+CLASS="literal"
+>TDV_SUSPEND</TT
+>/<TT
+CLASS="literal"
+>TDV_RESUME</TT
+>)の発行により、各デバイスドライバはデバイスのサスペンド／リジューム処理を行う。サスペンド／リジュームイベントは、物理デバイスに対してのみ発行される。</P
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="device_suspend_processing"
+>デバイスのサスペンド処理</A
+></H4
+><P
+>サスペンド処理を開始するためのイベントは次の通りである。</P
+><PRE
+CLASS="synopsis"
+>&#13;evttyp = TDV_SUSPEND
+evtinf = NULL (なし)
+</PRE
+><P
+>サスペンドイベント(<TT
+CLASS="literal"
+>TDV_SUSPEND</TT
+>)の発行により、次のような手順でサスペンド処理を行う。</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>現在処理中の要求があれば、完了するまで待つか、中断または中止する。どの方法を選択するかはデバイスドライバの実装に依存する。ただし、できるだけ速やかにサスペンドする必要があるため、完了までに時間がかかる場合は中断または中止としなければならない。</P
+><P
+>サスペンドイベントは物理デバイスに対してのみ発行されるが、そのデバイスに含まれるすべての論理デバイスに対しても、同様に処理する。</P
+><P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>中断：処理を一時的に中断し、リジューム後に続きを行う。</TD
+></TR
+><TR
+><TD
+>中止：中止処理関数(<A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+>)による中止と同様に、処理を中止する。リジューム後も再開されない。</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></LI
+><LI
+><P
+>リジュームイベント以外の新たな要求を受け付けないようにする。</P
+></LI
+><LI
+><P
+>デバイスの電源を切るなどのサスペンド処理を行う。</P
+></LI
+></OL
+><P
+>中止はアプリケーションへの影響が大きいと考えられるため極力避けたい。シリアル回線からの長期の入力待ちなどで、かつ中断とするのが難しい場合以外は中止としない。通常は、終了まで待つか、可能であれば中断とする。</P
+><P
+>サスペンド期間中にデバイスドライバへ来た要求は、リジュームまで待たせてリジューム後に受け付け処理する。ただし、デバイスへのアクセスを伴わない処理など、サスペンド中でも可能な処理は受け付けてもよい。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="device_resume_processing"
+>デバイスのリジューム処理</A
+></H4
+><P
+>リジューム処理を開始するためのイベントは次の通りである。</P
+><PRE
+CLASS="synopsis"
+>&#13;evttyp = TDV_RESUME
+evtinf = NULL (なし)
+</PRE
+><P
+>リジュームイベント(<TT
+CLASS="literal"
+>TDV_RESUME</TT
+>)の発行により、次のような手順でリジューム処理を行う。</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>デバイスの電源を入れデバイスの状態を復帰させるなどのリジューム処理を行う。</P
+></LI
+><LI
+><P
+>中断していた処理があれば再開する。</P
+></LI
+><LI
+><P
+>要求受け付けを再開する。</P
+></LI
+></OL
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="utk_sm_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="interrupt_management_functions_sm.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>μT-Kernel/SMの機能</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_sm_functions.html"
+ACCESSKEY="U"
+>上に戻る</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>割込み管理機能</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

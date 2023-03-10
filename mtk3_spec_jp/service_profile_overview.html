@@ -1,0 +1,203 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>サービスプロファイル</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernelの概念"
+HREF="concepts_underlying_utk.html"><LINK
+REL="PREVIOUS"
+TITLE="保護レベル"
+HREF="protection_levels.html"><LINK
+REL="NEXT"
+TITLE="μT-Kernel共通規定"
+HREF="common_utk.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="protection_levels.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernelの概念</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="common_utk.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="service_profile_overview"
+>サービスプロファイル</A
+></H1
+><P
+>μT-Kernel 3.0は小規模組込みシステムを想定したOS仕様であり、実装を単一化せず、各プラットフォームに応じた最適化・適応化を行った実装を認めている。特に、FPU(Floating-Point Unit)などハードウェアに強く依存する機能や、デバッグサポートにおけるフック機能などの効率性に影響を及ぼす可能性のある機能に対し、仕様のサブセット化を許容しており、これによって効率の良いμT-Kernel 3.0仕様OSを実現することが可能になる。このようなサブセット化を許容した上で、なおかつミドルウェアやアプリケーションの流通性・移植性を維持するため、μT-Kernel 3.0では他のμT-Kernel 3.0の実装との間の差異を記述するための仕組みを導入する。この記述を、サービスプロファイルと呼ぶ。</P
+><P
+>μT-Kernel 3.0におけるサービスプロファイルは、μT-Kernel 3.0の実装に関する情報をC言語の定数マクロ定義として列挙したものとして実現される。たとえば、<TT
+CLASS="literal"
+>TA_USERBUF</TT
+>の指定が可能な実装では、対応するサービスプロファイル項目を以下のように定義し、<TT
+CLASS="literal"
+>TA_USERBUF</TT
+>が利用可能であることを示さなければならない。</P
+><PRE
+CLASS="programlisting"
+>&#13;#define  TK_SUPPORT_USERBUF          TRUE   /* ユーザバッファ指定(TA_USERBUF)のサポート */
+</PRE
+><P
+>アプリケーションやミドルウェアではこのサービスプロファイル情報を利用して、<TT
+CLASS="literal"
+>TA_USERBUF</TT
+>に対するサポートの有無に応じたコード記述を行うことができる。たとえば、以下のような利用方法が考えられる。</P
+><PRE
+CLASS="programlisting"
+>&#13;T_CTSK  ctsk = {
+        .exinf   = NULL,
+#if TK_SUPPORT_USERBUF
+        .tskatr  = TA_HLNG|TA_RNG0|TA_USERBUF,
+        .bufptr  = taskA_stack,
+#else
+        .tskatr  = TA_HLNG|TA_RNG0,
+#endif
+        .task    = task,
+        .itskpri = 10,
+        .stksz   = 2048
+};
+
+tskid = tk_cre_tsk(&#38;ctsk);
+</PRE
+><P
+>上記のコード例では、<TT
+CLASS="literal"
+>TA_USERBUF</TT
+>が利用可能か否かに応じて、<A
+HREF="utk_os_functions.html#tk_cre_tsk"
+>tk_cre_tsk</A
+> に引き渡すパケットパラメータ<CODE
+CLASS="varname"
+>ctsk</CODE
+>の内容を設定している。これによって、<TT
+CLASS="literal"
+>TA_USERBUF</TT
+>をサポートする実装・そうでない実装の両者から利用可能なアプリケーションやミドルウェアを実現できる。このサービスプロファイルの仕組みを用いて、ミドルウェア開発者はサービスプロファイルを適切に利用し、ソフトウェアの流通性を向上させることが求められる。</P
+><P
+>μT-Kernel 3.0で規定される具体的なサービスプロファイルの項目については、<A
+HREF="service_profile_definitions.html"
+><I
+>サービスプロファイル</I
+>項<I
+>μT-Kernel共通規定</I
+>章</A
+> を参照すること。</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="protection_levels.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="common_utk.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>保護レベル</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="concepts_underlying_utk.html"
+ACCESSKEY="U"
+>上に戻る</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>μT-Kernel共通規定</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

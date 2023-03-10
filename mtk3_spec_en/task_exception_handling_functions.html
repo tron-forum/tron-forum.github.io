@@ -1,0 +1,2934 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Task Exception Handling Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/OS Functions"
+HREF="utk_os_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Task Synchronization Functions"
+HREF="task_dependent_synchronization_functions.html"><LINK
+REL="NEXT"
+TITLE="Synchronization and Communication Functions"
+HREF="synchronzation_and_communication_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="task_dependent_synchronization_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/OS Functions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="synchronzation_and_communication_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="task_exception_handling_functions"
+>Task Exception Handling Functions</A
+></H1
+><P
+>Task exception handling functions handle exception events that are raised for a task in the context of that task.</P
+><P
+>The task exception handler is started when all the following processing has taken place:</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>Register task exception handler by <A
+HREF="task_exception_handling_functions.html#tk_def_tex"
+>tk_def_tex</A
+></P
+></LI
+><LI
+><P
+>Enable task exception by <A
+HREF="task_exception_handling_functions.html#tk_ena_tex"
+>tk_ena_tex</A
+></P
+></LI
+><LI
+><P
+>Raise task exception by <A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+></P
+></LI
+></OL
+><P
+>A task exception handler is executed as a part of the task where the task exception occurred, in the context of that task and at the protection level specified when the task was created. The task states in a task exception handler, except for those states concerning task exceptions, are the same as the states when running an ordinary task portion; and the same set of system calls are available.</P
+><P
+>A task exception handler can be started only when the target task is running in a task portion. If the task is running in any other portion when a task exception is raised, the task exception handler is started only after the control returns to the task portion. If a quasi-task portion (extended SVC) is being executed when a task exception is raised, the processing of the extended SVC handler is aborted and the control returns to the task portion. If it is needed to abort the processing of the extended SVC handler (called "break processing" for the extended SVC handler), it is performed before the control returns to the task portion where the extended SVC handler is called. "Break processing" is executed by the break function of <A
+HREF="subsystem_management_functions.html"
+>Subsystem Management Functions</A
+>.</P
+><P
+>Requested task exceptions are cleared when the task exception handler is called (when the task exception handler starts running).</P
+><P
+>Task exception is identified by a task exception code: from 1 to (bit width of UINT data type - 1). For example, if UINT is 16 bits, a number from 0 to 15 can be used as task exception code. 0 corresponds to the highest priority, and (bit width of UINT data type - 1) corresponds to the lowest priority. Task exception code 0 is handled differently from the others, as explained below.</P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>Processing of task exception code from 1 to (bit width of UINT data type) - 1:</DT
+><DD
+><P
+></P
+><UL
+><LI
+><P
+>These task exception handlers cannot be executed by nesting them. A task exception (other than task exception code 0) raised while a task exception handler is running will be made pending.</P
+></LI
+><LI
+><P
+>On return from a task exception handler, the task resumes from the point where processing was interrupted by the exception.</P
+></LI
+><LI
+><P
+>It is also possible to use <CODE
+CLASS="function"
+>longjmp()</CODE
+> or the like to jump to any point in the task without returning from the task exception handler.</P
+></LI
+></UL
+></DD
+><DT
+>Task exception code 0:</DT
+><DD
+><P
+></P
+><UL
+><LI
+><P
+>This exception can be executed by nesting even while a task exception handler is executing for an exception of task exception code from 1 to (bit width of UINT data type - 1). Nesting does not take place when the task exception handler of task exception code 0 is executed.</P
+></LI
+><LI
+><P
+>A task exception handler runs after setting the user stack pointer to the initial setting when the task was started. In a system without a separate user stack and system stack, however, the stack pointer is not reset to its initial setting.</P
+></LI
+><LI
+><P
+>A task exception code 0 handler does not return to task processing. The task must be terminated by calling <A
+HREF="utk_os_functions.html#tk_ext_tsk"
+>tk_ext_tsk</A
+> or <A
+HREF="utk_os_functions.html#tk_exd_tsk"
+>tk_exd_tsk</A
+>.</P
+></LI
+></UL
+></DD
+></DL
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Porting Guideline</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Be warned that the available number of task exception codes is now dependent on the bit width of UINT data type. For example, task exception code can take the value from 0 to 15 in 16-bit environment.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_def_tex"
+>tk_def_tex - Define Task Exception Handler</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5988"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN5990"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_def_tex</CODE
+>(ID tskid, CONST T_DTEX *pk_dtex);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5999"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6001"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+><TR
+><TD
+>CONST T_DTEX*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_dtex</CODE
+>
+              </TD
+><TD
+>Packet to Define Task Exception</TD
+><TD
+>Task exception handler definition information</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_dtex</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6022"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>texatr</CODE
+>
+              </TD
+><TD
+>Task Exception Attribute</TD
+><TD
+>Task exception handler attributes</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>texhdr</CODE
+>
+              </TD
+><TD
+>Task Exception Handler</TD
+><TD
+>Task exception handler address</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6043"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6045"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6058"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6060"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>Insufficient memory (memory for control block cannot be allocated)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> runs at protection level 0 (<TT
+CLASS="literal"
+>TA_RNG0</TT
+>))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>Reserved attribute (<CODE
+CLASS="varname"
+>texatr</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>pk_dtex</CODE
+> is invalid or cannot be used)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6099"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6101"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6116"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6119"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+              </TD
+><TD
+>Support of task exception handling functions</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6128"
+>Description</A
+></H3
+><P
+>Defines a task exception handler for the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>. Only one task exception handler can be defined per task; if one is already defined, the last-defined handler is valid. Setting <CODE
+CLASS="varname"
+>pk_dtex</CODE
+> = <TT
+CLASS="literal"
+>NULL</TT
+> cancels a definition.</P
+><P
+>Defining or canceling a task exception handler clears pending task exception requests and disables all task exceptions.</P
+><P
+><CODE
+CLASS="varname"
+>texatr</CODE
+> indicates system attributes in its lower bits and implementation-dependent attributes in its higher bits.<CODE
+CLASS="varname"
+> The texatr</CODE
+> system attributes are not assigned in the present version of T-Kernel specification, and system attributes are not used.</P
+><P
+>A task exception handler takes the following form.</P
+><PRE
+CLASS="programlisting"
+>&#13;void texhdr( INT texcd )
+{
+        /*
+                Task exception handling
+        */
+
+        /* Task exception handler termination */
+        if ( texcd == 0 ) {
+                tk_ext_tsk() or tk_exd_tsk();
+        } else {
+                tk_end_tex();
+                return or longjmp();
+        }
+}
+</PRE
+><P
+>A task exception handler behaves like a <TT
+CLASS="literal"
+>TA_ASM</TT
+> attribute object and cannot be called via a high-level language support routine. The entry part of the task exception handler must be written in assembly language. The kernel vendor must provide the assembly language source code of the entry routine for calling the above C language task exception handler. That is, source code equivalent to a high-level language support routine must be provided.</P
+><P
+>A task set to protection level <TT
+CLASS="literal"
+>TA_RNG0</TT
+> when it is created cannot use task exceptions.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6144"
+>Additional Notes</A
+></H3
+><P
+>At the time a task is created, no task exception handler is defined and task exceptions are disabled.</P
+><P
+>When a task reverts to DORMANT state, the task exception handler definition is canceled and task exceptions are disabled. Pending task exceptions are cleared. It is possible, however, to define a task exception handler for a task in DORMANT state.</P
+><P
+>Task exceptions are software interrupts raised by <A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+>, with no direct relation to CPU exceptions.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ena_tex"
+>tk_ena_tex - Enable Task Exception</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6152"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN6154"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ena_tex</CODE
+>(ID tskid, UINT texptn);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6163"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6165"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>texptn</CODE
+>
+              </TD
+><TD
+>Task Exception Pattern</TD
+><TD
+>Task exception pattern</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6184"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6186"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6199"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6201"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist or no task exception handler is defined)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>texptn</CODE
+> is invalid or cannot be used)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6225"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6227"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6242"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6245"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+              </TD
+><TD
+>Support of task exception handling functions</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6254"
+>Description</A
+></H3
+><P
+>Enables task exceptions for the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>.</P
+><P
+>The parameter <CODE
+CLASS="varname"
+>texptn</CODE
+> is a logical OR bit array representing task exception codes in the form 1 &#60;&#60; task exception code.</P
+><P
+><A
+HREF="task_exception_handling_functions.html#tk_ena_tex"
+>tk_ena_tex</A
+> enables the task exceptions specified in <CODE
+CLASS="varname"
+>texptn</CODE
+>. If the current exception enabled status is <CODE
+CLASS="varname"
+>texmask</CODE
+>, it changes as follows.</P
+><P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>enable: texmask |= texptn</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+><P
+>If all the bits of <CODE
+CLASS="varname"
+>texptn</CODE
+> are cleared to 0, no operation is made to <CODE
+CLASS="varname"
+>texmask</CODE
+>. No error will result in this case.</P
+><P
+>Task exceptions cannot be enabled for a task with no task exception handler defined.</P
+><P
+>This system call can be called to tasks in DORMANT state.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6271"
+>Porting Guideline</A
+></H3
+><P
+>Be warned that the available number of task exception codes is now dependent on the bit width of UINT data type. For example, task exception code can take the value from 0 to 15 in 16-bit environment.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_dis_tex"
+>tk_dis_tex - Disable Task Exception</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6276"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN6278"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_dis_tex</CODE
+>(ID tskid, UINT texptn);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6287"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6289"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>texptn</CODE
+>
+              </TD
+><TD
+>Task Exception Pattern</TD
+><TD
+>Task exception pattern</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6308"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6310"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6323"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6325"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist or no task exception handler is defined)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>texptn</CODE
+> is invalid or cannot be used)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6349"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6351"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6366"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6369"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+              </TD
+><TD
+>Support of task exception handling functions</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6378"
+>Description</A
+></H3
+><P
+>Disables task exceptions for the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>.</P
+><P
+>The parameter <CODE
+CLASS="varname"
+>texptn</CODE
+> is a logical OR bit array representing task exception codes in the form 1 &#60;&#60; task exception code.</P
+><P
+><A
+HREF="task_exception_handling_functions.html#tk_dis_tex"
+>tk_dis_tex</A
+> disables the task exceptions specified in <CODE
+CLASS="varname"
+>texptn</CODE
+>. If the current exception enabled status is <CODE
+CLASS="varname"
+>texmask</CODE
+>, it changes as follows.</P
+><P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>disable: texmask &#38;= ~texptn</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+><P
+>If all the bits of <CODE
+CLASS="varname"
+>texptn</CODE
+> are cleared to 0, no operation is made to <CODE
+CLASS="varname"
+>texmask</CODE
+>. No error will result in either case.</P
+><P
+>A disabled task exception is ignored, and is not made pending. If exceptions are disabled for a task while there are pending task exceptions, the pending task exception requests are discarded (their pending status is cleared).</P
+><P
+>This system call can be called to tasks in DORMANT state.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6395"
+>Porting Guideline</A
+></H3
+><P
+>Be warned that the available number of task exception codes is now dependent on the bit width of UINT data type. For example, task exception code can take the value from 0 to 15 in 16-bit environment.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ras_tex"
+>tk_ras_tex - Raise Task Exception</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6400"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN6402"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ras_tex</CODE
+>(ID tskid, INT texcd);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6411"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6413"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>texcd</CODE
+>
+              </TD
+><TD
+>Task Exception Code</TD
+><TD
+>Task exception code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6432"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6434"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6447"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6449"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist or no task exception handler is defined)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> is in DORMANT state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>texcd</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6482"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6484"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6499"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6502"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+              </TD
+><TD
+>Support of task exception handling functions</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6511"
+>Description</A
+></H3
+><P
+>Raises the task exception specified in <CODE
+CLASS="varname"
+>texcd</CODE
+> for the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>. If the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> disables the task exception specified in <CODE
+CLASS="varname"
+>texcd</CODE
+>, the raised task exception is ignored, and is not made pending. In this case, <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+> is returned to this system call.</P
+><P
+>If a task exception handler is already running in the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>, the newly raised task exception is made pending. If an exception is pending, the break processing (break function) for the extended SVC handler is not performed even if the target task is executing an extended SVC.</P
+><P
+>In the case of <CODE
+CLASS="varname"
+>texcd</CODE
+> = 0, however, exceptions are not made pending even if the target task is executing an exception handler. If the target task is running a task exception handler for an exception of task exception codes from 1 to (bit width of UINT data type - 1), the task exception is accepted; and if an extended SVC is executing, the break processing (break function) for the extended SVC handler is performed. If the target task is running a task exception handler for an exception of task exception code 0, task exceptions are ignored.</P
+><P
+>The invoking task can be specified by setting <CODE
+CLASS="varname"
+>tskid</CODE
+> = <TT
+CLASS="literal"
+>TSK_SELF</TT
+> = 0.</P
+><P
+>If this system call is issued from a task-independent portion, error code <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+> is returned.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6528"
+>Additional Notes</A
+></H3
+><P
+>If the target task is executing an extended SVC, the break processing (break function) corresponding to the extended SVC runs as a quasi-task portion of the task that issued <A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+>. That is, it is executed in the context of the quasi-task portion whose requesting task is the task that issued <A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+>.</P
+><P
+>In such a case <A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+> does not return control until the break processing ends. For this reason, the specification does not allow <A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+> to be issued from a task-independent portion.</P
+><P
+>Task exceptions raised in the task that called <A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+> while the break processing is running are held until the break processing (break function) ends.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6538"
+>Porting Guideline</A
+></H3
+><P
+>Be warned that the available number of task exception codes is now dependent on the bit width of UINT data type. For example, task exception code can take the value from 0 to 15 in 16-bit environment.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_end_tex"
+>tk_end_tex - end task exception handler</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6543"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN6545"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT texcd = tk_end_tex</CODE
+>(BOOL enatex);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6552"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6554"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>BOOL</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>enatex</CODE
+>
+              </TD
+><TD
+>Enable Task Exception</TD
+><TD
+>Task exception handler calling enabled flag</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6567"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6569"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>texcd</CODE
+>
+              </TD
+><TD
+>Task Exception Code</TD
+><TD
+>Raised exception code</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6586"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6588"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (called for other than a task exception handler or task exception code 0 (detection is implementation-dependent))</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6597"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6599"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6614"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6617"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+              </TD
+><TD
+>Support of task exception handling functions</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6626"
+>Description</A
+></H3
+><P
+>Ends a task exception handler and enables the new task exception handler. If there are pending task exceptions, the highest-priority task exception code among them is passed in the return code. If there are no pending task exceptions, 0 is returned.</P
+><P
+>If <CODE
+CLASS="varname"
+>enatex</CODE
+> = <TT
+CLASS="literal"
+>FALSE</TT
+> and there are pending task exception, calling the new task exception handler is not allowed. In this case, the exception handler specified in return code <CODE
+CLASS="varname"
+>texcd</CODE
+> is in running state upon return from <A
+HREF="task_exception_handling_functions.html#tk_end_tex"
+>tk_end_tex</A
+>. If there are no pending task exceptions, calling the new task exception handler is allowed.</P
+><P
+>If <CODE
+CLASS="varname"
+>enatex</CODE
+> = <TT
+CLASS="literal"
+>TRUE</TT
+>, calling the new task exception handler is allowed regardless of whether there are pending task exceptions. Even if there are pending task exceptions, the task exception handler is in terminated status.</P
+><P
+>There is no way of ending a task exception handler other than by calling <A
+HREF="task_exception_handling_functions.html#tk_end_tex"
+>tk_end_tex</A
+>. A task exception handler continues executing from the time it is started until <A
+HREF="task_exception_handling_functions.html#tk_end_tex"
+>tk_end_tex</A
+> is called. Even if return is made from a task exception handler without calling <A
+HREF="task_exception_handling_functions.html#tk_end_tex"
+>tk_end_tex</A
+>, the task exception handler will still be running at the point of return. Similarly, even if <CODE
+CLASS="function"
+>longjmp</CODE
+> is used to get out of a task exception handler without calling <A
+HREF="task_exception_handling_functions.html#tk_end_tex"
+>tk_end_tex</A
+>, the task exception handler will still be running at the jump destination.</P
+><P
+>Calling <A
+HREF="task_exception_handling_functions.html#tk_end_tex"
+>tk_end_tex</A
+> while task exceptions are pending results in a new task exception being accepted. At this time even when <A
+HREF="task_exception_handling_functions.html#tk_end_tex"
+>tk_end_tex</A
+><A
+HREF="task_exception_handling_functions.html#tk_end_tex"
+></A
+> is called from an extended SVC handler, a break processing (break function) cannot be called for that extended SVC handler. If extended SVC calls are nested, then when the extended SVC nesting goes down one level, the break processing (break function) corresponding to the extended SVC return destination can be called. Calling of a task exception handler takes place upon return to the task portion.</P
+><P
+>The <A
+HREF="task_exception_handling_functions.html#tk_end_tex"
+>tk_end_tex</A
+> system call cannot be issued in the case of task exception code 0 since the task exception handler cannot be ended in this case. The task must be terminated by calling <A
+HREF="utk_os_functions.html#tk_ext_tsk"
+>tk_ext_tsk</A
+> or <A
+HREF="utk_os_functions.html#tk_exd_tsk"
+>tk_exd_tsk</A
+>. If <A
+HREF="task_exception_handling_functions.html#tk_end_tex"
+>tk_end_tex</A
+> is called while processing the task exception code 0, the behavior is undefined (implementation-dependent).</P
+><P
+>This system call cannot be issued from other than a task exception handler. The behavior when it is called from other than a task exception handler is undefined (implementation-dependent).</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6653"
+>Additional Notes</A
+></H3
+><P
+>When <A
+HREF="task_exception_handling_functions.html#tk_end_tex"
+>tk_end_tex</A
+> (<TT
+CLASS="literal"
+>TRUE</TT
+>) is called and there are pending task exceptions, another task exception handler call is made immediately following <A
+HREF="task_exception_handling_functions.html#tk_end_tex"
+>tk_end_tex</A
+>. In this case, a task exception handler is called without restoring the stack, giving rise to possible stack overflow.</P
+><P
+>Ordinarily <A
+HREF="task_exception_handling_functions.html#tk_end_tex"
+>tk_end_tex</A
+> (<TT
+CLASS="literal"
+>FALSE</TT
+>) can be used, and processing looped as illustrated below while there are task exceptions pending.</P
+><PRE
+CLASS="programlisting"
+>&#13;void texhdr( INT texcd )
+{
+	if ( texcd == 0 ){
+		/*
+			Processing for task exception 0
+		*/
+		tk_exd_tsk();
+	}
+
+	do {
+		/*
+			Processing of task exception: from 1 to  (bit width of UINT data type) - 1
+		*/
+	} while ( (texcd = tk_end_tex(FALSE)) &#62; 0 );
+}
+</PRE
+><P
+>Strictly speaking, if a task exception were to occur during the interval after 0 is returned by <A
+HREF="task_exception_handling_functions.html#tk_end_tex"
+>tk_end_tex</A
+> ending the loop and before exit from <CODE
+CLASS="varname"
+>texhdr</CODE
+>, the possibility exists of reentering <CODE
+CLASS="varname"
+>texhdr</CODE
+> without restoring the stack. Since task exceptions are software driven, however, ordinarily they do not occur independently of executing tasks; so in practice this is not a problem.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6667"
+>Porting Guideline</A
+></H3
+><P
+>Be warned that the available number of task exception codes is now dependent on the bit width of UINT data type. For example, task exception code can take the value from 0 to 15 in 16-bit environment.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ref_tex"
+>tk_ref_tex - Reference Task Exception Status</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6672"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN6674"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_tex</CODE
+>(ID tskid, T_RTEX *pk_rtex);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6683"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6685"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+><TR
+><TD
+>T_RTEX*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rtex</CODE
+>
+              </TD
+><TD
+>Packet to Return Task Exception Status</TD
+><TD
+>Pointer to the area to return the task exception status</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6704"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6706"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rtex</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6721"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pendtex</CODE
+>
+              </TD
+><TD
+>Pending Task Exception</TD
+><TD
+>Pending task exceptions</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>texmask</CODE
+>
+              </TD
+><TD
+>Task Exception Mask</TD
+><TD
+>Allowed task exceptions</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6742"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6744"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (invalid <CODE
+CLASS="varname"
+>pk_rtex</CODE
+>)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6768"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6770"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6785"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6788"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+              </TD
+><TD
+>Support of task exception handling functions</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN6797"
+>Description</A
+></H3
+><P
+>Gets the status of task exceptions for the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>.</P
+><P
+><CODE
+CLASS="varname"
+>pendtex</CODE
+> indicates the currently pending task exceptions. A raised task exception is indicated in <CODE
+CLASS="varname"
+>pendtex</CODE
+> from the time the task exception is raised until its task exception handler is called.</P
+><P
+><CODE
+CLASS="varname"
+>texmask</CODE
+> indicates allowed task exceptions.</P
+><P
+>Both <CODE
+CLASS="varname"
+>pendtex</CODE
+> and <CODE
+CLASS="varname"
+>texmask</CODE
+> are bit arrays of the form 1 &#60;&#60; task exception code.</P
+><P
+>The invoking task can be specified by setting <CODE
+CLASS="varname"
+>tskid</CODE
+> = <TT
+CLASS="literal"
+>TSK_SELF</TT
+> = 0. Note, however, that when <CODE
+CLASS="varname"
+>tskid</CODE
+> = <TT
+CLASS="literal"
+>TSK_SELF</TT
+> = 0 is specified in a system call issued from a task-independent portion, error code <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+> is returned.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="task_dependent_synchronization_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="synchronzation_and_communication_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Task Synchronization Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Synchronization and Communication Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

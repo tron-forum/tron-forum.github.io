@@ -1,0 +1,6271 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>μT-Kernel/OS Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="Service Profile"
+HREF="service_profile_definitions.html"><LINK
+REL="NEXT"
+TITLE="Task Synchronization Functions"
+HREF="task_dependent_synchronization_functions.html"></HEAD
+><BODY
+CLASS="chapter"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="service_profile_definitions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="task_dependent_synchronization_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="chapter"
+><H1
+><A
+NAME="utk_os_functions"
+></A
+>μT-Kernel/OS Functions</H1
+><P
+>This chapter describes details of the system calls provided by μT-Kernel/OS (Operating System).</P
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="task_management_functions"
+>Task Management Functions</A
+></H1
+><P
+>Task management functions are functions that directly manipulate or reference task states. Functions are provided for creating and deleting a task, for task starting and exit, changing task priority, and referencing task state. A task is an object identified by an ID number called a task ID. Task states and scheduling rules are explained in <A
+HREF="task_states_and_scheduling_rules.html"
+>the Section called <I
+>Task States and Scheduling Rules</I
+> in the Chapter called <I
+>μT-Kernel Concepts</I
+></A
+>.</P
+><P
+>For control of execution order, a task has a base priority and current priority. When simply "task priority" is mentioned, this means the current priority. The base priority of a task is initialized to the startup priority when a task is started. If the mutex function is not used, the task current priority is always identical to its base priority. For this reason, the current priority immediately after a task is started is the task startup priority. When the mutex function is used, the current priority is set as discussed in <A
+HREF="extended_synchronization_and_communication_functions.html#mutex"
+>the Section called <I
+>Mutex</I
+></A
+>.</P
+><P
+>The kernel does not perform processing for freeing of resources acquired by a task (semaphore resources, memory blocks, etc.) upon task exit, other than mutex unlocking. Freeing of task resources is the responsibility of the application.</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_cre_tsk"
+>tk_cre_tsk - Create Task</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN1987"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN1989"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID tskid = tk_cre_tsk</CODE
+>(CONST T_CTSK *pk_ctsk);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN1996"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN1998"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST T_CTSK*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_ctsk</CODE
+>
+              </TD
+><TD
+>Packet to Create Task</TD
+><TD
+>Information about task creation</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_ctsk</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2013"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Extended information</TD
+></TR
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskatr</CODE
+>
+              </TD
+><TD
+>Task Attribute</TD
+><TD
+>Task attribute</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>task</CODE
+>
+              </TD
+><TD
+>Task Start Address</TD
+><TD
+>Task start address</TD
+></TR
+><TR
+><TD
+>PRI</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>itskpri</CODE
+>
+              </TD
+><TD
+>Initial Task Priority</TD
+><TD
+>Initial task priority</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>stksz</CODE
+>
+              </TD
+><TD
+>Stack Size</TD
+><TD
+>Stack size (in bytes)</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>sstksz</CODE
+>
+              </TD
+><TD
+>System Stack Size</TD
+><TD
+>System stack size (in bytes)</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>stkptr</CODE
+>
+              </TD
+><TD
+>User Stack Pointer</TD
+><TD
+>User stack pointer</TD
+></TR
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dsname[8]</CODE
+>
+              </TD
+><TD
+>DS Object name</TD
+><TD
+>DS object name</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>bufptr</CODE
+>
+              </TD
+><TD
+>Buffer Pointer</TD
+><TD
+>User buffer pointer</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2076"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2078"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2095"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2097"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>Insufficient memory (memory for control block or user stack cannot be allocated)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>Number of tasks exceeds the system limit</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>Reserved attribute (<CODE
+CLASS="varname"
+>tskatr</CODE
+> is invalid or cannot be used), or the specified coprocessor does not exist</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOSPT</SPAN
+>
+              </TD
+><TD
+>Unsupported functions(when the specification of <TT
+CLASS="literal"
+>TA_ASM</TT
+>, <TT
+CLASS="literal"
+>TA_USERSTACK</TT
+>, <TT
+CLASS="literal"
+>TA_TASKSPACE</TT
+>, or <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> is not supported.)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOCOP</SPAN
+>
+              </TD
+><TD
+>The specified coprocessor cannot be used (not installed, or abnormal operation detected)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2131"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2133"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2148"
+>Related Service Profile Items</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2150"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_ASM</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_ASM</TT
+> for task attribute</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USERBUF</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> for task attribute</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_AUTOBUF</TT
+>
+              </TD
+><TD
+>Automatic buffer allocation is supported (by not specifying <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> to task attribute)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_FPU</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_FPU</TT
+> for task attribute</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_COPn</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_COPn</TT
+> for task attribute</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_HAS_SYSSTACK</TT
+>
+              </TD
+><TD
+>Task can have a system stack independent of user-stack, and each can be specified separately using (<TT
+CLASS="literal"
+>TA_USERSTACK</TT
+>, <TT
+CLASS="literal"
+>TA_SSTKSZ</TT
+>)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> for task attribute</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+>
+              </TD
+><TD
+>Maximum task priority that can be specified (must be 16 or higher)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2195"
+>Description</A
+></H3
+><P
+>Creates a task, assigning to it a task ID number. This system call allocates a TCB (Task Control Block) to the created task and initializes it based on <CODE
+CLASS="varname"
+>itskpri</CODE
+>, <CODE
+CLASS="varname"
+>task</CODE
+>, <CODE
+CLASS="varname"
+>stksz</CODE
+> and other parameters.</P
+><P
+>After the task is created, it is initially in DORMANT state.</P
+><P
+><CODE
+CLASS="varname"
+>itskpri</CODE
+> is used to specify the startup priority when a task is started. Task priority level can be specified by a positive integer, and the smaller the value, higher priority the task has. The largest task priority level is defined by <TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+>.</P
+><P
+><CODE
+CLASS="varname"
+>exinf</CODE
+> can be used freely by the user to insert miscellaneous information about the task. The information set here is passed to the task as startup parameter information and can be referred to by calling <A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+>. If a larger area is needed for indicating user information, or if the information may need to be changed after the task is created, this can be done by allocating separate memory for this purpose and putting the memory packet address in <CODE
+CLASS="varname"
+>exinf</CODE
+>. The kernel pays no attention to the contents of <CODE
+CLASS="varname"
+>exinf</CODE
+>.</P
+><P
+><CODE
+CLASS="varname"
+>tskatr</CODE
+> indicates system attributes in its lower bits and implementation-dependent attributes in its higher bits. The system attribute part of <CODE
+CLASS="varname"
+>tskatr</CODE
+> is as follows.</P
+><PRE
+CLASS="synopsis"
+>&#13;tskatr := (TA_ASM || TA_HLNG)
+   | [TA_SSTKSZ] | [TA_USERSTACK] | [TA_USERBUF] | [TA_DSNAME]
+   | (TA_RNG0 || TA_RNG1 || TA_RNG2 || TA_RNG3)
+   | [TA_COP0] | [TA_COP1] | [TA_COP2] | [TA_COP3] | [TA_FPU]
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2214"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_ASM</TT
+>
+              </TD
+><TD
+>Indicates that the task is written in assembly language</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_HLNG</TT
+>
+              </TD
+><TD
+>Indicates that the task is written in high-level language</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_SSTKSZ</TT
+>
+              </TD
+><TD
+>Specifies the system stack size</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_USERSTACK</TT
+>
+              </TD
+><TD
+>Points to the user stack</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_USERBUF</TT
+>
+              </TD
+><TD
+>Use of user-specified memory area as stack</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_DSNAME</TT
+>
+              </TD
+><TD
+>Specifies DS object name</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_RNGn</TT
+>
+              </TD
+><TD
+>Indicates that the task runs at protection level n</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_COPn</TT
+>
+              </TD
+><TD
+>Specifies use of the nth coprocessor (including floating point coprocessor or DSP)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_FPU</TT
+>
+              </TD
+><TD
+>Specifies use of a floating point coprocessor (when a coprocessor specified in <TT
+CLASS="literal"
+>TA_COPn</TT
+> is a general-purpose FPU particularly for floating point processing and not dependent on the CPU)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>The function for specifying implementation-dependent attributes can be used, for example, to specify that a task is subject to debugging. One use of the remaining system attribute fields is for indicating multiprocessor attributes in the future.</P
+><PRE
+CLASS="programlisting"
+>&#13;#define TA_ASM          0x00000000      /* Task in Assembly Language */
+#define TA_HLNG         0x00000001      /* Task in High-level language */
+#define TA_SSTKSZ       0x00000002      /* System stack size */
+#define TA_USERSTACK    0x00000004      /* User stack pointer */
+#define TA_USERBUF      0x00000020      /* Use user-specified buffer */
+#define TA_DSNAME       0x00000040      /* DS object name */
+#define TA_RNG0         0x00000000      /* Run at protection level 0 */
+#define TA_RNG1         0x00000100      /* Run at protection level 1 */
+#define TA_RNG2         0x00000200      /* Run at protection level 2 */
+#define TA_RNG3         0x00000300      /* Run at protection level 3 */
+#define TA_COP0         0x00001000      /* Use ID=0 coprocessor */
+#define TA_COP1         0x00002000      /* Use ID=1 coprocessor */
+#define TA_COP2         0x00004000      /* Use ID=2 coprocessor */
+#define TA_COP3         0x00008000      /* Use ID=3 coprocessor */
+</PRE
+><P
+>When <TT
+CLASS="literal"
+>TA_HLNG</TT
+> is specified, starting the <CODE
+CLASS="varname"
+>task</CODE
+> jumps to the <CODE
+CLASS="varname"
+>task</CODE
+> address not directly but by going through a high-level language environment configuration program (high-level language support routine). The task takes the following form in this case.<TT
+CLASS="literal"
+></TT
+></P
+><PRE
+CLASS="programlisting"
+>&#13;void task( INT stacd, void *exinf )
+{
+        /*
+                (processing)
+        */
+
+        tk_ext_tsk(); or tk_exd_tsk(); /* Exit task */
+}
+</PRE
+><P
+>The startup parameters passed to the task include the task startup code <CODE
+CLASS="varname"
+>stacd</CODE
+> specified in <A
+HREF="utk_os_functions.html#tk_sta_tsk"
+>tk_sta_tsk</A
+>, and the extended information <CODE
+CLASS="varname"
+>exinf</CODE
+> specified in <A
+HREF="utk_os_functions.html#tk_cre_tsk"
+>tk_cre_tsk</A
+>.</P
+><P
+>The task cannot (must not) be terminated by a simple return from the function, otherwise the operation will be indeterminate (implementation-dependent).</P
+><P
+>The form of the task when the <TT
+CLASS="literal"
+>TA_ASM</TT
+> attribute is specified in implementation-dependent, but <CODE
+CLASS="varname"
+>stacd</CODE
+> and <CODE
+CLASS="varname"
+>exinf</CODE
+> must be passed as startup parameters.</P
+><P
+>The task runs at the protection level specified in the <TT
+CLASS="literal"
+>TA_RNGn</TT
+> attribute. When a system call or extended SVC is called, the protection level goes to 0, then goes back to its original level upon return from the system call or extended SVC.</P
+><P
+>Each task has two stack areas, a system stack and user stack. The user stack is used at the protection level specified in <TT
+CLASS="literal"
+>TA_RNGn</TT
+> while the system stack is used at protection level 0. When the calling of a system call or extended SVC causes the protection level to change, the stack is also switched.</P
+><P
+>Note that a task running at <TT
+CLASS="literal"
+>TA_RNG0</TT
+> does not switch protection levels, so there is no stack switching either. When <TT
+CLASS="literal"
+>TA_RNG0</TT
+> is specified, the combined total of the user stack size and system stack size is the size of one stack, employed as both a user stack and system stack.</P
+><P
+>When <TT
+CLASS="literal"
+>TA_SSTKSZ</TT
+> is specified, <CODE
+CLASS="varname"
+>sstksz</CODE
+> is valid. If <TT
+CLASS="literal"
+>TA_SSTKSZ</TT
+> is not specified, <CODE
+CLASS="varname"
+>sstksz</CODE
+> is ignored and the default size applies.</P
+><P
+>When <TT
+CLASS="literal"
+>TA_USERSTACK</TT
+> is specified, <CODE
+CLASS="varname"
+>stkptr</CODE
+> is valid. In this case a user stack is not provided by the OS, but must be allocated by the caller. <CODE
+CLASS="varname"
+>stksz</CODE
+> must be set to 0. If <TT
+CLASS="literal"
+>TA_USERSTACK</TT
+> is not specified, <CODE
+CLASS="varname"
+>stkptr</CODE
+> is ignored. Note that if <TT
+CLASS="literal"
+>TA_RNG0</TT
+> is set, <TT
+CLASS="literal"
+>TA_USERSTACK</TT
+> cannot be specified. <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> occurs if <TT
+CLASS="literal"
+>TA_RNG0</TT
+> and <TT
+CLASS="literal"
+>TA_USERSTACK</TT
+> are specified at the same time.</P
+><P
+><TT
+CLASS="literal"
+>TA_USERBUF</TT
+> can be specified for implementation where there is no distinction of user stack and system stack and there is only one unified stack for a task. When this attribute is specified, <CODE
+CLASS="varname"
+>bufptr</CODE
+> becomes effective, and the memory area starting at <CODE
+CLASS="varname"
+>bufptr</CODE
+> containing <CODE
+CLASS="varname"
+>stksz</CODE
+> octets is used as the unified user and system stack area. In this case, the kernel does not provide the stack area.</P
+><P
+>When <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> is specified, <CODE
+CLASS="varname"
+>dsname</CODE
+> is valid and specifies the DS object name. DS object name is used to identify objects by debugger, and it is handled only by T-Kernel/DS API, <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>. For more details, see the description of <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>. If <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> is not specified, <CODE
+CLASS="varname"
+>dsname</CODE
+> is ignored. Then <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> return <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> error.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2314"
+>Additional Notes</A
+></H3
+><P
+>A task runs either at the protection level set in <TT
+CLASS="literal"
+>TA_RNGn</TT
+> or at protection level 0. For example, a task for which <TT
+CLASS="literal"
+>TA_RNG3</TT
+> is specified in no case runs at protection level 1 or 2.</P
+><P
+>In a system with separate interrupt stack, interrupt handlers also use the system stack. An interrupt handler runs at protection level 0.</P
+><P
+>The system stack default size is decided taking into account the amount taken up by system call execution and, in a system with separate interrupt stack, the amount used by interrupt handlers.</P
+><P
+>The definition of <TT
+CLASS="literal"
+>TA_COPn</TT
+> is dependent on the CPU and other hardware and is not portable.</P
+><P
+><TT
+CLASS="literal"
+>TA_FPU</TT
+> is provided as a portable notation method only for the definition in <TT
+CLASS="literal"
+>TA_COPn</TT
+> of a floating point coprocessor. If, for example, the floating point coprocessor is <TT
+CLASS="literal"
+>TA_COP0</TT
+>, then <TT
+CLASS="literal"
+>TA_FPU</TT
+> = <TT
+CLASS="literal"
+>TA_COP0</TT
+>. If there is no particular need to specify the use of a coprocessor for floating point operations, <TT
+CLASS="literal"
+>TA_FPU</TT
+> = 0 is set.</P
+><P
+>Even in a system with a single CPU's operating mode, for the sake of portability all attributes including <TT
+CLASS="literal"
+>TA_RNGn</TT
+> must be accepted. It is possible, for example, to handle all <TT
+CLASS="literal"
+>TA_RNGn</TT
+> as equivalent to <TT
+CLASS="literal"
+>TA_RNG0</TT
+>, but error must not be returned.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2334"
+>Porting Guideline</A
+></H3
+><P
+>The T-Kernel 2.0 specification does not define <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> and its associated notion of <CODE
+CLASS="varname"
+>bufptr</CODE
+>. So if this feature is used, a modification is necessary to port the software to T-Kernel 2.0. However, if <CODE
+CLASS="varname"
+>stksz</CODE
+> is properly set already, simply removing <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> and <CODE
+CLASS="varname"
+>bufptr</CODE
+> will complete the modification for porting.</P
+><P
+>The largest task priority is defined by <TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+>. Although <TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+> is variable, but is guaranteed to be equal to or larger than 16, and so by restricting the used task priorities only to the range from 1 to 16, there shall be no need for modifying the task priorities during porting.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_del_tsk"
+>tk_del_tsk - Delete Task</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2347"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN2349"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_del_tsk</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2356"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2358"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2371"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2373"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error Code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2386"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2388"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (the task is not in DORMANT state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2411"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2413"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2428"
+>Related Service Profile Items</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2431"
+>Description</A
+></H3
+><P
+>Deletes the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>.</P
+><P
+>This system call changes the state of the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> from DORMANT state to NONEXISTENT state (no longer exists in the system), releasing the TCB and stack area that were assigned to the task. The task ID number is also released. When this system call is issued for a task not in DORMANT state, error code <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> is returned.</P
+><P
+>This system call cannot specify the invoking task. If the invoking task is specified, error code <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> is returned since the invoking task is not in DORMANT state. The invoking task is deleted not by this system call but by the <A
+HREF="utk_os_functions.html#tk_exd_tsk"
+>tk_exd_tsk</A
+> system call.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_sta_tsk"
+>tk_sta_tsk - Start Task</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2443"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN2445"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_sta_tsk</CODE
+>(ID tskid, INT stacd);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2454"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2456"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>stacd</CODE
+>
+              </TD
+><TD
+>Task Start Code</TD
+><TD
+>Task start code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2475"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2477"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2490"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2492"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (the task is not in DORMANT state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2515"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2517"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2532"
+>Related Service Profile Items</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2535"
+>Description</A
+></H3
+><P
+>Starts the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>. This system call changes the state of the specified task from DORMANT state to READY state.</P
+><P
+>Parameters to be passed to the task when it starts can be set in <CODE
+CLASS="varname"
+>stacd</CODE
+>. These parameters can be referred to from the started task, enabling use of this feature for simple message passing.</P
+><P
+>The task priority when it starts is the task startup priority (<CODE
+CLASS="varname"
+>itskpri</CODE
+>) specified when the started task was created.</P
+><P
+>Start requests by this system call are not queued. If this system call is issued while the target task is in a state other than DORMANT state, the system call is ignored and error code <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> is returned to the calling task.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2545"
+>Porting Guideline</A
+></H3
+><P
+>Note that <CODE
+CLASS="varname"
+>stacd</CODE
+> is INT type, and its value range is implementation-dependent, so care must be taken.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ext_tsk"
+>tk_ext_tsk - Exit Task</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2551"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN2553"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void tk_ext_tsk</CODE
+>(void);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2559"
+>Parameter</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2562"
+>Return Parameter</A
+></H3
+><P
+>Does not return to the context issuing the system call.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2565"
+>Error Codes</A
+></H3
+><P
+>The following kind of error may be detected, but no return is made to the context issuing the system call even if the error is detected. For this reason the error code cannot be passed directly as a system call return parameter. The behavior in case an error occurs is implementation-dependent.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2568"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2577"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2579"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2594"
+>Related Service Profile Items</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2597"
+>Description</A
+></H3
+><P
+>Exits the invoking task normally and changes its state to DORMANT state.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2600"
+>Additional Notes</A
+></H3
+><P
+>When a task terminates by <A
+HREF="utk_os_functions.html#tk_ext_tsk"
+>tk_ext_tsk</A
+>, the resources acquired by the task up to that time (memory blocks, semaphores, etc.) are not automatically freed. The user is responsible for releasing such resources before the task exits.</P
+><P
+><A
+HREF="utk_os_functions.html#tk_ext_tsk"
+>tk_ext_tsk</A
+> is a system call that does not return to the context from which it was called. Even if an error code is returned when an error of some kind is detected, normally no error checking is performed in the context from which the system call was invoked, leaving the possibility that the program will behave in an unexpected manner. For this reason these system calls do not return even if error is detected.</P
+><P
+>As a rule, the task priority and other information included in the TCB is reset when the task returns to DORMANT state. If, for example, the task priority is changed by <A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+> and later terminated by <A
+HREF="utk_os_functions.html#tk_ext_tsk"
+>tk_ext_tsk</A
+>, the task priority reverts to the startup priority (<CODE
+CLASS="varname"
+>itskpri</CODE
+>) specified by <A
+HREF="utk_os_functions.html#tk_cre_tsk"
+>tk_cre_tsk</A
+> at startup. It does not keep the task priority in effect at the time <A
+HREF="utk_os_functions.html#tk_ext_tsk"
+>tk_ext_tsk</A
+> was executed.</P
+><P
+>System calls that do not return to the calling context are those named tk_ret_??? or tk_ext_??? (tk_exd_???).</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_exd_tsk"
+>tk_exd_tsk - Exit and Delete Task</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2615"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN2617"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void tk_exd_tsk</CODE
+>(void);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2623"
+>Parameter</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2626"
+>Return Parameter</A
+></H3
+><P
+>Does not return to the context issuing the system call.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2629"
+>Error Codes</A
+></H3
+><P
+>The following kind of error may be detected, but no return is made to the context issuing the system call even if the error is detected. For this reason the error code cannot be passed directly as a system call return parameter. The behavior in case an error occurs is implementation-dependent.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2632"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2641"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2643"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2658"
+>Related Service Profile Items</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2661"
+>Description</A
+></H3
+><P
+>Terminates the invoking task normally and also deletes it. This system call changes the state of the invoking task to NON-EXISTENT state (no longer exists in the system).</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2664"
+>Additional Notes</A
+></H3
+><P
+>When a task terminates by <A
+HREF="utk_os_functions.html#tk_exd_tsk"
+>tk_exd_tsk</A
+>, the resources acquired by the task up to that time (memory blocks, semaphores, etc.) are not automatically freed. The user is responsible for releasing such resources before the task exits.</P
+><P
+><A
+HREF="utk_os_functions.html#tk_exd_tsk"
+>tk_exd_tsk</A
+> is a system call that does not return to the context from which it was called. Even if an error code is returned when an error of some kind is detected, normally no error checking is performed in the context from which the system call was invoked, leaving the possibility that the program will behave in an unexpected manner. For this reason these system calls do not return even if error is detected.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ter_tsk"
+>tk_ter_tsk - Terminate Task</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2672"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN2674"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ter_tsk</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2681"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2683"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2696"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2698"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2711"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2713"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (the target task is in DORMANT state or is the invoking task)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2736"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2738"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2753"
+>Related Service Profile Items</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2756"
+>Description</A
+></H3
+><P
+>Forcibly terminates the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>. This system call changes the state of the target task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> to DORMANT state.</P
+><P
+>Even if the target task was in the waiting state (including SUSPENDED state), the waiting state is released and the task is terminated. If the target task was in some kind of queue (semaphore wait, etc.), executing <A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+> results in its removal from the queue.</P
+><P
+>This system call cannot specify the invoking task. If the invoking task is specified, error code <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> is returned.</P
+><P
+>The relationships between target task states and the results of executing <A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+> are summarized in <A
+HREF="utk_os_functions.html#table_tk_ter_tsk"
+>Table 1</A
+>.</P
+><DIV
+CLASS="table"
+><A
+NAME="table_tk_ter_tsk"
+></A
+><P
+><B
+>Table 1. Target Task State and Execution Result (tk_ter_tsk)</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="40%"><COL
+WIDTH="30%"><COL
+WIDTH="30%"><THEAD
+><TR
+><TH
+ALIGN="left"
+>Target Task State</TH
+><TH
+ALIGN="left"
+><A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+><CODE
+CLASS="varname"
+>ercd</CODE
+> Return Value</TH
+><TH
+ALIGN="left"
+>(processing)</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>Run state (RUNNING or READY) (not for invoking task)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Forced termination</TD
+></TR
+><TR
+><TD
+>Running state (RUNNING) (invoking task)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>No operation</TD
+></TR
+><TR
+><TD
+>Waiting state (WAITING)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Forced termination</TD
+></TR
+><TR
+><TD
+>Suspended state (SUSPENDED)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Forced termination</TD
+></TR
+><TR
+><TD
+>Waiting-suspended state (WAITING-SUSPENDED)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Forced termination</TD
+></TR
+><TR
+><TD
+>Dormant state (DORMANT)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>No operation</TD
+></TR
+><TR
+><TD
+>Non-existent state (NON-EXISTENT)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>No operation</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2817"
+>Additional Notes</A
+></H3
+><P
+>When a task is terminated by <A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+>, the resources acquired by the task up to that time (memory blocks, semaphores, etc.) are not automatically freed. The user is responsible for releasing such resources before the task is terminated.</P
+><P
+>As a rule, the task priority and other information included in the TCB is reset when the task returns to DORMANT state. If, for example, the task priority is changed by <A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+> and later terminated by <A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+>, the task priority reverts to the startup priority (<CODE
+CLASS="varname"
+>itskpri</CODE
+>) that is specified by <A
+HREF="utk_os_functions.html#tk_cre_tsk"
+>tk_cre_tsk</A
+> at startup. The task priority at task termination by <A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+> is not used after the task is restarted by <A
+HREF="utk_os_functions.html#tk_sta_tsk"
+>tk_sta_tsk</A
+>.</P
+><P
+>Forcible termination of another task is intended for use only by a debugger or a few other tasks closely related to the OS. As a rule, this system call is not to be used by ordinary applications or middleware, for the following reason.</P
+><P
+>Forced termination occurs regardless of the running state of the target task. If, for example, a task were forcibly terminated while the task was calling a middleware function, the task would terminate right while the middleware was executing. If such a situation were allowed, normal operation of the middleware could not be guaranteed.</P
+><P
+>This is an example of how task termination should not be allowed when the task status (what it is executing) is unknown. Ordinary applications therefore must not use the forcible termination function.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_chg_pri"
+>tk_chg_pri - Change Task Priority</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2833"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN2835"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_chg_pri</CODE
+>(ID tskid, PRI tskpri);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2844"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2846"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+><TR
+><TD
+>PRI</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskpri</CODE
+>
+              </TD
+><TD
+>Task Priority</TD
+><TD
+>Task priority</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2865"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2867"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2880"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2882"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>tskpri</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+>
+              </TD
+><TD
+>Illegal use (upper priority limit exceeded)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2910"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2912"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2927"
+>Related Service Profile Items</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2929"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+>
+              </TD
+><TD
+>Maximum task priority that can be specified (must be 16 or higher)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2938"
+>Description</A
+></H3
+><P
+>Changes the base priority of the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> to the value specified in <CODE
+CLASS="varname"
+>tskpri</CODE
+>. The current priority of the task also changes as a result.</P
+><P
+>Task priority values are specified from 1 to <TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+>, with the smaller numbers indicating higher priority.</P
+><P
+>When <TT
+CLASS="literal"
+>TSK_SELF</TT
+> (= 0) is specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>, the invoking task is the target task. Note, however, that when <CODE
+CLASS="varname"
+>tskid</CODE
+>=<TT
+CLASS="literal"
+>TSK_SELF</TT
+> is specified in a system call issued from a task-independent portion, error code <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+> is returned. When <TT
+CLASS="literal"
+>TPRI_INI</TT
+> (= 0) is specified as <CODE
+CLASS="varname"
+>tskpri</CODE
+>, the target task base priority is changed to the initial priority when the task was started (<CODE
+CLASS="varname"
+>itskpri</CODE
+>).</P
+><P
+>A priority changed by this system call remains valid until the task is terminated. When the task reverts to DORMANT state, the task priority before its exit is discarded, with the task again assigned to the initial priority when the task was started (<CODE
+CLASS="varname"
+>itskpri</CODE
+>). However, the priority changed in DORMANT state is valid. The next time the task is started, it has the new initial priority.</P
+><P
+>If as a result of this system call execution the target task current priority matches the base priority (this condition is always met when the mutex function is not used), processing is as follows.</P
+><P
+>If the target task is in a run state, the task precedence changes according to its priority. The target task has the lowest precedence among tasks of the same priority after the change.</P
+><P
+>If the target task is in some kind of priority-based queue, the order in that queue changes in accordance with the new task priority. Among tasks of the same priority after the change, the target task is queued at the end.</P
+><P
+>If the target task has locked a <TT
+CLASS="literal"
+>TA_CEILING</TT
+> attribute mutex or is waiting for a lock, and the base priority specified in <CODE
+CLASS="varname"
+>tskpri</CODE
+> is higher than any of the ceiling priorities, error code <SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+> is returned.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2963"
+>Additional Notes</A
+></H3
+><P
+>In some cases when this system call results in a change in the queued order of the target task in a task priority-based queue, it may be necessary to release the wait state of another task waiting in that queue (in a message buffer send queue, or in a queue waiting to acquire a variable-size memory pool).</P
+><P
+>In some cases when this system call results in a base priority change while the target task is waiting for a mutex lock with <TT
+CLASS="literal"
+>TA_INHERIT</TT
+> dynamic priority inheritance processing may be necessary.</P
+><P
+>When a mutex function is not used and the system call is issued specifying the invoking task as the target task, setting the new priority to the base priority of the invoking task, the order of execution of the invoking task becomes the lowest among tasks of the same priority. This system call can therefore be used to relinquish execution privilege.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2969"
+>Porting Guideline</A
+></H3
+><P
+>The largest task priority is defined by <TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+>. Although <TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+> is variable, but is guaranteed to be equal to or larger than 16, and so by restricting the used task priorities only to the range from 1 to 16, there shall be no need for modifying the task priorities during porting.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_get_reg"
+>tk_get_reg - Get Task Registers</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2976"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN2978"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_get_reg</CODE
+>(ID tskid, T_REGS *pk_regs, T_EIT *pk_eit, T_CREGS *pk_cregs);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2991"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2993"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+><TR
+><TD
+>T_REGS*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_regs</CODE
+>
+              </TD
+><TD
+>Packet of Registers</TD
+><TD
+>Pointer to the area to return the general register values</TD
+></TR
+><TR
+><TD
+>T_EIT*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_eit</CODE
+>
+              </TD
+><TD
+>Packet of EIT Registers</TD
+><TD
+>Pointer to the area to return the values of registers saved when an exception occurs</TD
+></TR
+><TR
+><TD
+>T_CREGS*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_cregs</CODE
+>
+              </TD
+><TD
+>Packet of Control Registers</TD
+><TD
+>Pointer to the area to return the control register values</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3024"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3026"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>The contents of T_REGS, T_EIT, and T_CREGS are defined for each CPU and implementation.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3040"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3042"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (called for the invoking task)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (called from task-independent portion)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3069"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3071"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3086"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3089"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_REGOPS</TT
+>
+              </TD
+><TD
+>Support for task-register manipulation functions</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3098"
+>Description</A
+></H3
+><P
+>Gets the current register contents of the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>.</P
+><P
+>If <TT
+CLASS="literal"
+>NULL</TT
+> is set in <CODE
+CLASS="varname"
+>pk_regs</CODE
+>, <CODE
+CLASS="varname"
+>pk_eit</CODE
+>, or <CODE
+CLASS="varname"
+>pk_cregs</CODE
+>, the corresponding registers are not referenced.</P
+><P
+>The referenced register values are not necessarily the values at the time the task portion was executing.</P
+><P
+>If this system call is issued for the invoking task, error code <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> is returned.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3110"
+>Additional Notes</A
+></H3
+><P
+>In principle, all registers in the task context can be referenced. This includes not only physical CPU registers but also those treated by the kernel as virtual registers.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_set_reg"
+>tk_set_reg - Set Task Registers</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3115"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN3117"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_set_reg</CODE
+>(ID tskid, CONST T_REGS *pk_regs, CONST T_EIT *pk_eit, CONST T_CREGS *pk_cregs);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3130"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3132"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+><TR
+><TD
+>CONST T_REGS*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_regs</CODE
+>
+              </TD
+><TD
+>Packet of Registers</TD
+><TD
+>General registers</TD
+></TR
+><TR
+><TD
+>CONST T_EIT*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_eit</CODE
+>
+              </TD
+><TD
+>Packet of EIT Registers</TD
+><TD
+>Registers saved when EIT occurs</TD
+></TR
+><TR
+><TD
+>CONST T_CREGS*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_cregs</CODE
+>
+              </TD
+><TD
+>Packet of Control Registers</TD
+><TD
+>Control registers</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>The contents of T_REGS, T_EIT, and T_CREGS are defined for each CPU and implementation.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3164"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3166"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3179"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3181"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (called for the invoking task)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (called from task-independent portion)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Invalid register value (implementation-dependent)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3212"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3214"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3229"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3232"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_REGOPS</TT
+>
+              </TD
+><TD
+>Support for task-register manipulation functions</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3241"
+>Description</A
+></H3
+><P
+>Sets the current register contents of the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>.</P
+><P
+>If <TT
+CLASS="literal"
+>NULL</TT
+> is set in <CODE
+CLASS="varname"
+>pk_regs</CODE
+>, <CODE
+CLASS="varname"
+>pk_eit</CODE
+>, or <CODE
+CLASS="varname"
+>pk_cregs</CODE
+>, the corresponding registers are not set.</P
+><P
+>The set register values are not necessarily the values while the task portion is executing. The kernel is not responsible for handling the side-effects of register value changes.</P
+><P
+>It is possible, however, that some registers or register bits cannot be changed if the kernel does not allow such changes.(Implementation-dependent)</P
+><P
+>If this system call is issued for the invoking task, error code <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> is returned.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_get_cpr"
+>tk_get_cpr - Get Task Coprocessor Registers</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3256"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN3258"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_get_cpr</CODE
+>(ID tskid, INT copno, T_COPREGS *pk_copregs);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3269"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3271"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>copno</CODE
+>
+              </TD
+><TD
+>Coprocessor Number</TD
+><TD
+>Coprocessor number (0 to 3)</TD
+></TR
+><TR
+><TD
+>T_COPREGS*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_copregs</CODE
+>
+              </TD
+><TD
+>Packet of Coprocessor Registers</TD
+><TD
+>Pointer to the area to return coprocessor register values</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3296"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3298"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_copregs</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3313"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>T_COP0REG</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cop0</CODE
+>
+              </TD
+><TD
+>Coprocessor Number 0 Register</TD
+><TD
+>Coprocessor number 0 register</TD
+></TR
+><TR
+><TD
+>T_COP1REG</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cop1</CODE
+>
+              </TD
+><TD
+>Coprocessor Number 1 Register</TD
+><TD
+>Coprocessor number 1 register</TD
+></TR
+><TR
+><TD
+>T_COP2REG</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cop2</CODE
+>
+              </TD
+><TD
+>Coprocessor Number 2 Register</TD
+><TD
+>Coprocessor number 2 register</TD
+></TR
+><TR
+><TD
+>T_COP3REG</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cop3</CODE
+>
+              </TD
+><TD
+>Coprocessor Number 3 Register</TD
+><TD
+>Coprocessor number 3 register</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>The contents of T_COPnREG are defined for each CPU and implementation.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3345"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3347"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (called for the invoking task)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (called from task-independent portion)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>copno</CODE
+> is invalid or the specified coprocessor does not exist)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3379"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3381"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3396"
+>Related Service Profile Items</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3398"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_COPn</TT
+>
+              </TD
+><TD
+>Support of co-processor number n</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>If <TT
+CLASS="literal"
+>TK_SUPPORT_COPn</TT
+> is ineffective for all <CODE
+CLASS="varname"
+>n</CODE
+>, this API is unsupported.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3410"
+>Description</A
+></H3
+><P
+>Gets the current contents of the register specified in <CODE
+CLASS="varname"
+>copno</CODE
+> of the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>.</P
+><P
+>The referenced register values are not necessarily the values at the time the task portion was executing.</P
+><P
+>If this system call is issued for the invoking task, error code <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> is returned.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3418"
+>Additional Notes</A
+></H3
+><P
+>In principle, all registers in the task context can be referenced. This includes not only physical CPU registers but also those treated by the kernel as virtual registers.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_set_cpr"
+>tk_set_cpr - Set Task Coprocessor Registers</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3423"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN3425"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_set_cpr</CODE
+>(ID tskid, INT copno, CONST T_COPREGS *pk_copregs);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3436"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3438"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="27%"><COL
+WIDTH="13%"><COL
+WIDTH="27%"><COL
+WIDTH="33%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>copno</CODE
+>
+              </TD
+><TD
+>Coprocessor Number</TD
+><TD
+>Coprocessor number (0 to 3)</TD
+></TR
+><TR
+><TD
+>CONST T_COPREGS*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_copregs</CODE
+>
+              </TD
+><TD
+>Packet of Coprocessor Registers</TD
+><TD
+>Coprocessor register</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_copregs</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3465"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="27%"
+TITLE="c1"><COL
+WIDTH="13%"><COL
+WIDTH="27%"><COL
+WIDTH="33%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>T_COP0REG</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cop0</CODE
+>
+              </TD
+><TD
+>Coprocessor Number 0 Register</TD
+><TD
+>Coprocessor number 0 register</TD
+></TR
+><TR
+><TD
+>T_COP1REG</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cop1</CODE
+>
+              </TD
+><TD
+>Coprocessor Number 1 Register</TD
+><TD
+>Coprocessor number 1 register</TD
+></TR
+><TR
+><TD
+>T_COP2REG</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cop2</CODE
+>
+              </TD
+><TD
+>Coprocessor Number 2 Register</TD
+><TD
+>Coprocessor number 2 register</TD
+></TR
+><TR
+><TD
+>T_COP3REG</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cop3</CODE
+>
+              </TD
+><TD
+>Coprocessor Number 3 Register</TD
+><TD
+>Coprocessor number 3 register</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3496"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3498"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="27%"><COL
+WIDTH="13%"><COL
+WIDTH="27%"><COL
+WIDTH="33%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3511"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3513"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (called for the invoking task)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (called from task-independent portion)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>copno</CODE
+> is invalid or the specified coprocessor does not exist), or the set register value is invalid (implementation-dependent)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3545"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3547"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3562"
+>Related Service Profile Items</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3564"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_COPn</TT
+>
+              </TD
+><TD
+>Support of co-processor number n</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>If <TT
+CLASS="literal"
+>TK_SUPPORT_COPn</TT
+> is ineffective for all <CODE
+CLASS="varname"
+>n</CODE
+>, this API is unsupported.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3576"
+>Description</A
+></H3
+><P
+>Sets the contents of the register specified in <CODE
+CLASS="varname"
+>copno</CODE
+> of the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>.</P
+><P
+>The set register values are not necessarily the values while the task portion is executing. The kernel is not responsible for handling the side-effects of register value changes.</P
+><P
+>It is possible, however, that some registers or register bits cannot be changed if the kernel does not allow such changes.(Implementation-dependent)</P
+><P
+>If this system call is issued for the invoking task, error code <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> is returned.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ref_tsk"
+>tk_ref_tsk - Reference Task Status</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3587"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN3589"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_tsk</CODE
+>(ID tskid, T_RTSK *pk_rtsk);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3598"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3600"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>Task ID</TD
+></TR
+><TR
+><TD
+>T_RTSK*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rtsk</CODE
+>
+              </TD
+><TD
+>Packet to Return Task Status</TD
+><TD
+>Pointer to the area to return the task status</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3619"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3621"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rtsk</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3636"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Extended information</TD
+></TR
+><TR
+><TD
+>PRI</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskpri</CODE
+>
+              </TD
+><TD
+>Task Priority</TD
+><TD
+>Current priority</TD
+></TR
+><TR
+><TD
+>PRI</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskbpri</CODE
+>
+              </TD
+><TD
+>Task Base Priority</TD
+><TD
+>Base priority</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskstat</CODE
+>
+              </TD
+><TD
+>Task State</TD
+><TD
+>Task State</TD
+></TR
+><TR
+><TD
+>UW</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskwait</CODE
+>
+              </TD
+><TD
+>Task Wait Factor</TD
+><TD
+>Wait factor</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wid</CODE
+>
+              </TD
+><TD
+>Waiting Object ID</TD
+><TD
+>Waiting object ID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wupcnt</CODE
+>
+              </TD
+><TD
+>Wakeup Count</TD
+><TD
+>Wakeup request queuing count</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>suscnt</CODE
+>
+              </TD
+><TD
+>Suspend Count</TD
+><TD
+>Suspend request nesting count</TD
+></TR
+><TR
+><TD
+>UW</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>waitmask</CODE
+>
+              </TD
+><TD
+>Wait Mask</TD
+><TD
+>Disabled wait factors</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>texmask</CODE
+>
+              </TD
+><TD
+>Task Exception Mask</TD
+><TD
+>Allowed task exceptions</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskevent</CODE
+>
+              </TD
+><TD
+>Task Event</TD
+><TD
+>Raised task event</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3711"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3713"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>tskid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (invalid <CODE
+CLASS="varname"
+>pk_rtsk</CODE
+>)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3737"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3739"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3754"
+>Related Service Profile Items</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3756"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>Information about disabled wait factors (<CODE
+CLASS="varname"
+>waitmask</CODE
+>) is obtainable</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+              </TD
+><TD
+>Task exception information (<CODE
+CLASS="varname"
+>texmask</CODE
+>) can be acquired.</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEVENT</TT
+>
+              </TD
+><TD
+>Generated task event(<CODE
+CLASS="varname"
+>tskevent</CODE
+>) can be acquired</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3776"
+>Description</A
+></H3
+><P
+>Gets the state of the task specified in <CODE
+CLASS="varname"
+>tskid</CODE
+>.</P
+><P
+><CODE
+CLASS="varname"
+>tskstat</CODE
+> takes the following values.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3782"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"><COL
+WIDTH="17%"><COL
+WIDTH="67%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_RUN</TT
+>
+              </TD
+><TD
+>0x0001</TD
+><TD
+>RUNNING state</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_RDY</TT
+>
+              </TD
+><TD
+>0x0002</TD
+><TD
+>READY state</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_WAI</TT
+>
+              </TD
+><TD
+>0x0004</TD
+><TD
+>WAITING state</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_SUS</TT
+>
+              </TD
+><TD
+>0x0008</TD
+><TD
+>SUSPENDED state</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_WAS</TT
+>
+              </TD
+><TD
+>0x000c</TD
+><TD
+>WAITING-SUSPENDED state</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_DMT</TT
+>
+              </TD
+><TD
+>0x0010</TD
+><TD
+>DORMANT state</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_NODISWAI</TT
+>
+              </TD
+><TD
+>0x0080</TD
+><TD
+>Disabling of wait by tk_dis_wai is prohibited</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>Task states such as <TT
+CLASS="literal"
+>TTS_RUN</TT
+> and <TT
+CLASS="literal"
+>TTS_WAI</TT
+> are expressed by corresponding bits, which is useful when making a complex state decision (e.g., deciding that the state is one of either RUNNING or READY state). Note that of the above states, <TT
+CLASS="literal"
+>TTS_WAS</TT
+> is a combination of <TT
+CLASS="literal"
+>TTS_SUS</TT
+> and <TT
+CLASS="literal"
+>TTS_WAI</TT
+> but <TT
+CLASS="literal"
+>TTS_SUS</TT
+> is never combined with other states (<TT
+CLASS="literal"
+>TTS_RUN</TT
+>, <TT
+CLASS="literal"
+>TTS_RDY</TT
+>, <TT
+CLASS="literal"
+>TTS_DMT</TT
+>).</P
+><P
+>In the case of <TT
+CLASS="literal"
+>TTS_WAI</TT
+> (including <TT
+CLASS="literal"
+>TTS_WAS</TT
+>), disabling of wait by the <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> is prohibited, <TT
+CLASS="literal"
+>TTS_NODISWAI</TT
+> is set. <TT
+CLASS="literal"
+>TTS NODISWAI</TT
+> is never combined with states other than <TT
+CLASS="literal"
+>TTS WAI</TT
+>.</P
+><P
+>When <A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+> is executed for an interrupted task from an interrupt handler, RUNNING (<TT
+CLASS="literal"
+>TTS_RUN</TT
+>) is returned as <CODE
+CLASS="varname"
+>tskstat</CODE
+>.</P
+><P
+>When <CODE
+CLASS="varname"
+>tskstat</CODE
+> is <TT
+CLASS="literal"
+>TTS_WAI</TT
+> (including <TT
+CLASS="literal"
+>TTS_WAS</TT
+>), the values of <CODE
+CLASS="varname"
+>tskwait</CODE
+> and <CODE
+CLASS="varname"
+>wid</CODE
+> are as shown in <A
+HREF="utk_os_functions.html#table_tk_ref_tsk"
+>Table 2</A
+>.</P
+><DIV
+CLASS="table"
+><A
+NAME="table_tk_ref_tsk"
+></A
+><P
+><B
+>Table 2. Values of <CODE
+CLASS="varname"
+>tskwait</CODE
+> and <CODE
+CLASS="varname"
+>wid</CODE
+></B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="22%"><COL
+WIDTH="22%"><COL
+WIDTH="33%"><COL
+WIDTH="22%"><THEAD
+><TR
+><TH
+ALIGN="left"
+>&#13;                <CODE
+CLASS="varname"
+>tskwait</CODE
+>
+              </TH
+><TH
+ALIGN="left"
+>Value</TH
+><TH
+ALIGN="left"
+>Description</TH
+><TH
+ALIGN="left"
+>&#13;                <CODE
+CLASS="varname"
+>wid</CODE
+>
+              </TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_SLP</TT
+>
+              </TD
+><TD
+>0x00000001</TD
+><TD
+>Wait caused by <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+></TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_DLY</TT
+>
+              </TD
+><TD
+>0x00000002</TD
+><TD
+>Wait caused by <A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk"
+>tk_dly_tsk</A
+></TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_SEM</TT
+>
+              </TD
+><TD
+>0x00000004</TD
+><TD
+>Wait caused by <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_sem"
+>tk_wai_sem</A
+></TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>semid</CODE
+>
+              </TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_FLG</TT
+>
+              </TD
+><TD
+>0x00000008</TD
+><TD
+>Wait caused by <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+></TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgid</CODE
+>
+              </TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_MBX</TT
+>
+              </TD
+><TD
+>0x00000040</TD
+><TD
+>Wait caused by <A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+></TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbxid</CODE
+>
+              </TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_MTX</TT
+>
+              </TD
+><TD
+>0x00000080</TD
+><TD
+>Wait caused by <A
+HREF="extended_synchronization_and_communication_functions.html#tk_loc_mtx"
+>tk_loc_mtx</A
+></TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mtxid</CODE
+>
+              </TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_SMBF</TT
+>
+              </TD
+><TD
+>0x00000100</TD
+><TD
+>Wait caused by <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+></TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfid</CODE
+>
+              </TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_RMBF</TT
+>
+              </TD
+><TD
+>0x00000200</TD
+><TD
+>Wait caused by <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+></TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfid</CODE
+>
+              </TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_CAL</TT
+>
+              </TD
+><TD
+>0x00000400</TD
+><TD
+>(reserved)</TD
+><TD
+>(reserved)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_ACP</TT
+>
+              </TD
+><TD
+>0x00000800</TD
+><TD
+>(reserved)</TD
+><TD
+>(reserved)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_RDV</TT
+>
+              </TD
+><TD
+>0x00001000</TD
+><TD
+>(reserved)</TD
+><TD
+>(reserved)</TD
+></TR
+><TR
+><TD
+>(<TT
+CLASS="literal"
+>TTW_CAL</TT
+> | <TT
+CLASS="literal"
+>TTW_RDV</TT
+>)</TD
+><TD
+>0x00001400</TD
+><TD
+>(reserved)</TD
+><TD
+>(reserved)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_MPF</TT
+>
+              </TD
+><TD
+>0x00002000</TD
+><TD
+>Wait caused by <A
+HREF="memory_pool_management_functions.html#tk_get_mpf"
+>tk_get_mpf</A
+></TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mpfid</CODE
+>
+              </TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_MPL</TT
+>
+              </TD
+><TD
+>0x00004000</TD
+><TD
+>Wait caused by <A
+HREF="memory_pool_management_functions.html#tk_get_mpl"
+>tk_get_mpl</A
+></TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mplid</CODE
+>
+              </TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_EV1</TT
+>
+              </TD
+><TD
+>0x00010000</TD
+><TD
+>Wait for task event #1</TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_EV2</TT
+>
+              </TD
+><TD
+>0x00020000</TD
+><TD
+>Wait for task event #2</TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_EV3</TT
+>
+              </TD
+><TD
+>0x00040000</TD
+><TD
+>Wait for task event #3</TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_EV4</TT
+>
+              </TD
+><TD
+>0x00080000</TD
+><TD
+>Wait for task event #4</TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_EV5</TT
+>
+              </TD
+><TD
+>0x00100000</TD
+><TD
+>Wait for task event #5</TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_EV6</TT
+>
+              </TD
+><TD
+>0x00200000</TD
+><TD
+>Wait for task event #6</TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_EV7</TT
+>
+              </TD
+><TD
+>0x00400000</TD
+><TD
+>Wait for task event #7</TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_EV8</TT
+>
+              </TD
+><TD
+>0x00800000</TD
+><TD
+>Wait for task event #8</TD
+><TD
+>0</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>When <CODE
+CLASS="varname"
+>tskstat</CODE
+> is not <TT
+CLASS="literal"
+>TTS_WAI</TT
+> (including <TT
+CLASS="literal"
+>TTS_WAS</TT
+>), both <CODE
+CLASS="varname"
+>tskwait</CODE
+> and <CODE
+CLASS="varname"
+>wid</CODE
+> are 0.</P
+><P
+><CODE
+CLASS="varname"
+>waitmask</CODE
+> is the same bit array as <CODE
+CLASS="varname"
+>tskwait</CODE
+>.</P
+><P
+><CODE
+CLASS="varname"
+>texmask</CODE
+> is a logical OR bit array representing permitted task exception codes in the form 1&#60;&#60; task exception code for each code.</P
+><P
+><CODE
+CLASS="varname"
+>tskevent</CODE
+> shows the list of generated and pending task events by representing each event as 1&#60;&#60; (task event number - 1) and calculating the logical OR of the bit values.</P
+><P
+>For a task in DORMANT state, <CODE
+CLASS="varname"
+>wupcnt</CODE
+> = 0, <CODE
+CLASS="varname"
+>suscnt</CODE
+> = 0, and <CODE
+CLASS="varname"
+>tskevent</CODE
+> = 0.</P
+><P
+>The invoking task can be specified by setting <CODE
+CLASS="varname"
+>tskid</CODE
+> = <TT
+CLASS="literal"
+>TSK_SELF</TT
+> = 0. Note, however, that when <CODE
+CLASS="varname"
+>tskid</CODE
+>=<SPAN
+CLASS="errorname"
+>TSK_SELF</SPAN
+>=0 is specified in a system call issued from a task-independent portion, error code <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+> is returned.</P
+><P
+>When the task specified with <A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+> does not exist, error code <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> is returned.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4046"
+>Additional Notes</A
+></H3
+><P
+>Even when <CODE
+CLASS="varname"
+>tskid</CODE
+> = <TT
+CLASS="literal"
+>TSK_SELF</TT
+> is specified with this system call, the ID of the invoking task is not known. Use <A
+HREF="system_management_functions.html#tk_get_tid"
+>tk_get_tid</A
+> to find out the ID of the invoking task.</P
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="service_profile_definitions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="task_dependent_synchronization_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Service Profile</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Task Synchronization Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

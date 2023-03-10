@@ -1,0 +1,831 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>サービスプロファイル</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel共通規定"
+HREF="common_utk.html"><LINK
+REL="PREVIOUS"
+TITLE="高級言語対応ルーチン"
+HREF="high_level_language_support_routines.html"><LINK
+REL="NEXT"
+TITLE="μT-Kernel/OSの機能"
+HREF="utk_os_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="high_level_language_support_routines.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel共通規定</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="service_profile_definitions"
+>サービスプロファイル</A
+></H1
+><P
+>μT-Kernel 3.0のサービスプロファイルを以下に示す。これらのサービスプロファイルを定義することは必須である。なお、このほかにOSの実装者が独自のサービスプロファイルの定義を追加することは構わない。</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="service_profile_bool"
+>有効・無効を示すプロファイル</A
+></H2
+><P
+>ある機能が有効か無効かを示すサービスプロファイルは、<TT
+CLASS="literal"
+>TRUE</TT
+>、<TT
+CLASS="literal"
+>FALSE</TT
+> のいずれかに定義された以下のマクロによってそれぞれ規定される。(以下の定義はあくまで例であり、実際の各プロファイルの値については実装に応じて適切に定義しなければならない。)</P
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_devicedriver"
+>デバイスドライバ向け機能</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_TASKEVENT      TRUE   /* タスクイベント関連機能のサポート */
+#define TK_SUPPORT_DISWAI         TRUE   /* タスクの待ち禁止状態のサポート */
+#define TK_SUPPORT_IOPORT         TRUE   /* I/Oポートアクセス機能のサポート */
+#define TK_SUPPORT_MICROWAIT      TRUE   /* 微小待ち機能のサポート */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TK_SUPPORT_TASKEVENT</TT
+>、<TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>は、高機能で汎用性の高いデバイスドライバを使用するシステムでは<TT
+CLASS="literal"
+>TRUE</TT
+>を推奨する。</P
+><P
+><TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+>、<TT
+CLASS="literal"
+>TK_SUPPORT_MICROWAIT</TT
+>は、一般には<TT
+CLASS="literal"
+>TRUE</TT
+>を推奨する。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_lowpower"
+>省電力機能</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_LOWPOWER       TRUE   /* 省電力機能のサポート */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TK_SUPPORT_LOWPOWER</TT
+>は、<TT
+CLASS="literal"
+>TRUE</TT
+>を推奨する。ただし、省電力の要求の強くないシステムや、ハードウェア上の制約のあるシステムでは、<TT
+CLASS="literal"
+>FALSE</TT
+>でよい。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_memorymanagement"
+>動的/静的メモリ管理機能</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_USERBUF        FALSE  /* ユーザバッファ指定(TA_USERBUF)のサポート */
+#define TK_SUPPORT_AUTOBUF        TRUE   /* 自動バッファ割当て(TA_USERBUF指定なし)のサポート */
+#define TK_SUPPORT_MEMLIB         TRUE   /* メモリ割当てライブラリのサポート */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TK_SUPPORT_USERBUF</TT
+>は、一般には<TT
+CLASS="literal"
+>FALSE</TT
+>を推奨する。</P
+><P
+><TT
+CLASS="literal"
+>TK_SUPPORT_AUTOBUF</TT
+>は、一般には<TT
+CLASS="literal"
+>TRUE</TT
+>を推奨する。</P
+><P
+>ただし、メモリ管理を静的に行うシステムでは、<TT
+CLASS="literal"
+>TK_SUPPORT_USERBUF</TT
+>を<TT
+CLASS="literal"
+>TRUE</TT
+>とし、<TT
+CLASS="literal"
+>TK_SUPPORT_AUTOBUF</TT
+>を<TT
+CLASS="literal"
+>FALSE</TT
+>としてもよい。</P
+><P
+><TT
+CLASS="literal"
+>TK_SUPPORT_USERBUF</TT
+>と<TT
+CLASS="literal"
+>TK_SUPPORT_AUTOBUF</TT
+>の両方を<TT
+CLASS="literal"
+>FALSE</TT
+>とすることはできない。</P
+><P
+><TT
+CLASS="literal"
+>TK_SUPPORT_MEMLIB</TT
+>は、一般には<TT
+CLASS="literal"
+>TRUE</TT
+>を推奨する。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_taskexception"
+>タスク例外処理機能</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_TASKEXCEPTION  TRUE /* タスク例外処理機能のサポート */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>は、複数のソフトウェアモジュールで構成され、柔軟な異常系の処理を必要とするような、比較的大規模なシステムでは<TT
+CLASS="literal"
+>TRUE</TT
+>を推奨する。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_subsystem"
+>サブシステム関連機能</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_SUBSYSTEM      TRUE  /* サブシステム管理機能のサポート */
+#define TK_SUPPORT_SSYEVENT       TRUE  /* サブシステムのイベント処理のサポート */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TK_SUPPORT_SUBSYSTEM</TT
+>、<TT
+CLASS="literal"
+>TK_SUPPORT_SSYEVENT</TT
+>は、ミドルウェアを利用するような、比較的大規模なシステムでは<TT
+CLASS="literal"
+>TRUE</TT
+>を推奨する。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_sysconfig"
+>システム構成情報取得機能</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_SYSCONF        FALSE  /* システム構成情報管理機能のサポート */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TK_SUPPORT_SYSCONF</TT
+>は、システム構成情報(タスクなどのオブジェクトの最大数など)の指定を静的に行うシステム、たとえばOSのビルド時にシステム構成情報をハードコーティングするようなシステムでは<TT
+CLASS="literal"
+>FALSE</TT
+>とする。一方、システム構成情報の指定を柔軟に行うシステムでは<TT
+CLASS="literal"
+>TRUE</TT
+>とする。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_double_half"
+>64ビット対応、16ビット対応</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_HAS_DOUBLEWORD         FALSE  /* 64ビットデータ型(D, UD, VD)のサポート */
+#define TK_SUPPORT_USEC           FALSE  /* マイクロ秒のサポート */
+#define TK_SUPPORT_LARGEDEV       FALSE  /* 大容量デバイス(64ビット)のサポート */
+#define TK_SUPPORT_SERCD          TRUE   /* サブエラーコードのサポート */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TK_HAS_DOUBLEWORD</TT
+>、<TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>、<TT
+CLASS="literal"
+>TK_SUPPORT_LARGEDEV</TT
+>は、対象となるハードウェアやシステムの用途に依存して、<TT
+CLASS="literal"
+>TRUE</TT
+>または<TT
+CLASS="literal"
+>FALSE</TT
+>とする。</P
+><P
+><TT
+CLASS="literal"
+>TK_HAS_DOUBLEWORD</TT
+> が<TT
+CLASS="literal"
+>FALSE</TT
+>であるとき、<TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+> および <TT
+CLASS="literal"
+>TK_SUPPORT_LARGEDEV</TT
+> も<TT
+CLASS="literal"
+>FALSE</TT
+>となる。</P
+><P
+><TT
+CLASS="literal"
+>TK_SUPPORT_SERCD</TT
+>は、INTやERが32ビットのシステムでは<TT
+CLASS="literal"
+>TRUE</TT
+>を推奨し、INTやERが16ビットのシステムでは<TT
+CLASS="literal"
+>FALSE</TT
+>を推奨する。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_hardware"
+>CPU、ハードウェア、システム、コンパイラ依存機能</A
+></H3
+><P
+>以下のプロファイルは、対象となるハードウェアやOSの実装に依存して、<TT
+CLASS="literal"
+>TRUE</TT
+>または<TT
+CLASS="literal"
+>FALSE</TT
+>とする。</P
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="service_profile_interrupt"
+>割込み関連機能</A
+></H4
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_INTCTRL        TRUE   /* 割込みコントローラ制御機能のサポート */
+#define TK_HAS_ENAINTLEVEL        TRUE   /* 割込み優先度の指定が可能 */
+#define TK_SUPPORT_CPUINTLEVEL    FALSE  /* CPU内割込みマスクレベルのサポート */
+#define TK_SUPPORT_CTRLINTLEVEL   TRUE   /* 割込みコントローラ内割込みマスクレベルのサポート */
+#define TK_SUPPORT_INTMODE        TRUE   /* 割込みモード設定機能のサポート */
+</PRE
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="service_profile_cache"
+>キャッシュ制御機能</A
+></H4
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_CACHECTRL      TRUE   /* メモリキャッシュ制御機能のサポート */
+#define TK_SUPPORT_SETCACHEMODE	  TRUE   /* キャッシュモード設定機能のサポート */
+#define TK_SUPPORT_WBCACHE        FALSE  /* ライトバックキャッシュのサポート */
+#define TK_SUPPORT_WTCACHE        TRUE   /* ライトスルーキャッシュのサポート */
+</PRE
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="service_profile_coproc"
+>FPU(COP)サポート</A
+></H4
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_FPU            TRUE   /* FPU機能のサポート */
+#define TK_SUPPORT_COP0           TRUE   /* 番号0のコプロセッサ利用機能のサポート */
+#define TK_SUPPORT_COP1           FALSE  /* 番号1のコプロセッサ利用機能のサポート */
+#define TK_SUPPORT_COP2           FALSE  /* 番号2のコプロセッサ利用機能のサポート */
+#define TK_SUPPORT_COP3           FALSE  /* 番号3のコプロセッサ利用機能のサポート */
+</PRE
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="service_profile_other"
+>その他の機能</A
+></H4
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_ASM            FALSE  /* アセンブリ言語による処理ルーチンのサポート */
+#define TK_SUPPORT_REGOPS         FALSE  /* タスクレジスタ取得・設定機能のサポート */
+#define TK_ALLOW_MISALIGN         FALSE  /* メモリのミスアラインアクセスが可能 */
+#define TK_BIGENDIAN              FALSE  /* ビッグエンディアン(定義必須) */
+#define TK_TRAP_SVC               TRUE   /* システムコールの呼び出しにCPUのトラップ命令を利用 */
+#define TK_HAS_SYSSTACK           TRUE   /* タスクが独立したシステムスタックを持つ */
+#define TK_SUPPORT_PTIMER         TRUE   /* 物理タイマ機能のサポート */
+#define TK_SUPPORT_UTC            TRUE   /* UNIX表現のシステム時刻のサポート */
+#define TK_SUPPORT_TRONTIME       FALSE  /* TRON表現のシステム時刻のサポート */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TK_SUPPORT_UTC</TT
+> と <TT
+CLASS="literal"
+>TK_SUPPORT_TRONTIME</TT
+> の少なくとも一方は<TT
+CLASS="literal"
+>TRUE</TT
+>でなければならない。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_debugger"
+>デバッグサポート関連機能</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_DSNAME         FALSE  /* DSオブジェクト名称のサポート */
+#define TK_SUPPORT_DBGSPT         FALSE  /* μT-Kernel/DSのサポート */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>、<TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>は、必要に応じて<TT
+CLASS="literal"
+>TRUE</TT
+>または<TT
+CLASS="literal"
+>FALSE</TT
+>とする。</P
+><P
+>なお、<TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>は、μT-Kernel/DSのAPIのうち、<A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> と <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> 以外のAPIの利用の可否を示す。<TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>が<TT
+CLASS="literal"
+>FALSE</TT
+>であっても、<TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>が<TT
+CLASS="literal"
+>TRUE</TT
+>であれば、<A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> と <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> を利用できる。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="check_method_of_service_profile"
+>サービスプロファイルの判定方法</A
+></H3
+><P
+>μT-Kernel 3.0の各実装では前述のプロファイルはすべて定義されなければならないが、プロファイル定義の提供されない他のOSやプロファイルの漏れなどを想定し、未定義の場合も考慮したプロファイルの利用が推奨される。例えば、有効・無効・未定義を全て区別して扱う場合には、たとえば以下のような条件判定を行えば良い。</P
+><PRE
+CLASS="programlisting"
+>&#13;#if defined(TK_SUPPORT_xxx)
+  #if TK_SUPPORT_xxx
+    /* プロファイルが有効に定義されている場合 */
+  #else
+    /* プロファイルが無効に定義されている場合 */
+  #endif
+#else
+  /* プロファイルが未定義の場合 */
+#endif
+</PRE
+><P
+>ここで、もし以下のようにプロファイル定義をそのまま "#if" の条件として使うと、このプロファイルを無効として定義していた場合と、このプロファイルが未定義だった場合との区別ができない。</P
+><PRE
+CLASS="programlisting"
+>&#13;#if TK_SUPPORT_xxx
+  /* プロファイルが有効に定義されている場合 */
+#else
+  /* プロファイルが無効または未定義の場合 */
+#endif
+</PRE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="service_profile_value"
+>値を持つサービスプロファイル</A
+></H2
+><P
+>上限値やバージョン番号などを示すサービスプロファイルは、その値を示すマクロとして規定される。(以下の定義はあくまで一例であり、実際のプロファイルの値については実装依存である。)</P
+><PRE
+CLASS="programlisting"
+>&#13;#define  TK_SPECVER_MAGIC            6      /* μT-KernelのMAGIC */
+#define  TK_SPECVER_MAJOR            3      /* 仕様書のメジャーバージョン番号 */
+#define  TK_SPECVER_MINOR            0      /* 仕様書のマイナーバージョン番号 */
+#define  TK_SPECVER                  ((TK_SPECVER_MAJOR &#60;&#60; 8) | TK_SPECVER_MINOR)
+                                            /* μT-Kernelのバージョン番号 */
+
+#define  TK_MAX_TSKPRI               32     /* 最大タスク優先度 (&#62;= 16) */
+#define  TK_WAKEUP_MAXCNT            65535  /* タスクの起床要求の最大キューイング数 (&#62;= 1) */
+#define  TK_SEMAPHORE_MAXCNT         65535  /* セマフォ資源数の最大値(maxsem)の上限値
+                                               (&#62;= 32767) */
+#define  TK_SUSPEND_MAXCNT           65535  /* タスクの強制待ち要求の最大ネスト数 (&#62;= 1) */
+#define  TK_MEM_RNG0                 0      /* TA_RNG0の実際のメモリ保護レベル (0〜3) */
+#define  TK_MEM_RNG1                 0      /* TA_RNG1の実際のメモリ保護レベル (0〜3) */
+#define  TK_MEM_RNG2                 0      /* TA_RNG2の実際のメモリ保護レベル (0〜3) */
+#define  TK_MEM_RNG3                 3      /* TA_RNG3の実際のメモリ保護レベル (0〜3) */
+#define  TK_MAX_PTIMER               2      /* 最大物理タイマ番号 (&#62;= 0)
+                                              (物理タイマ番号に1〜TK_MAX_PTIMERが指定可) */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TK_MEM_RNGn</TT
+> は、<TT
+CLASS="literal"
+>TA_RNGn</TT
+>で指定されたメモリの実際のメモリ保護レベルを指し、<FONT
+COLOR="RED"
+>TK_MEM_RNGn == TK_MEM_RNGm</FONT
+> ならば、メモリアクセスの保護レベルについて<TT
+CLASS="literal"
+>TA_RNGn</TT
+>と<TT
+CLASS="literal"
+>TA_RNGm</TT
+>が同一であることを示す。すなわち、保護レベルが n のメモリを、保護レベル m を持つタスクからアクセスしてもアクセス権違反の例外が生じないことが保証される。</P
+><P
+>なお、値を持つサービスプロファイルに対しても、<FONT
+COLOR="RED"
+>defined(...)</FONT
+>等を用いてプロファイル定義が提供されないケースを考慮した上で利用することが推奨される。</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="service_profile_example"
+>サービスプロファイルの具体例</A
+></H2
+><P
+>以下にサービスプロファイルの具体例を示す。</P
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_small_system"
+>16ビットCPUでごく小規模なシステムでのプロファイル例</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_TASKEVENT      FALSE
+#define TK_SUPPORT_DISWAI         FALSE
+#define TK_SUPPORT_IOPORT         TRUE
+#define TK_SUPPORT_MICROWAIT      TRUE
+
+#define TK_SUPPORT_LOWPOWER       TRUE
+
+#define TK_SUPPORT_USERBUF        TRUE
+#define TK_SUPPORT_AUTOBUF        FALSE
+#define TK_SUPPORT_MEMLIB         FALSE
+
+#define TK_SUPPORT_TASKEXCEPTION  FALSE
+
+#define TK_SUPPORT_SUBSYSTEM      FALSE
+#define TK_SUPPORT_SSYEVENT       FALSE
+
+#define TK_SUPPORT_SYSCONF        FALSE
+
+#define TK_HAS_DOUBLEWORD         FALSE
+#define TK_SUPPORT_USEC           FALSE
+#define TK_SUPPORT_LARGEDEV       FALSE
+#define TK_SUPPORT_SERCD          FALSE
+
+#define TK_SUPPORT_INTCTRL        FALSE
+#define TK_HAS_ENAINTLEVEL        FALSE
+#define TK_SUPPORT_CPUINTLEVEL    FALSE
+#define TK_SUPPORT_CTRLINTLEVEL   FALSE
+#define TK_SUPPORT_INTMODE        TRUE
+
+#define TK_SUPPORT_CACHECTRL      FALSE
+#define TK_SUPPORT_SETCACHEMODE   FALSE
+#define TK_SUPPORT_WBCACHE        FALSE
+#define TK_SUPPORT_WTCACHE        FALSE
+
+#define TK_SUPPORT_FPU            FALSE
+#define TK_SUPPORT_COP0           FALSE
+#define TK_SUPPORT_COP1           FALSE
+#define TK_SUPPORT_COP2           FALSE
+#define TK_SUPPORT_COP3           FALSE
+
+#define TK_SUPPORT_ASM            TRUE
+#define TK_SUPPORT_REGOPS         FALSE
+#define TK_ALLOW_MISALIGN         FALSE
+#define TK_BIGENDIAN              FALSE
+#define TK_TRAP_SVC               FALSE
+#define TK_HAS_SYSSTACK           FALSE
+#define TK_SUPPORT_PTIMER         FALSE
+#define TK_SUPPORT_UTC            TRUE
+#define TK_SUPPORT_TRONTIME       FALSE
+
+#define TK_SUPPORT_DSNAME         FALSE
+#define TK_SUPPORT_DBGSPT         FALSE
+
+#define TK_SPECVER_MAGIC          6
+#define TK_SPECVER_MAJOR          3
+#define TK_SPECVER_MINOR          0
+#define TK_SPECVER                ((TK_SPECVER_MAJOR &#60;&#60; 8) | TK_SPECVER_MINOR)
+
+#define TK_MAX_TSKPRI             16
+#define TK_WAKEUP_MAXCNT          4095
+#define TK_SEMAPHORE_MAXCNT       4095
+#define TK_SUSPEND_MAXCNT         4095
+#define TK_MEM_RNG0               0
+#define TK_MEM_RNG1               0
+#define TK_MEM_RNG2               0
+#define TK_MEM_RNG3               0
+#define TK_MAX_PTIMER             0
+</PRE
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_large_system"
+>比較的大規模なシステムでのプロファイル例</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_TASKEVENT      TRUE
+#define TK_SUPPORT_DISWAI         TRUE
+#define TK_SUPPORT_IOPORT         TRUE
+#define TK_SUPPORT_MICROWAIT      TRUE
+
+#define TK_SUPPORT_LOWPOWER       TRUE
+
+#define TK_SUPPORT_USERBUF        FALSE
+#define TK_SUPPORT_AUTOBUF        TRUE
+#define TK_SUPPORT_MEMLIB         TRUE
+
+#define TK_SUPPORT_TASKEXCEPTION  TRUE
+
+#define TK_SUPPORT_SUBSYSTEM      TRUE
+#define TK_SUPPORT_SSYEVENT       TRUE
+
+#define TK_SUPPORT_SYSCONF        TRUE
+
+#define TK_HAS_DOUBLEWORD         TRUE
+#define TK_SUPPORT_USEC           TRUE
+#define TK_SUPPORT_LARGEDEV       TRUE
+#define TK_SUPPORT_SERCD          TRUE
+
+#define TK_SUPPORT_INTCTRL        TRUE
+#define TK_HAS_ENAINTLEVEL        TRUE
+#define TK_SUPPORT_CPUINTLEVEL    FALSE
+#define TK_SUPPORT_CTRLINTLEVEL   TRUE
+#define TK_SUPPORT_INTMODE        TRUE
+
+#define TK_SUPPORT_CACHECTRL      TRUE
+#define TK_SUPPORT_SETCACHEMODE   TRUE
+#define TK_SUPPORT_WBCACHE        TRUE
+#define TK_SUPPORT_WTCACHE        TRUE
+
+#define TK_SUPPORT_FPU            TRUE
+#define TK_SUPPORT_COP0           TRUE
+#define TK_SUPPORT_COP1           FALSE
+#define TK_SUPPORT_COP2           FALSE
+#define TK_SUPPORT_COP3           FALSE
+
+#define TK_SUPPORT_ASM            TRUE
+#define TK_SUPPORT_REGOPS         TRUE
+#define TK_ALLOW_MISALIGN         FALSE
+#define TK_BIGENDIAN              FALSE
+#define TK_TRAP_SVC               TRUE
+#define TK_HAS_SYSSTACK           TRUE
+#define TK_SUPPORT_PTIMER         TRUE
+#define TK_SUPPORT_UTC            TRUE
+#define TK_SUPPORT_TRONTIME       FALSE
+
+#define TK_SUPPORT_DSNAME         TRUE
+#define TK_SUPPORT_DBGSPT         TRUE
+
+#define TK_SPECVER_MAGIC          6
+#define TK_SPECVER_MAJOR          3
+#define TK_SPECVER_MINOR          0
+#define TK_SPECVER                ((TK_SPECVER_MAJOR &#60;&#60; 8) | TK_SPECVER_MINOR)
+
+#define TK_MAX_TSKPRI             140
+#define TK_WAKEUP_MAXCNT          65535
+#define TK_SEMAPHORE_MAXCNT       65535
+#define TK_SUSPEND_MAXCNT         65535
+#define TK_MEM_RNG0               0
+#define TK_MEM_RNG1               0
+#define TK_MEM_RNG2               0
+#define TK_MEM_RNG3               3
+#define TK_MAX_PTIMER             10
+</PRE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="high_level_language_support_routines.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>高級言語対応ルーチン</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="common_utk.html"
+ACCESSKEY="U"
+>上に戻る</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>μT-Kernel/OSの機能</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

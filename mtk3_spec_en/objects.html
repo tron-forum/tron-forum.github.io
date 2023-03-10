@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Objects</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel Concepts"
+HREF="concepts_underlying_utk.html"><LINK
+REL="PREVIOUS"
+TITLE="System States"
+HREF="system_states.html"><LINK
+REL="NEXT"
+TITLE="Protection Levels"
+HREF="protection_levels.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="system_states.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel Concepts</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="protection_levels.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="objects"
+>Objects</A
+></H1
+><P
+>"Object" is the general term for resources handled by μT-Kernel. Besides <A
+HREF="utk_os_functions.html#task_management_functions"
+>tasks</A
+>, objects include <A
+HREF="memory_pool_management_functions.html"
+>memory pools</A
+>, <A
+HREF="synchronzation_and_communication_functions.html#semaphore"
+>semaphores</A
+>, <A
+HREF="synchronzation_and_communication_functions.html#event_flag"
+>event flags</A
+>, <A
+HREF="synchronzation_and_communication_functions.html#mailbox"
+>mailboxes</A
+> and other synchronization and communication mechanisms, as well as time event handlers (<A
+HREF="time_management_functions.html#cyclic_handler"
+>cyclic handlers</A
+> and <A
+HREF="time_management_functions.html#alarm_handler"
+>alarm handlers</A
+>).</P
+><P
+>Attributes can generally be specified when an object is created. Attributes determine detailed differences in object behavior or the object initial state. When TA_XXXXX is specified for an object, that object is called a "TA_XXXXX attribute object." If there is no particular attribute to be defined, <TT
+CLASS="literal"
+>TA_NULL</TT
+> (= 0) is specified. Generally there is no interface provided for reading attributes after an object is registered.</P
+><P
+>In an object attribute value, the lower bits indicate system attributes and the upper bits indicate implementation-dependent attributes. This specification does not define the bit position at which the upper and lower distinction is to be made. Basically, bits that are not defined in the standard specification can be used as implementation-dependent attributes. In principle, however, the system attribute portion is assigned from the least significant bit (LSB) toward the most significant bit (MSB), and implementation-dependent attributes from the MSB toward the LSB. Bits not defining any attribute must be cleared to 0.</P
+><P
+>In some cases an object may contain extended information. Extended information is specified when the object is registered. Information passed in parameters when an object starts execution has no effect on μT-Kernel behavior. Extended information can be read by calling an object status reference system call.</P
+><P
+>An object is identified by an ID number. In μT-Kernel, an ID number is automatically assigned when an object is created. Users cannot specify ID numbers. This makes identifying an object during debugging difficult. We can specify an object name for debugging upon creating each object. This name is used temporarily for debugging and can be referred to only from μT-Kernel/DS functions. No check is performed on the naming by μT-Kernel.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="system_states.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="protection_levels.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>System States</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="concepts_underlying_utk.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Protection Levels</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

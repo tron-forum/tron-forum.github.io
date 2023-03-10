@@ -1,0 +1,9028 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>同期・通信機能</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/OSの機能"
+HREF="utk_os_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="タスク例外処理機能"
+HREF="task_exception_handling_functions.html"><LINK
+REL="NEXT"
+TITLE="拡張同期・通信機能"
+HREF="extended_synchronization_and_communication_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="task_exception_handling_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/OSの機能</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="extended_synchronization_and_communication_functions.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="synchronzation_and_communication_functions"
+>同期・通信機能</A
+></H1
+><P
+>同期・通信機能は、タスクとは独立したオブジェクトにより、タスク間の同期・通信を行うための機能である。セマフォ、イベントフラグ、メールボックスの各機能が含まれる。</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="semaphore"
+>セマフォ</A
+></H2
+><P
+>セマフォは、使用されていない資源の有無や数量を数値で表現することにより、その資源を使用する際の排他制御や同期を行うためのオブジェクトである。セマフォ機能には、セマフォを生成／削除する機能、セマフォの資源を獲得／返却する機能、セマフォの状態を参照する機能が含まれる。セマフォはID番号で識別されるオブジェクトである。セマフォのID番号をセマフォIDと呼ぶ。</P
+><P
+>セマフォは、対応する資源の有無や数量を表現するセマフォ資源数(セマフォカウント値)と、資源の獲得を待つタスクの待ち行列を持つ。資源をm個返却する側(イベントを知らせる側)では、セマフォの資源数をm個増やす。一方、資源をn個獲得する側(イベントを待つ側)では、セマフォの資源数をn個減らす。セマフォの資源数が足りなくなった場合(具体的には、資源数を減らすと資源数が負になる場合)、資源を獲得しようとしたタスクは、次に資源が返却されるまでセマフォ資源の獲得待ち状態となる。セマフォ資源の獲得待ち状態になったタスクは、そのセマフォの待ち行列につながれる。</P
+><P
+>また、セマフォに対して資源が返却され過ぎるのを防ぐために、セマフォ毎にセマフォ資源数の最大値を設定することができる。最大資源数を越える資源がセマフォに返却されようとした場合(具体的には、セマフォの資源数を増やすと最大資源数を超える場合)には、エラーを報告する。</P
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_cre_sem"
+>tk_cre_sem - セマフォ生成</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN6829"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN6831"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID semid = tk_cre_sem</CODE
+>(CONST T_CSEM *pk_csem);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN6838"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6840"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST T_CSEM*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_csem</CODE
+>
+              </TD
+><TD
+>Packet to Create Semaphore</TD
+><TD
+>セマフォ生成情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_csem</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6855"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>拡張情報</TD
+></TR
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>sematr</CODE
+>
+              </TD
+><TD
+>Semaphore Attribute</TD
+><TD
+>セマフォ属性</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>isemcnt</CODE
+>
+              </TD
+><TD
+>Initial Semaphore Count</TD
+><TD
+>セマフォ資源数の初期値</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>maxsem</CODE
+>
+              </TD
+><TD
+>Maximum Semaphore Count</TD
+><TD
+>セマフォ資源数の最大値</TD
+></TR
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dsname[8]</CODE
+>
+              </TD
+><TD
+>DS Object name</TD
+><TD
+>DSオブジェクト名称</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN6894"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6896"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>semid</CODE
+>
+              </TD
+><TD
+>Semaphore ID</TD
+><TD
+>セマフォID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN6913"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6915"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>メモリ不足(管理ブロック用の領域が確保できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>セマフォの数がシステムの上限を超えた</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>予約属性(<CODE
+CLASS="varname"
+>sematr</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>pk_csem</CODE
+> が不正, <CODE
+CLASS="varname"
+>isemcnt</CODE
+>, <CODE
+CLASS="varname"
+>maxsem</CODE
+> が負または不正)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN6940"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6942"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN6957"
+>関連するサービスプロファイル</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6959"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>セマフォ属性として<TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>(待ち禁止の拒否)が指定可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+              </TD
+><TD
+><TT
+CLASS="literal"
+>TA_DSNAME</TT
+>のセマフォ属性指定が可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SEMAPHORE_MAXCNT</TT
+>
+              </TD
+><TD
+>セマフォ資源数の最大値(maxsem)の上限値 (&#62;= 32767)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN6978"
+>解説</A
+></H4
+><P
+>セマフォを生成しセマフォID番号を割り当てる。具体的には、生成するセマフォに対して管理ブロックを割り付け、そのセマフォ資源数の初期値を <CODE
+CLASS="varname"
+>isemcnt</CODE
+>、最大値(上限値)を <CODE
+CLASS="varname"
+>maxsem</CODE
+> とする。なお、<CODE
+CLASS="varname"
+>maxsem</CODE
+> には少なくとも32767が指定できなくてはならない。32768以上の値が指定できるかは実装に依存する。</P
+><P
+><CODE
+CLASS="varname"
+>exinf</CODE
+> は、対象セマフォに関する情報を入れておくためにユーザが自由に利用できる。ここで設定した情報は、<A
+HREF="synchronzation_and_communication_functions.html#tk_ref_sem"
+>tk_ref_sem</A
+> で取り出すことができる。なお、ユーザの情報を入れるためにもっと大きな領域がほしい場合や、途中で内容を変更したい場合には、自分でそのためのメモリを確保し、そのメモリパケットのアドレスを <CODE
+CLASS="varname"
+>exinf</CODE
+> に入れる。カーネルでは <CODE
+CLASS="varname"
+>exinf</CODE
+> の内容について関知しない。</P
+><P
+><CODE
+CLASS="varname"
+>sematr</CODE
+> は、下位側がシステム属性を表し、上位側が実装独自属性を表す。<CODE
+CLASS="varname"
+>sematr</CODE
+> のシステム属性の部分では、次のような指定を行う。</P
+><PRE
+CLASS="synopsis"
+>&#13;sematr := (TA_TFIFO || TA_TPRI) | (TA_FIRST || TA_CNT) | [TA_DSNAME] | [TA_NODISWAI]
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6993"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>
+              </TD
+><TD
+>待ちタスクのキューイングはFIFO</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TPRI</TT
+>
+              </TD
+><TD
+>待ちタスクのキューイングは優先度順</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_FIRST</TT
+>
+              </TD
+><TD
+>待ち行列先頭のタスクを優先</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_CNT</TT
+>
+              </TD
+><TD
+>要求数の少ないタスクを優先</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_DSNAME</TT
+>
+              </TD
+><TD
+>DSオブジェクト名称を指定する</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>
+              </TD
+><TD
+><A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> による待ち禁止を拒否する</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><TT
+CLASS="literal"
+>TA_TFIFO</TT
+>, <TT
+CLASS="literal"
+>TA_TPRI</TT
+> では、タスクがセマフォの待ち行列に並ぶ際の並び方を指定することができる。属性が <TT
+CLASS="literal"
+>TA_TFIFO</TT
+> であればタスクの待ち行列はFIFOとなり、属性が <TT
+CLASS="literal"
+>TA_TPRI</TT
+> であればタスクの待ち行列はタスクの優先度順となる。</P
+><P
+><TT
+CLASS="literal"
+>TA_FIRST</TT
+>, <TT
+CLASS="literal"
+>TA_CNT</TT
+> では、資源獲得の優先順を指定する。<TT
+CLASS="literal"
+>TA_FIRST</TT
+> および <TT
+CLASS="literal"
+>TA_CNT</TT
+> の指定によって待ち行列の並び順が変わることはない。待ち行列の並び順は <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>, <TT
+CLASS="literal"
+>TA_TPRI</TT
+> によってのみ決定される。</P
+><P
+><TT
+CLASS="literal"
+>TA_FIRST</TT
+> では、要求するセマフォ資源数に関係なく待ち行列の先頭のタスクから順に資源を割り当てる。待ち行列の先頭のタスクが要求分の資源を獲得できない限り、待ち行列の後ろのタスクが資源を獲得することはない。</P
+><P
+><TT
+CLASS="literal"
+>TA_CNT</TT
+> では、要求するセマフォ資源数の獲得できるタスクから順に割り当てる。具体的には、待ち行列の先頭のタスクから順に要求するセマフォ資源数を検査し、その資源数が割り当てられるタスクに割り当てる。要求するセマフォ資源数の少ない順に割り当てるわけではない。</P
+><P
+><TT
+CLASS="literal"
+>TA_DSNAME</TT
+> を指定した場合に <CODE
+CLASS="varname"
+>dsname</CODE
+> が有効となり、DSオブジェクト名称として設定される。DSオブジェクト名称はデバッガがオブジェクトを識別するために使用され、T-Kernel/DSのシステムコール <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> と <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> からのみ操作可能である。詳細は <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> 、<A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> を参照のこと。<TT
+CLASS="literal"
+>TA_DSNAME</TT
+> を指定しなかった場合は、<CODE
+CLASS="varname"
+>dsname</CODE
+> が無視され、<A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> や <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> が、<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> エラーとなる。</P
+><PRE
+CLASS="programlisting"
+>&#13;#define TA_TFIFO        0x00000000      /* 待ちタスクをFIFOで管理 */
+#define TA_TPRI         0x00000001      /* 待ちタスクを優先度順で管理 */
+#define TA_FIRST        0x00000000      /* 待ち行列先頭のタスクを優先 */
+#define TA_CNT          0x00000002      /* 要求数の少ないタスクを優先 */
+#define TA_DSNAME       0x00000040      /* DSオブジェクト名称を指定 */
+#define TA_NODISWAI     0x00000080      /* 待ち禁止拒否 */
+</PRE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_del_sem"
+>tk_del_sem - セマフォ削除</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7054"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN7056"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_del_sem</CODE
+>(ID semid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7063"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7065"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>semid</CODE
+>
+              </TD
+><TD
+>Semaphore ID</TD
+><TD
+>セマフォID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7078"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7080"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7093"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7095"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>semid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>semid</CODE
+> のセマフォが存在しない)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7114"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7116"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7131"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7134"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>semid</CODE
+> で示されたセマフォを削除する。</P
+><P
+>本システムコールの発行により、対象セマフォのID番号および管理ブロック用の領域は解放される。</P
+><P
+>対象セマフォにおいて条件成立を待っているタスクがあった場合にも、本システムコールは正常終了するが、待ち状態にあったタスクにはエラー <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+> が返される。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_sig_sem"
+>tk_sig_sem - セマフォ資源返却</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7143"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN7145"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_sig_sem</CODE
+>(ID semid, INT cnt);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7154"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7156"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>semid</CODE
+>
+              </TD
+><TD
+>Semaphore ID</TD
+><TD
+>セマフォID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cnt</CODE
+>
+              </TD
+><TD
+>Count</TD
+><TD
+>返却するセマフォ資源数</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7175"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7177"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7190"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7192"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>semid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>semid</CODE
+> のセマフォが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_QOVR</SPAN
+>
+              </TD
+><TD
+>キューイングまたはネストのオーバーフロー(セマフォ資源数 <CODE
+CLASS="varname"
+>semcnt</CODE
+> のオーバーフロー)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>cnt</CODE
+>≦0)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7221"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7223"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7238"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7241"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>semid</CODE
+> で示されたセマフォに対して、<CODE
+CLASS="varname"
+>cnt</CODE
+> 個の資源を返却する操作を行う。対象セマフォに対して既に待っているタスクがあれば、要求するセマフォ資源数を確認して可能であれば資源を割り当てる。資源を割り当てられたタスクを実行可能状態(READY)に移す。条件によっては、複数のタスクに資源が割り当てられ実行可能状態(READY)になる場合がある。</P
+><P
+>セマフォ資源数の増加により、その値がセマフォ資源数の最大値(<CODE
+CLASS="varname"
+>maxsem</CODE
+>)を越えようとした場合は、<SPAN
+CLASS="errorname"
+>E_QOVR</SPAN
+> のエラーとなる。この場合、資源の返却は一切行われず、セマフォ資源数(<CODE
+CLASS="varname"
+>semcnt</CODE
+>)も変化しない。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7250"
+>補足事項</A
+></H4
+><P
+>セマフォ資源数(<CODE
+CLASS="varname"
+>semcnt</CODE
+>)がその初期値(<CODE
+CLASS="varname"
+>isemcnt</CODE
+>)を越えた場合にも、エラーとはならない。排他制御ではなく、同期の目的(<A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+>～<A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> と同様)でセマフォを使用する場合には、セマフォ資源数(<CODE
+CLASS="varname"
+>semcnt</CODE
+>)が初期値(<CODE
+CLASS="varname"
+>isemcnt</CODE
+>)を越えることがある。一方、排他制御の目的でセマフォを使う場合は、セマフォ資源数の初期値(<CODE
+CLASS="varname"
+>isemcnt</CODE
+>)と最大値(<CODE
+CLASS="varname"
+>maxsem</CODE
+>)を等しい値にしておくことにより、セマフォ資源数の増加によるエラーをチェックすることができる。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_wai_sem"
+>tk_wai_sem - セマフォ資源獲得</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7263"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN7265"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_wai_sem</CODE
+>(ID semid, INT cnt, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7276"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7278"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>semid</CODE
+>
+              </TD
+><TD
+>Semaphore ID</TD
+><TD
+>セマフォID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cnt</CODE
+>
+              </TD
+><TD
+>Count</TD
+><TD
+>要求するセマフォ資源数</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト指定(ミリ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7303"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7305"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7318"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7320"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>semid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>semid</CODE
+> のセマフォが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>tmout</CODE
+>≦(-2), <CODE
+CLASS="varname"
+>cnt</CODE
+>≦0)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>待ちオブジェクトが削除された(待ちの間に対象セマフォが削除)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>ポーリング失敗またはタイムアウト</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7366"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7368"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7383"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7386"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>semid</CODE
+> で示されたセマフォから、<CODE
+CLASS="varname"
+>cnt</CODE
+> 個の資源を獲得する操作を行う。資源が獲得できれば、本システムコールの発行タスクは待ち状態に入らず、実行を継続する。この場合、そのセマフォのセマフォ資源数(<CODE
+CLASS="varname"
+>semcnt</CODE
+>)は <CODE
+CLASS="varname"
+>cnt</CODE
+> 分減算される。資源が獲得できなければ、本システムコールを発行したタスクは待ち状態に入る。すなわち、そのセマフォに対する待ち行列につながれる。この場合、そのセマフォのセマフォ資源数(<CODE
+CLASS="varname"
+>semcnt</CODE
+>)は不変である。</P
+><P
+><CODE
+CLASS="varname"
+>tmout</CODE
+> により待ち時間の最大値(タイムアウト値)を指定することができる。<CODE
+CLASS="varname"
+>tmout</CODE
+> の基準時間(時間の単位)はシステム時刻の基準時間(＝1ミリ秒)と同じである。待ち解除の条件が満足されない(<A
+HREF="synchronzation_and_communication_functions.html#tk_sig_sem"
+>tk_sig_sem</A
+> が実行されない)まま <CODE
+CLASS="varname"
+>tmout</CODE
+> の時間が経過すると、タイムアウトエラー <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> となってシステムコールが終了する。</P
+><P
+><CODE
+CLASS="varname"
+>tmout</CODE
+> として <TT
+CLASS="literal"
+>TMO_POL</TT
+>＝0を指定した場合は、タイムアウト値として0を指定したことを示し、資源を獲得できなくても待ちに入らず <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> を返す。また、<CODE
+CLASS="varname"
+>tmout</CODE
+> として <TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1)を指定した場合は、タイムアウト値として無限大の時間を指定したことを示し、タイムアウトせずに資源が獲得できるまで待ち続ける。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_wai_sem_u"
+>tk_wai_sem_u - セマフォ資源獲得(マイクロ秒単位)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7408"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN7410"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_wai_sem_u</CODE
+>(ID semid, INT cnt, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7421"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7423"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>semid</CODE
+>
+              </TD
+><TD
+>Semaphore ID</TD
+><TD
+>セマフォID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cnt</CODE
+>
+              </TD
+><TD
+>Count</TD
+><TD
+>資源要求数</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト指定(マイクロ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7448"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7450"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7463"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7465"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>semid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>semid</CODE
+> のセマフォが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>tmout_u</CODE
+>≦(-2), <CODE
+CLASS="varname"
+>cnt</CODE
+>≦0)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>待ちオブジェクトが削除された(待ちの間に対象セマフォが削除)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>ポーリング失敗またはタイムアウト</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7511"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7513"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7528"
+>関連するサービスプロファイル</A
+></H4
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7531"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>マイクロ秒のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7540"
+>解説</A
+></H4
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_wai_sem"
+>tk_wai_sem</A
+> のパラメータである <CODE
+CLASS="varname"
+>tmout</CODE
+> を64ビットマイクロ秒単位の <CODE
+CLASS="varname"
+>tmout_u</CODE
+> としたシステムコールである。</P
+><P
+>パラメータが <CODE
+CLASS="varname"
+>tmout_u</CODE
+> となった点を除き、本システムコールの仕様は <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_sem"
+>tk_wai_sem</A
+> と同じである。詳細は <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_sem"
+>tk_wai_sem</A
+> の説明を参照のこと。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_ref_sem"
+>tk_ref_sem - セマフォ状態参照</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7552"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN7554"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_sem</CODE
+>(ID semid, T_RSEM *pk_rsem);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7563"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7565"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>semid</CODE
+>
+              </TD
+><TD
+>Semaphore ID</TD
+><TD
+>セマフォID</TD
+></TR
+><TR
+><TD
+>T_RSEM*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rsem</CODE
+>
+              </TD
+><TD
+>Packet to Refer Semaphore Status</TD
+><TD
+>セマフォ状態を返す領域へのポインタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7584"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7586"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rsem</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7601"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>拡張情報</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wtsk</CODE
+>
+              </TD
+><TD
+>Waiting Task ID</TD
+><TD
+>待ちタスクのID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>semcnt</CODE
+>
+              </TD
+><TD
+>Semaphore Count</TD
+><TD
+>現在のセマフォ資源数</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7628"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7630"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>semid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>semid</CODE
+> のセマフォが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>pk_rsem</CODE
+> が不正)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7654"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7656"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7671"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7674"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>semid</CODE
+> で示された対象セマフォの各種の状態を参照し、リターンパラメータとして現在のセマフォ資源数(<CODE
+CLASS="varname"
+>semcnt</CODE
+>)、待ちタスクのID(<CODE
+CLASS="varname"
+>wtsk</CODE
+>)、拡張情報(<CODE
+CLASS="varname"
+>exinf</CODE
+>) を返す。</P
+><P
+><CODE
+CLASS="varname"
+>wtsk</CODE
+> は、このセマフォで待っているタスクのIDを示す。複数のタスクが待っている場合には、待ち行列の先頭のタスクのIDを返す。待ちタスクが無い場合は <CODE
+CLASS="varname"
+>wtsk</CODE
+>＝0となる。</P
+><P
+>対象セマフォが存在しない場合には、エラー <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> となる。</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="event_flag"
+>イベントフラグ</A
+></H2
+><P
+>イベントフラグは、イベントの有無をビット毎のフラグで表現することにより、同期を行うためのオブジェクトである。イベントフラグ機能には、イベントフラグを生成／削除する機能、イベントフラグをセット／クリアする機能、イベントフラグで待つ機能、イベントフラグの状態を参照する機能が含まれる。イベントフラグはID番号で識別されるオブジェクトである。イベントフラグのID番号をイベントフラグIDと呼ぶ。</P
+><P
+>イベントフラグは、対応するイベントの有無をビット毎に表現するビットパターンと、そのイベントフラグで待つタスクの待ち行列を持つ。イベントフラグのビットパターンを、単にイベントフラグと呼ぶ場合もある。イベントを知らせる側では、イベントフラグのビットパターンの指定したビットをセットないしはクリアすることが可能である。一方、イベントを待つ側では、イベントフラグのビットパターンの指定したビットのすべてまたはいずれかがセットされるまで、タスクをイベントフラグ待ち状態にすることができる。イベントフラグ待ち状態になったタスクは、そのイベントフラグの待ち行列につながれる。</P
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_cre_flg"
+>tk_cre_flg - イベントフラグ生成</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7692"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN7694"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID flgid = tk_cre_flg</CODE
+>(CONST T_CFLG *pk_cflg);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7701"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7703"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST T_CFLG*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_cflg</CODE
+>
+              </TD
+><TD
+>Packet to Create EventFlag</TD
+><TD
+>イベントフラグ生成情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_cflg</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7718"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>拡張情報</TD
+></TR
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgatr</CODE
+>
+              </TD
+><TD
+>EventFlag Attribute</TD
+><TD
+>イベントフラグ属性</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>iflgptn</CODE
+>
+              </TD
+><TD
+>Initial EventFlag Pattern</TD
+><TD
+>イベントフラグの初期値</TD
+></TR
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dsname[8]</CODE
+>
+              </TD
+><TD
+>DS Object name</TD
+><TD
+>DSオブジェクト名称</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7751"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7753"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgid</CODE
+>
+              </TD
+><TD
+>EventFlag ID</TD
+><TD
+>イベントフラグID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7770"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7772"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>メモリ不足(管理ブロック用の領域が確保できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>イベントフラグの数がシステムの上限を超えた</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>予約属性(<CODE
+CLASS="varname"
+>flgatr</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>pk_cflg</CODE
+> が不正)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7795"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7797"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7812"
+>関連するサービスプロファイル</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7814"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>イベントフラグ属性として待ち禁止の拒否(<TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>)が指定可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+              </TD
+><TD
+><TT
+CLASS="literal"
+>TA_DSNAME</TT
+>のイベントフラグ属性指定が可能</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7829"
+>解説</A
+></H4
+><P
+>イベントフラグを生成しイベントフラグID番号を割り当てる。具体的には、生成するイベントフラグに対して管理ブロックを割り付け、その初期値を <CODE
+CLASS="varname"
+>iflgptn</CODE
+> とする。一つのイベントフラグで、プロセッサの1ワード分のビットをグループ化して扱う。操作はすべて1ワード分を単位とする。</P
+><P
+><CODE
+CLASS="varname"
+>exinf</CODE
+> は、対象イベントフラグに関する情報を入れておくためにユーザが自由に利用できる。ここで設定した情報は、<A
+HREF="synchronzation_and_communication_functions.html#tk_ref_flg"
+>tk_ref_flg</A
+> で取り出すことができる。なお、ユーザの情報を入れるためにもっと大きな領域がほしい場合や、途中で内容を変更したい場合には、自分でそのためのメモリを確保し、そのメモリパケットのアドレスを <CODE
+CLASS="varname"
+>exinf</CODE
+> に入れる。カーネルでは <CODE
+CLASS="varname"
+>exinf</CODE
+> の内容について関知しない。</P
+><P
+><CODE
+CLASS="varname"
+>flgatr</CODE
+> は、下位側がシステム属性を表し、上位側が実装独自属性を表す。<CODE
+CLASS="varname"
+>flgatr</CODE
+> のシステム属性の部分では、次のような指定を行う。</P
+><PRE
+CLASS="synopsis"
+>&#13;flgatr := (TA_TFIFO || TA_TPRI) | (TA_WMUL || TA_WSGL) | [TA_DSNAME] | [TA_NODISWAI]
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7842"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>
+              </TD
+><TD
+>待ちタスクのキューイングはFIFO</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TPRI</TT
+>
+              </TD
+><TD
+>待ちタスクのキューイングは優先度順</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_WSGL</TT
+>
+              </TD
+><TD
+>複数タスクの待ちを許さない(Wait Single Task)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_WMUL</TT
+>
+              </TD
+><TD
+>複数タスクの待ちを許す(Wait Multiple Task)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_DSNAME</TT
+>
+              </TD
+><TD
+>DSオブジェクト名称を指定する</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>
+              </TD
+><TD
+><A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> による待ち禁止を拒否する</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><TT
+CLASS="literal"
+>TA_WSGL</TT
+> を指定した場合は、複数のタスクが同時に待ち状態になることを禁止する。<TT
+CLASS="literal"
+>TA_WMUL</TT
+> を指定した場合は、同時に複数のタスクが待ち状態となることが許される。</P
+><P
+><TT
+CLASS="literal"
+>TA_TFIFO</TT
+>, <TT
+CLASS="literal"
+>TA_TPRI</TT
+> では、タスクがイベントフラグの待ち行列に並ぶ際の並び方を指定することができる。属性が <TT
+CLASS="literal"
+>TA_TFIFO</TT
+> であればタスクの待ち行列はFIFOとなり、属性が <TT
+CLASS="literal"
+>TA_TPRI</TT
+> であればタスクの待ち行列はタスクの優先度順となる。ただし、<TT
+CLASS="literal"
+>TA_WSGL</TT
+> を指定した場合は待ち行列を作らないため、<TT
+CLASS="literal"
+>TA_TFIFO</TT
+>, <TT
+CLASS="literal"
+>TA_TPRI</TT
+> のどちらを指定しても動作に変わりはない。</P
+><P
+>複数のタスクが待っている場合、待ち行列の先頭から順に待ち条件が成立しているか検査し、待ち条件が成立しているタスクの待ちを解除する。したがって、待ち行列の先頭のタスクが必ずしも最初に待ちが解除される訳ではない。また、待ち条件が成立したタスクが複数あれば、複数のタスクの待ちが解除される。</P
+><P
+><TT
+CLASS="literal"
+>TA_DSNAME</TT
+> を指定した場合に <CODE
+CLASS="varname"
+>dsname</CODE
+> が有効となり、DSオブジェクト名称として設定される。DSオブジェクト名称はデバッガがオブジェクトを識別するために使用され、T-Kernel/DSのシステムコール <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> と <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> からのみ操作可能である。詳細は <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> 、<A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> を参照のこと。<TT
+CLASS="literal"
+>TA_DSNAME</TT
+> を指定しなかった場合は、<CODE
+CLASS="varname"
+>dsname</CODE
+> が無視され、<A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> や <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> が、<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> エラーとなる。</P
+><PRE
+CLASS="programlisting"
+>&#13;#define TA_TFIFO        0x00000000      /* 待ちタスクをFIFOで管理 */
+#define TA_TPRI         0x00000001      /* 待ちタスクを優先度順で管理 */
+#define TA_WSGL         0x00000000      /* 複数タスクの待ちを許さない */
+#define TA_WMUL         0x00000008      /* 複数タスクの待ちを許す */
+#define TA_DSNAME       0x00000040      /* DSオブジェクト名称を指定 */
+#define TA_NODISWAI     0x00000080      /* 待ち禁止拒否 */
+</PRE
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7897"
+>移植ガイドライン</A
+></H4
+><P
+>T_CFLGの<CODE
+CLASS="varname"
+>iflgptn</CODE
+>メンバはUINT型であり、処理系によってビット幅が異なる可能性があるため注意が必要である。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_del_flg"
+>tk_del_flg - イベントフラグ削除</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7903"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN7905"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_del_flg</CODE
+>(ID flgid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7912"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7914"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgid</CODE
+>
+              </TD
+><TD
+>EventFlag ID</TD
+><TD
+>イベントフラグID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7927"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7929"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7942"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7944"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>flgid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>flgid</CODE
+> のイベントフラグが存在しない)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7963"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7965"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7980"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7983"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>flgid</CODE
+> で示されたイベントフラグを削除する。</P
+><P
+>本システムコールの発行により、対象イベントフラグのID番号および管理ブロック用の領域は解放される。</P
+><P
+>対象イベントフラグにおいて条件成立を待っているタスクがあった場合にも、本システムコールは正常終了するが、待ち状態にあったタスクにはエラー <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+> が返される。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_set_flg"
+>tk_set_flg - イベントフラグのセット</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7992"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN7994"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_set_flg</CODE
+>(ID flgid, UINT setptn);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8003"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8005"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgid</CODE
+>
+              </TD
+><TD
+>EventFlag ID</TD
+><TD
+>イベントフラグID</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>setptn</CODE
+>
+              </TD
+><TD
+>Set Bit Pattern</TD
+><TD
+>セットするビットパターン</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8024"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8026"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8039"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8041"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>flgid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>flgid</CODE
+> のイベントフラグが存在しない)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8060"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8062"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8077"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8080"
+>解説</A
+></H4
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+> では、<CODE
+CLASS="varname"
+>flgid</CODE
+> で示される1ワードのイベントフラグのうち、<CODE
+CLASS="varname"
+>setptn</CODE
+> で示されているビットがセットされる。すなわち、<CODE
+CLASS="varname"
+>flgid</CODE
+> で示されるイベントフラグの値に対して、<CODE
+CLASS="varname"
+>setptn</CODE
+> の値で論理和がとられる。(イベントフラグ値 <CODE
+CLASS="varname"
+>flgptn</CODE
+> に対して <CODE
+CLASS="varname"
+>flgptn</CODE
+> |= <CODE
+CLASS="varname"
+>setptn</CODE
+> の処理を実行)</P
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+> によりイベントフラグの値が変更された結果、<A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> でそのイベントフラグを待っていたタスクの待ち解除の条件を満たすようになれば、そのタスクの待ち状態が解除され、実行状態(RUNNING)または実行可能状態(READY)(待っていたタスクが二重待ち状態(WAITING-SUSPENDED)であった場合には強制待ち状態(SUSPENDED))へと移行する。</P
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+> で <CODE
+CLASS="varname"
+>setptn</CODE
+> の全ビットを0とした場合には、対象イベントフラグに対して何の操作も行わないことになる。ただし、この場合でもエラーとはならない。</P
+><P
+><TT
+CLASS="literal"
+>TA_WMUL</TT
+> の属性を持つイベントフラグに対しては、同一のイベントフラグに対して複数のタスクが同時に待つことができる。したがって、イベントフラグでもタスクが待ち行列を作ることになる。この場合、一回の <A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+> で複数のタスクが待ち解除となることがある。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8100"
+>移植ガイドライン</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>setptn</CODE
+>はUINT型であり、処理系によってビット幅が異なる可能性があるため注意が必要である。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_clr_flg"
+>tk_clr_flg - イベントフラグのクリア</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8106"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN8108"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_clr_flg</CODE
+>(ID flgid, UINT clrptn);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8117"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8119"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgid</CODE
+>
+              </TD
+><TD
+>EventFlag ID</TD
+><TD
+>イベントフラグID</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>clrptn</CODE
+>
+              </TD
+><TD
+>Clear Bit Pattern</TD
+><TD
+>クリアするビットパターン</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8138"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8140"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8153"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8155"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>flgid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>flgid</CODE
+> のイベントフラグが存在しない)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8174"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8176"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8191"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8194"
+>解説</A
+></H4
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_clr_flg"
+>tk_clr_flg</A
+> では、<CODE
+CLASS="varname"
+>flgid</CODE
+> で示される1ワードのイベントフラグのうち、対応する <CODE
+CLASS="varname"
+>clrptn</CODE
+> の0になっているビットがクリアされる。すなわち、<CODE
+CLASS="varname"
+>flgid</CODE
+> で示されるイベントフラグの値に対して、<CODE
+CLASS="varname"
+>clrptn</CODE
+> の値で論理積がとられる。(イベントフラグ値 <CODE
+CLASS="varname"
+>flgptn</CODE
+> に対して <CODE
+CLASS="varname"
+>flgptn</CODE
+> &#38;= <CODE
+CLASS="varname"
+>clrptn</CODE
+> の処理を実行)</P
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_clr_flg"
+>tk_clr_flg</A
+> では、対象イベントフラグを待っているタスクが待ち解除となることはない。すなわち、ディスパッチは起らない。</P
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_clr_flg"
+>tk_clr_flg</A
+> で <CODE
+CLASS="varname"
+>clrptn</CODE
+> の全ビットを1とした場合には、対象イベントフラグに対して何の操作も行わないことになる。ただし、この場合でもエラーとはならない。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8210"
+>移植ガイドライン</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>clrptn</CODE
+>はUINT型であり、処理系によってビット幅が異なる可能性があるため注意が必要である。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_wai_flg"
+>tk_wai_flg - イベントフラグ待ち</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8216"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN8218"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_wai_flg</CODE
+>(ID flgid, UINT waiptn, UINT wfmode, UINT *p_flgptn, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8233"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8235"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgid</CODE
+>
+              </TD
+><TD
+>EventFlag ID</TD
+><TD
+>イベントフラグID</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>waiptn</CODE
+>
+              </TD
+><TD
+>Wait Bit Pattern</TD
+><TD
+>待ちビットパターン</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wfmode</CODE
+>
+              </TD
+><TD
+>Wait EventFlag Mode</TD
+><TD
+>待ちモード</TD
+></TR
+><TR
+><TD
+>UINT*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>p_flgptn</CODE
+>
+              </TD
+><TD
+>Pointer to EventFlag Bit Pattern</TD
+><TD
+>リターンパラメータ <CODE
+CLASS="varname"
+>flgptn</CODE
+> を返す領域へのポインタ</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト指定(ミリ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8273"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8275"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgptn</CODE
+>
+              </TD
+><TD
+>EventFlag Bit Pattern</TD
+><TD
+>待ち解除時のビットパターン</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8294"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8296"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>flgid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>flgid</CODE
+> のイベントフラグが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>waiptn</CODE
+>＝0, <CODE
+CLASS="varname"
+>wfmode</CODE
+> が不正, <CODE
+CLASS="varname"
+>tmout</CODE
+>≦(-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>オブジェクトの状態が不正(<TT
+CLASS="literal"
+>TA_WSGL</TT
+> 属性のイベントフラグに対する複数タスクの待ち)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>待ちオブジェクトが削除された(待ちの間に対象イベントフラグが削除)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>ポーリング失敗またはタイムアウト</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8348"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8350"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8365"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8368"
+>解説</A
+></H4
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> では、<CODE
+CLASS="varname"
+>wfmode</CODE
+> で示される待ち解除の条件にしたがって、<CODE
+CLASS="varname"
+>flgid</CODE
+> で示されるイベントフラグがセットされるのを待つ。</P
+><P
+><CODE
+CLASS="varname"
+>flgid</CODE
+> で示されるイベントフラグが、既に <CODE
+CLASS="varname"
+>wfmode</CODE
+> で示される待ち解除条件を満たしている場合には、発行タスクは待ち状態にならずに実行を続ける。</P
+><P
+><CODE
+CLASS="varname"
+>wfmode</CODE
+> では、次のような指定を行う。</P
+><PRE
+CLASS="synopsis"
+>&#13;wfmode := (TWF_ANDW || TWF_ORW) ｜ [TWF_CLR || TWF_BITCLR]
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8380"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="67%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TWF_ANDW</TT
+>
+              </TD
+><TD
+>0x00</TD
+><TD
+>AND待ち</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TWF_ORW</TT
+>
+              </TD
+><TD
+>0x01</TD
+><TD
+>OR待ち</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TWF_CLR</TT
+>
+              </TD
+><TD
+>0x10</TD
+><TD
+>全クリア指定</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TWF_BITCLR</TT
+>
+              </TD
+><TD
+>0x20</TD
+><TD
+>条件ビットのみクリア指定</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><TT
+CLASS="literal"
+>TWF_ORW</TT
+> を指定した場合には、<CODE
+CLASS="varname"
+>flgid</CODE
+> で示されるイベントフラグのうち、<CODE
+CLASS="varname"
+>waiptn</CODE
+> で指定したビットのいずれかがセットされるのを待つ(OR待ち)。また、<TT
+CLASS="literal"
+>TWF_ANDW</TT
+> を指定した場合には、<CODE
+CLASS="varname"
+>flgid</CODE
+> で示されるイベントフラグのうち、<CODE
+CLASS="varname"
+>waiptn</CODE
+> で指定したビットのすべてがセットされるのを待つ(AND待ち)。</P
+><P
+><TT
+CLASS="literal"
+>TWF_CLR</TT
+> の指定が無い場合には、条件が満足されてこのタスクが待ち解除となった場合にも、イベントフラグの値はそのままである。<TT
+CLASS="literal"
+>TWF_CLR</TT
+> の指定がある場合には、条件が満足されてこのタスクが待ち解除となった場合、イベントフラグの値(全部のビット)が0にクリアされる。<TT
+CLASS="literal"
+>TWF_BITCLR</TT
+> の指定がある場合には、条件が満足されてこのタスクが待ち解除となった場合、イベントフラグの待ち解除条件に一致したビットのみが0クリアされる。(イベントフラグ値 &#38;= ~待ち解除条件)</P
+><P
+><CODE
+CLASS="varname"
+>flgptn</CODE
+> は、本システムコールによる待ち状態が解除される時のイベントフラグの値(<TT
+CLASS="literal"
+>TWF_CLR</TT
+> または <TT
+CLASS="literal"
+>TWF_BITCLR</TT
+> 指定の場合は、イベントフラグがクリアされる前の値) を示すリターンパラメータである。<CODE
+CLASS="varname"
+>flgptn</CODE
+> で返る値は、このシステムコールの待ち解除の条件を満たすものになっている。なお、タイムアウト等で待ちが解除された場合は、<CODE
+CLASS="varname"
+>flgptn</CODE
+> の内容は不定となる。</P
+><P
+><CODE
+CLASS="varname"
+>tmout</CODE
+> により待ち時間の最大値(タイムアウト値)を指定することができる。<CODE
+CLASS="varname"
+>tmout</CODE
+> の基準時間(時間の単位)はシステム時刻の基準時間(＝1ミリ秒)と同じである。待ち解除の条件が満足されないまま <CODE
+CLASS="varname"
+>tmout</CODE
+> の時間が経過すると、タイムアウトエラー <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> となってシステムコールが終了する。</P
+><P
+><CODE
+CLASS="varname"
+>tmout</CODE
+> として <TT
+CLASS="literal"
+>TMO_POL</TT
+>＝0を指定した場合は、タイムアウト値として0を指定したことを示し、条件を満たしていなくても待ちに入らず <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> を返す。また、<CODE
+CLASS="varname"
+>tmout</CODE
+> として <TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1)を指定した場合は、タイムアウト値として無限大の時間を指定したことを示し、タイムアウトせずに条件が成立するまで待ち続ける。</P
+><P
+>タイムアウトした場合は、<TT
+CLASS="literal"
+>TWF_CLR</TT
+> または <TT
+CLASS="literal"
+>TWF_BITCLR</TT
+> の指定があってもイベントフラグのクリアは行われない。</P
+><P
+><CODE
+CLASS="varname"
+>waiptn</CODE
+> を0とした場合は、パラメータエラー <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> になる。</P
+><P
+>既に待ちタスクの存在する <TT
+CLASS="literal"
+>TA_WSGL</TT
+> 属性のイベントフラグに対して、別のタスクが <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> を実行することはできない。この場合は、後から <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> を実行したタスクが待ち状態に入るかどうか(待ち解除条件が満たされているかどうか)にかかわらず、後から <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> を実行したタスクは <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> のエラーとなる。</P
+><P
+>一方、<TT
+CLASS="literal"
+>TA_WMUL</TT
+> の属性を持つイベントフラグに対しては、同一のイベントフラグに対して複数のタスクが同時に待つことができる。したがって、イベントフラグでもタスクが待ち行列を作ることになる。この場合、一回の <A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+> で複数のタスクが待ち解除となることがある。</P
+><P
+><TT
+CLASS="literal"
+>TA_WMUL</TT
+> 属性を持つイベントフラグに対して複数のタスクが待ち行列を作った場合、次のような動作をする。</P
+><P
+></P
+><UL
+><LI
+><P
+>待ち行列の順番はFIFOまたはタスク優先度順である。(ただし、<CODE
+CLASS="varname"
+>waiptn</CODE
+> や <CODE
+CLASS="varname"
+>wfmode</CODE
+> との関係により、必ずしも行列先頭のタスクから待ち解除になるとは限らない。)</P
+></LI
+><LI
+><P
+>待ち行列中にクリア指定のタスクがあれば、そのタスクが待ち解除になる時に、フラグをクリアする。</P
+></LI
+><LI
+><P
+>クリア指定を行っていたタスクよりも後ろの待ち行列にあったタスクは、既にクリアされた後のイベントフラグを見ることになる。</P
+></LI
+></UL
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+> によって同じ優先度を持つ複数のタスクが同時に待ち解除となる場合、待ち解除後のタスクの優先順位は、元のイベントフラグの待ち行列の順序を保存する。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8462"
+>補足事項</A
+></H4
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> の待ち解除条件として全ビットの論理和を指定すれば、(<CODE
+CLASS="varname"
+>waiptn</CODE
+>＝0xfff...ff, <CODE
+CLASS="varname"
+>wfmode</CODE
+>＝<TT
+CLASS="literal"
+>TWF_ORW</TT
+>)、<A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+> と組み合わせることによって、1ワードのビットパターンによるメッセージ転送を行うことができる。ただし、この場合、全部のビットが0というメッセージを送ることはできない。また、前のメッセージが <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> で読まれる前に <A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+> により次のメッセージが送られると、前のメッセージは消えてしまう。すなわち、メッセージのキューイングはできない。</P
+><P
+><CODE
+CLASS="varname"
+>waiptn</CODE
+>＝0の指定は <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> のエラーになるので、イベントフラグで待つタスクの <CODE
+CLASS="varname"
+>waiptn</CODE
+> は0でないことが保証されている。したがって、<A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+> で全ビットをセットすれば、どのような条件でイベントフラグを待つタスクであっても、待ち行列の先頭にあるタスクは必ず待ち解除となる。</P
+><P
+>イベントフラグに対する複数タスク待ちの機能は、次のような場合に有効である。例えば、タスクAが(1)の <A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+> を実行するまで、タスクB、タスクCを(2), (3)の <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> で待たせておく場合に、イベントフラグの複数待ちが可能であれば、(1)(2)(3)のどのシステムコールが先に実行されても結果は同じになる[<A
+HREF="synchronzation_and_communication_functions.html#figure_tk_wai_flg"
+>図1</A
+>]。一方、イベントフラグの複数待ちができなければ、(2)→(3)→(1)の順でシステムコールが実行された場合に、(3)の <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> が <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> のエラーになる。</P
+><DIV
+CLASS="figure"
+><A
+NAME="figure_tk_wai_flg"
+></A
+><P
+><B
+>図 1. イベントフラグに対する複数タスク待ちの機能</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_08s.png"></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8490"
+>仕様決定の理由</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>waiptn</CODE
+>＝0の指定を <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> のエラーとしたのは、<CODE
+CLASS="varname"
+>waiptn</CODE
+>＝0の指定を許した場合に、それ以後イベントフラグがどのような値に変わっても待ち状態から抜けることができなくなるためである。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8496"
+>移植ガイドライン</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>waiptn</CODE
+>と<CODE
+CLASS="varname"
+>p_flgptn</CODE
+>の指す先の型がUINTであり、処理系によってビット幅が異なる可能性があるため注意が必要である。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_wai_flg_u"
+>tk_wai_flg_u - イベントフラグ待ち(マイクロ秒単位)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8503"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN8505"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_wai_flg_u</CODE
+>(ID flgid, UINT waiptn, UINT wfmode, UINT *p_flgptn, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8520"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8522"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgid</CODE
+>
+              </TD
+><TD
+>EventFlag ID</TD
+><TD
+>イベントフラグID</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>waiptn</CODE
+>
+              </TD
+><TD
+>Wait Bit Pattern</TD
+><TD
+>待ちビットパターン</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wfmode</CODE
+>
+              </TD
+><TD
+>Wait EventFlag Mode</TD
+><TD
+>待ちモード</TD
+></TR
+><TR
+><TD
+>UINT*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>p_flgptn</CODE
+>
+              </TD
+><TD
+>Pointer to EventFlag Bit Pattern</TD
+><TD
+>リターンパラメータ <CODE
+CLASS="varname"
+>flgptn</CODE
+> を返す領域へのポインタ</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト指定(マイクロ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8560"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8562"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgptn</CODE
+>
+              </TD
+><TD
+>EventFlag Bit Pattern</TD
+><TD
+>待ち解除時のビットパターン</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8581"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8583"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>flgid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>flgid</CODE
+> のイベントフラグが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>waiptn</CODE
+>＝0, <CODE
+CLASS="varname"
+>wfmode</CODE
+> が不正, <CODE
+CLASS="varname"
+>tmout_u</CODE
+>≦(-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>オブジェクトの状態が不正(<TT
+CLASS="literal"
+>TA_WSGL</TT
+> 属性のイベントフラグに対する複数タスクの待ち)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>待ちオブジェクトが削除された(待ちの間に対象イベントフラグが削除)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>ポーリング失敗またはタイムアウト</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8635"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8637"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8652"
+>関連するサービスプロファイル</A
+></H4
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8655"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>マイクロ秒のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8664"
+>解説</A
+></H4
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> のパラメータである <CODE
+CLASS="varname"
+>tmout</CODE
+> を64ビットマイクロ秒単位の <CODE
+CLASS="varname"
+>tmout_u</CODE
+> としたシステムコールである。</P
+><P
+>パラメータが <CODE
+CLASS="varname"
+>tmout_u</CODE
+> となった点を除き、本システムコールの仕様は <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> と同じである。詳細は <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> の説明を参照のこと。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8674"
+>移植ガイドライン</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>waiptn</CODE
+>と<CODE
+CLASS="varname"
+>p_flgptn</CODE
+>の指す先の型がUINTであり、処理系によってビット幅が異なる可能性があるため注意が必要である。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_ref_flg"
+>tk_ref_flg - イベントフラグ状態参照</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8681"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN8683"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_flg</CODE
+>(ID flgid, T_RFLG *pk_rflg);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8692"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8694"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgid</CODE
+>
+              </TD
+><TD
+>EventFlag ID</TD
+><TD
+>イベントフラグID</TD
+></TR
+><TR
+><TD
+>T_RFLG*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rflg</CODE
+>
+              </TD
+><TD
+>Packet to Refer EventFlag Status</TD
+><TD
+>イベントフラグ状態を返す領域へのポインタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8713"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8715"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rflg</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8730"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>拡張情報</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wtsk</CODE
+>
+              </TD
+><TD
+>Waiting Task ID</TD
+><TD
+>待ちタスクのID</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgptn</CODE
+>
+              </TD
+><TD
+>EventFlag Bit Pattern</TD
+><TD
+>現在のイベントフラグのビットパターン</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8757"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8759"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>flgid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>flgid</CODE
+> のイベントフラグが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>pk_rflg</CODE
+> が不正)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8783"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8785"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8800"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8803"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>flgid</CODE
+> で示された対象イベントフラグの各種の状態を参照し、リターンパラメータとして現在のフラグ値(<CODE
+CLASS="varname"
+>flgptn</CODE
+>)、待ちタスクのID(<CODE
+CLASS="varname"
+>wtsk</CODE
+>)、拡張情報(<CODE
+CLASS="varname"
+>exinf</CODE
+>) を返す。</P
+><P
+><CODE
+CLASS="varname"
+>wtsk</CODE
+> は、このイベントフラグで待っているタスクのIDを示す。このイベントフラグで複数のタスクが待っている場合(<TT
+CLASS="literal"
+>TA_WMUL</TT
+>属性のときのみ)には、待ち行列の先頭のタスクのIDを返す。待ちタスクが無い場合は <CODE
+CLASS="varname"
+>wtsk</CODE
+>＝0となる。</P
+><P
+>対象イベントフラグが存在しない場合には、エラー <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> となる。</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="mailbox"
+>メールボックス</A
+></H2
+><P
+>メールボックスは、共有メモリ上に置かれたメッセージを受渡しすることにより、同期と通信を行うためのオブジェクトである。メールボックス機能には、メールボックスを生成／削除する機能、メールボックスに対してメッセージを送信／受信する機能、メールボックスの状態を参照する機能が含まれる。メールボックスはID番号で識別されるオブジェクトである。メールボックスのID番号をメールボックスIDと呼ぶ。</P
+><P
+>メールボックスは、送信されたメッセージを入れるためのメッセージキューと、メッセージの受信を待つタスクの待ち行列を持つ。メッセージを送信する側(イベントを知らせる側)では、送信したいメッセージをメッセージキューに入れる。一方、メッセージを受信する側(イベントを待つ側)では、メッセージキューに入っているメッセージを一つ取り出す。メッセージキューにメッセージが入っていない場合は、次にメッセージが送られてくるまでメールボックスからの受信待ち状態になる。メールボックスからの受信待ち状態になったタスクは、そのメールボックスの待ち行列につながれる。</P
+><P
+>メールボックスによって実際に送受信されるのは、送信側と受信側で共有しているメモリ上に置かれたメッセージの先頭番地のみである。すなわち、送受信されるメッセージの内容のコピーは行わない。カーネルは、メッセージキューに入っているメッセージを、リンクリストにより管理する。アプリケーションプログラムは、送信するメッセージの先頭に、カーネルがリンクリストに用いるための領域を確保しなければならない。この領域をメッセージヘッダと呼ぶ。また、メッセージヘッダと、それに続くアプリケーションがメッセージを入れるための領域をあわせて、メッセージパケットと呼ぶ。メールボックスへメッセージを送信するシステムコールは、メッセージパケットの先頭番地(<CODE
+CLASS="varname"
+>pk_msg</CODE
+>)をパラメータとする。</P
+><P
+>また、メールボックスからメッセージを受信するシステムコールは、メッセージパケットの先頭番地をリターンパラメータとして返す。</P
+><P
+>メッセージキューをメッセージの優先度順にする場合には、メッセージの優先度を入れるための領域(<CODE
+CLASS="varname"
+>msgpri</CODE
+>)も、メッセージヘッダ中に持つ必要がある。(<A
+HREF="synchronzation_and_communication_functions.html#figure_mailbox"
+>図2</A
+>)</P
+><P
+>ユーザが実際にメッセージを入れることができるのは、メッセージ先頭アドレスの直後からではなく、メッセージヘッダの後の部分から(図のメッセージの内容の部分) である。</P
+><DIV
+CLASS="figure"
+><A
+NAME="figure_mailbox"
+></A
+><P
+><B
+>図 2. メールボックスで使用されるメッセージの形式</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_09s.png"></P
+></DIV
+></DIV
+><P
+>カーネルは、メッセージキューに入っている(ないしは、入れようとしている)メッセージのメッセージヘッダ(メッセージ優先度のための領域を除く)の内容を書き換える。一方、アプリケーションは、メッセージキューに入っているメッセージのメッセージヘッダ(メッセージ優先度のための領域を含む)の内容を書き換えてはならない。アプリケーションによってメッセージヘッダの内容が書き換えられた場合の振舞いは未定義である。この規定は、アプリケーションプログラムがメッセージヘッダの内容を直接書き換えた場合に加えて、メッセージヘッダの番地をカーネルに渡し、カーネルにメッセージヘッダの内容を書き換えさせた場合にも適用される。したがって、すでにメッセージキューに入っているメッセージを再度メールボックスに送信した場合の振舞いは未定義となる。</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>補足事項</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>メールボックス機能では、メッセージヘッダの領域をアプリケーションプログラムで確保することとしているため、メッセージキューに入れることができるメッセージの数には上限がない。また、メッセージを送信するシステムコールで待ち状態になることもない。</P
+><P
+>メッセージパケットとしては、固定長メモリプールまたは可変長メモリプールから動的に確保したメモリブロックを用いることも、静的に確保した領域を用いることも可能である。</P
+><P
+>一般的な使い方としては、送信側のタスクがメモリプールからメモリブロックを確保し、それをメッセージパケットとして送信し、受信側のタスクはメッセージの内容を取り出した後にそのメモリブロックを直接メモリプールに返却するという手順をとることが多い。</P
+><P
+>上記のような使い方をする場合のプログラム例を以下に示す。</P
+><PRE
+CLASS="programlisting"
+>&#13;/* メッセージの型定義 */
+typedef	struct	{
+	T_MSG	msgque;			/* メッセージヘッダ、T_MFIFO属性の場合 */
+	UB	msgcont[MSG_SIZE];	/* メッセージ内容 */
+} T_MSG_PACKET;
+</PRE
+><PRE
+CLASS="programlisting"
+>&#13;/* メモリブロックの獲得とメッセージの送信を行うタスクの処理 */
+
+	T_MSG_PACKET	*pk_msg;
+		...
+
+	/* 固定長メモリプールからメモリブロックを獲得 */
+	/* 固定長メモリブロックサイズが sizeof(T_MSG_PACKET) 以上であること */
+	tk_get_mpf( mpfid, (void**)&#38;pk_msg, TMO_FEVR );
+
+	/* pk_msg -&#62; msgcont[] 以下にメッセージを作成 */
+		...
+
+	/* メッセージを送信 */
+	tk_snd_mbx( mbxid, (T_MSG*)pk_msg );
+</PRE
+><PRE
+CLASS="programlisting"
+>&#13;/* メッセージの受信とメモリブロックの解放を行うタスクの処理 */
+
+	T_MSG_PACKET	*pk_msg;
+		...
+
+	/* メッセージを受信 */
+	tk_rcv_mbx( mbxid, (T_MSG**)&#38;pk_msg, TMO_FEVR );
+
+	/* pk_msg -&#62; msgcont[] 以下のメッセージ内容の確認、それに応じた処理 */
+		...
+
+	/* 固定長メモリプールにメモリブロックを返却 */
+	tk_rel_mpf( mpfid, (void*)pk_msg );
+</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_cre_mbx"
+>tk_cre_mbx - メールボックス生成</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8846"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN8848"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID mbxid = tk_cre_mbx</CODE
+>(CONST T_CMBX *pk_cmbx);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8855"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8857"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST T_CMBX*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_cmbx</CODE
+>
+              </TD
+><TD
+>Packet to Create Mailbox</TD
+><TD
+>メールボックス生成情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_cmbx</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8872"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>拡張情報</TD
+></TR
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbxatr</CODE
+>
+              </TD
+><TD
+>Mailbox Attribute</TD
+><TD
+>メールボックス属性</TD
+></TR
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dsname[8]</CODE
+>
+              </TD
+><TD
+>DS Object name</TD
+><TD
+>DSオブジェクト名称</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8899"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8901"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbxid</CODE
+>
+              </TD
+><TD
+>Mailbox ID</TD
+><TD
+>メールボックスID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8918"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8920"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>メモリ不足(管理ブロック用の領域が確保できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>メールボックスの数がシステムの上限を超えた</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>予約属性(<CODE
+CLASS="varname"
+>mbxatr</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>pk_cmbx</CODE
+> が不正)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8943"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8945"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8960"
+>関連するサービスプロファイル</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8962"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>メールボックス属性として<TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>(待ち禁止の拒否)が指定可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+              </TD
+><TD
+><TT
+CLASS="literal"
+>TA_DSNAME</TT
+>のメールボックス属性指定が可能</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8977"
+>解説</A
+></H4
+><P
+>メールボックスを生成しメールボックスID番号を割り当てる。具体的には、生成するメールボックスに対して管理ブロックなどを割り付ける。</P
+><P
+><CODE
+CLASS="varname"
+>exinf</CODE
+> は、対象メールボックスに関する情報を入れておくためにユーザが自由に利用できる。ここで設定した情報は、<A
+HREF="synchronzation_and_communication_functions.html#tk_ref_mbx"
+>tk_ref_mbx</A
+> で取り出すことができる。なお、ユーザの情報を入れるためにもっと大きな領域がほしい場合や、途中で内容を変更したい場合には、自分でそのためのメモリを確保し、そのメモリパケットのアドレスを <CODE
+CLASS="varname"
+>exinf</CODE
+> に入れる。カーネルでは <CODE
+CLASS="varname"
+>exinf</CODE
+> の内容について関知しない。</P
+><P
+><CODE
+CLASS="varname"
+>mbxatr</CODE
+> は、下位側がシステム属性を表し、上位側が実装独自属性を表す。<CODE
+CLASS="varname"
+>mbxatr</CODE
+> のシステム属性の部分では、次のような指定を行う。</P
+><PRE
+CLASS="synopsis"
+>&#13;mbxatr := (TA_TFIFO || TA_TPRI) | (TA_MFIFO || TA_MPRI) | [TA_DSNAME] | [TA_NODISWAI]
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8989"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>
+              </TD
+><TD
+>待ちタスクのキューイングはFIFO</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TPRI</TT
+>
+              </TD
+><TD
+>待ちタスクのキューイングは優先度順</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_MFIFO</TT
+>
+              </TD
+><TD
+>メッセージのキューイングはFIFO</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_MPRI</TT
+>
+              </TD
+><TD
+>メッセージのキューイングは優先度順</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_DSNAME</TT
+>
+              </TD
+><TD
+>DSオブジェクト名称を指定する</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>
+              </TD
+><TD
+><A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> による待ち禁止を拒否する</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><TT
+CLASS="literal"
+>TA_TFIFO</TT
+>, <TT
+CLASS="literal"
+>TA_TPRI</TT
+> では、メッセージを受信するタスクがメールボックスの待ち行列に並ぶ際の並び方を指定することができる。属性が <TT
+CLASS="literal"
+>TA_TFIFO</TT
+> であればタスクの待ち行列はFIFOとなり、属性が <TT
+CLASS="literal"
+>TA_TPRI</TT
+> であればタスクの待ち行列はタスクの優先度順となる。</P
+><P
+>一方、<TT
+CLASS="literal"
+>TA_MFIFO</TT
+>, <TT
+CLASS="literal"
+>TA_MPRI</TT
+> では、メッセージがメッセージキュー(受信されるのを待つメッセージの待ち行列) に入る際の並び方を指定することができる。属性が <TT
+CLASS="literal"
+>TA_MFIFO</TT
+> であればメッセージキューはFIFOとなり、属性が <TT
+CLASS="literal"
+>TA_MPRI</TT
+> であればメッセージキューはメッセージの優先度順となる。メッセージの優先度は、メッセージパケットの中の特定領域で指定する。メッセージ優先度は正の値で、1が最も優先度が高く、数値が大きくなるほど優先度は低くなる。PRI型で表せる最大の正の値が最も低い優先度となる。同一優先度の場合はFIFOとなる。</P
+><P
+><TT
+CLASS="literal"
+>TA_DSNAME</TT
+> を指定した場合に <CODE
+CLASS="varname"
+>dsname</CODE
+> が有効となり、DSオブジェクト名称として設定される。DSオブジェクト名称はデバッガがオブジェクトを識別するために使用され、T-Kernel/DSのシステムコール <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> と <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> からのみ操作可能である。詳細は <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> 、<A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> を参照のこと。<TT
+CLASS="literal"
+>TA_DSNAME</TT
+> を指定しなかった場合は、<CODE
+CLASS="varname"
+>dsname</CODE
+> が無視され、<A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> や <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> が、<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> エラーとなる。</P
+><PRE
+CLASS="programlisting"
+>&#13;#define TA_TFIFO        0x00000000      /* 待ちタスクをFIFOで管理 */
+#define TA_TPRI         0x00000001      /* 待ちタスクを優先度順で管理 */
+#define TA_MFIFO        0x00000000      /* メッセージをFIFOで管理 */
+#define TA_MPRI         0x00000002      /* メッセージを優先度順で管理 */
+#define TA_DSNAME       0x00000040      /* DSオブジェクト名称を指定 */
+#define TA_NODISWAI     0x00000080      /* 待ち禁止拒否 */
+</PRE
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9042"
+>補足事項</A
+></H4
+><P
+>メールボックスで送受信されるメッセージの本体はメモリ上に置かれており、実際に送受信されるのはその先頭アドレスのみである。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_del_mbx"
+>tk_del_mbx - メールボックス削除</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9047"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN9049"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_del_mbx</CODE
+>(ID mbxid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9056"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9058"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbxid</CODE
+>
+              </TD
+><TD
+>Mailbox ID</TD
+><TD
+>メールボックスID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9071"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9073"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9086"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9088"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>mbxid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>mbxid</CODE
+> のメールボックスが存在しない)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9107"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9109"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9124"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9127"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>mbxid</CODE
+> で示されたメールボックスを削除する。</P
+><P
+>本システムコールの発行により、対象メールボックスのID番号および管理ブロック用の領域などが解放される。</P
+><P
+>対象メールボックスにおいてメッセージを待っているタスクがあった場合にも、本システムコールは正常終了するが、待ち状態にあったタスクにはエラー <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+> が返される。また、対象メールボックスの中にメッセージが残っている場合でも、エラーとはならず、メールボックスの削除が行われる。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_snd_mbx"
+>tk_snd_mbx - メールボックスへ送信</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9136"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN9138"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_snd_mbx</CODE
+>(ID mbxid, T_MSG *pk_msg);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9147"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9149"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbxid</CODE
+>
+              </TD
+><TD
+>Mailbox ID</TD
+><TD
+>メールボックスID</TD
+></TR
+><TR
+><TD
+>T_MSG*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_msg</CODE
+>
+              </TD
+><TD
+>Packet of Message</TD
+><TD
+>メッセージパケットの先頭アドレス</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9168"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9170"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9183"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9185"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>mbxid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>mbxid</CODE
+> のメールボックスが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>pk_msg</CODE
+> が不正, <CODE
+CLASS="varname"
+>msgpri</CODE
+>≦0)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9210"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9212"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9227"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9230"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>mbxid</CODE
+> で示された対象メールボックスに、<CODE
+CLASS="varname"
+>pk_msg</CODE
+> を先頭アドレスとするメッセージパケットを送信する。</P
+><P
+>メッセージパケットの内容はコピーされず、受信時には先頭アドレス(<CODE
+CLASS="varname"
+>pk_msg</CODE
+> の値)のみが渡される。したがって、このメッセージを受信したタスクがメッセージパケットの内容を取り出すまで、メッセージパケットの内容を書き換えてはいけない。</P
+><P
+>対象メールボックスで既にメッセージを待っているタスクがあった場合には、待ち行列の先頭のタスクの待ち状態が解除され、<A
+HREF="synchronzation_and_communication_functions.html#tk_snd_mbx"
+>tk_snd_mbx</A
+> で指定した <CODE
+CLASS="varname"
+>pk_msg</CODE
+> がそのタスクに送信されて、<A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+> のリターンパラメータとなる。一方、対象メールボックスでメッセージを待っているタスクが無ければ、送信されたメッセージは、メールボックスの中のメッセージキュー(メッセージの待ち行列)に入れられる。どちらの場合にも、<A
+HREF="synchronzation_and_communication_functions.html#tk_snd_mbx"
+>tk_snd_mbx</A
+> 発行タスクは待ち状態とはならない。</P
+><P
+><CODE
+CLASS="varname"
+>pk_msg</CODE
+> は、メッセージヘッダを含めたメッセージパケットの先頭アドレスである。メッセージヘッダは次の形式となる。</P
+><PRE
+CLASS="programlisting"
+>&#13;typedef struct t_msg {
+        ?       ?               /* 内容は実装依存(ただし、固定長) */
+} T_MSG;
+
+typedef struct t_msg_pri {
+        T_MSG   msgque;         /* メッセージキューのためのエリア */
+        PRI     msgpri;         /* メッセージ優先度 */
+} T_MSG_PRI;
+</PRE
+><P
+>メッセージヘッダは、<TT
+CLASS="literal"
+>TA_MFIFO</TT
+> の場合は <TT
+CLASS="literal"
+>T_MSG</TT
+>、<TT
+CLASS="literal"
+>TA_MPRI</TT
+> の場合は <TT
+CLASS="literal"
+>T_MSG_PRI</TT
+> となる。いずれの場合も、メッセージヘッダのサイズは固定長で、sizeof(<TT
+CLASS="literal"
+>T_MSG</TT
+>)またはsizeof(<TT
+CLASS="literal"
+>T_MSG_PRI</TT
+>)で取得する。</P
+><P
+>実際にメッセージを格納できるのは、メッセージヘッダより後ろの領域となる。メッセージ本体部分のサイズには制限はなく、可変長でもよい。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9253"
+>補足事項</A
+></H4
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_snd_mbx"
+>tk_snd_mbx</A
+> によるメッセージ送信は、受信側のタスクの状態とは無関係に行われる。すなわち、非同期のメッセージ送信が行われる。待ち行列につながれるのは、そのタスクの発行したメッセージであって、タスクそのものではない。すなわち、メッセージの待ち行列(メッセージキュー)や受信タスクの待ち行列は存在するが、送信タスクの待ち行列は存在しない。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_rcv_mbx"
+>tk_rcv_mbx - メールボックスから受信</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9259"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN9261"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_rcv_mbx</CODE
+>(ID mbxid, T_MSG **ppk_msg, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9272"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9274"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbxid</CODE
+>
+              </TD
+><TD
+>Mailbox ID</TD
+><TD
+>メールボックスID</TD
+></TR
+><TR
+><TD
+>T_MSG**</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ppk_msg</CODE
+>
+              </TD
+><TD
+>Pointer to Packet of Message</TD
+><TD
+>リターンパラメータ <CODE
+CLASS="varname"
+>pk_msg</CODE
+> を返す領域へのポインタ</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト指定(ミリ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9300"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9302"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+><TR
+><TD
+>T_MSG*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_msg</CODE
+>
+              </TD
+><TD
+>Packet of Message</TD
+><TD
+>メッセージパケットの先頭アドレス</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9321"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9323"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>mbxid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>mbxid</CODE
+> のメールボックスが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>tmout</CODE
+>≦(-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>待ちオブジェクトが削除された(待ちの間に対象メールボックスが削除)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>ポーリング失敗またはタイムアウト</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9368"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9370"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9385"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9388"
+>解説</A
+></H4
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+> では、<CODE
+CLASS="varname"
+>mbxid</CODE
+> で示されたメールボックスからメッセージを受信する。</P
+><P
+>対象メールボックスにまだメッセージが送信されていない場合(メッセージキューが空の場合) には、本システムコールを発行したタスクは待ち状態となり、メッセージの到着を待つ待ち行列につながれる。一方、対象メールボックスに既にメッセージが入っている場合には、メッセージキューの先頭にあるメッセージを1つ取り出して、それをリターンパラメータ <CODE
+CLASS="varname"
+>pk_msg</CODE
+> とする。</P
+><P
+><CODE
+CLASS="varname"
+>tmout</CODE
+> により待ち時間の最大値(タイムアウト値)を指定することができる。<CODE
+CLASS="varname"
+>tmout</CODE
+> の基準時間(時間の単位)はシステム時刻の基準時間(＝1ミリ秒)と同じである。タイムアウト指定が行われた場合、待ち解除の条件が満足されない(メッセージが到着しない)まま <CODE
+CLASS="varname"
+>tmout</CODE
+> の時間が経過すると、タイムアウトエラー <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> となってシステムコールが終了する。</P
+><P
+><CODE
+CLASS="varname"
+>tmout</CODE
+> として <TT
+CLASS="literal"
+>TMO_POL</TT
+>＝0を指定した場合は、タイムアウト値として0を指定したことを示し、メッセージがない場合も待ちに入らず <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> を返す。また、<CODE
+CLASS="varname"
+>tmout</CODE
+> として <TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1)を指定した場合は、タイムアウト値として無限大の時間を指定したことを示し、タイムアウトせずにメッセージが到着するまで待ち続ける。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9406"
+>補足事項</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>pk_msg</CODE
+> は、メッセージヘッダを含めたメッセージパケットの先頭アドレスである。メッセージヘッダは <TT
+CLASS="literal"
+>TA_MFIFO</TT
+> の場合は <TT
+CLASS="literal"
+>T_MSG</TT
+>、<TT
+CLASS="literal"
+>TA_MPRI</TT
+> の場合は <TT
+CLASS="literal"
+>T_MSG_PRI</TT
+> となる。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_rcv_mbx_u"
+>tk_rcv_mbx_u - メールボックスから受信(マイクロ秒単位)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9416"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN9418"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_rcv_mbx_u</CODE
+>(ID mbxid, T_MSG **ppk_msg, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9429"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9431"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbxid</CODE
+>
+              </TD
+><TD
+>Mailbox ID</TD
+><TD
+>メールボックスID</TD
+></TR
+><TR
+><TD
+>T_MSG**</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ppk_msg</CODE
+>
+              </TD
+><TD
+>Pointer to Packet of Message</TD
+><TD
+>リターンパラメータ <CODE
+CLASS="varname"
+>pk_msg</CODE
+> を返す領域へのポインタ</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト指定(マイクロ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9457"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9459"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+><TR
+><TD
+>T_MSG*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_msg</CODE
+>
+              </TD
+><TD
+>Packet of Message</TD
+><TD
+>メッセージパケットの先頭アドレス</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9478"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9480"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>mbxid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>mbxid</CODE
+> のメールボックスが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>tmout_u</CODE
+>≦(-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>待ちオブジェクトが削除された(待ちの間に対象メールボックスが削除)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>ポーリング失敗またはタイムアウト</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9525"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9527"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9542"
+>関連するサービスプロファイル</A
+></H4
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9545"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>マイクロ秒のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9554"
+>解説</A
+></H4
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+> のパラメータである <CODE
+CLASS="varname"
+>tmout</CODE
+> を64ビットマイクロ秒単位の <CODE
+CLASS="varname"
+>tmout_u</CODE
+> としたシステムコールである。</P
+><P
+>パラメータが <CODE
+CLASS="varname"
+>tmout_u</CODE
+> となった点を除き、本システムコールの仕様は <A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+> と同じである。詳細は <A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+> の説明を参照のこと。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_ref_mbx"
+>tk_ref_mbx - メールボックス状態参照</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9566"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN9568"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_mbx</CODE
+>(ID mbxid, T_RMBX *pk_rmbx);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9577"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9579"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbxid</CODE
+>
+              </TD
+><TD
+>Mailbox ID</TD
+><TD
+>メールボックスID</TD
+></TR
+><TR
+><TD
+>T_RMBX*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rmbx</CODE
+>
+              </TD
+><TD
+>Packet to Refer Mailbox Status</TD
+><TD
+>メールボックス状態を返す領域へのポインタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9598"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9600"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rmbx</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9615"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>拡張情報</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wtsk</CODE
+>
+              </TD
+><TD
+>Waiting Task ID</TD
+><TD
+>待ちタスクのID</TD
+></TR
+><TR
+><TD
+>T_MSG*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_msg</CODE
+>
+              </TD
+><TD
+>Packet of Message</TD
+><TD
+>次に受信されるメッセージ</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9642"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9644"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>mbxid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>mbxid</CODE
+> のメールボックスが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>pk_rmbx</CODE
+> が不正)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9668"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9670"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9685"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9688"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>mbxid</CODE
+> で示された対象メールボックスの各種の状態を参照し、リターンパラメータとして次に受信されるメッセージ(メッセージキューの先頭のメッセージ)、待ちタスクのID(<CODE
+CLASS="varname"
+>wtsk</CODE
+>)、拡張情報(<CODE
+CLASS="varname"
+>exinf</CODE
+>) を返す。</P
+><P
+><CODE
+CLASS="varname"
+>wtsk</CODE
+> は、このメールボックスで待っているタスクのIDを示す。このメールボックスで複数のタスクが待っている場合には、待ち行列の先頭のタスクのIDを返す。待ちタスクが無い場合は <CODE
+CLASS="varname"
+>wtsk</CODE
+>＝0となる。</P
+><P
+>対象メールボックスが存在しない場合には、エラー <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> となる。</P
+><P
+><CODE
+CLASS="varname"
+>pk_msg</CODE
+> は、次に <A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+> を実行した場合に受信されるメッセージである。メッセージキューにメッセージが無い時は、<CODE
+CLASS="varname"
+>pk_msg</CODE
+>＝<TT
+CLASS="literal"
+>NULL</TT
+> となる。また、どんな場合でも、<CODE
+CLASS="varname"
+>pk_msg</CODE
+>＝<TT
+CLASS="literal"
+>NULL</TT
+> と <CODE
+CLASS="varname"
+>wtsk</CODE
+>＝0の少なくとも一方は成り立つ。</P
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="task_exception_handling_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="extended_synchronization_and_communication_functions.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>タスク例外処理機能</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="U"
+>上に戻る</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>拡張同期・通信機能</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

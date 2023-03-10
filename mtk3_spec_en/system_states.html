@@ -1,0 +1,317 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>System States</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel Concepts"
+HREF="concepts_underlying_utk.html"><LINK
+REL="PREVIOUS"
+TITLE="Task Exception Handling"
+HREF="task_exception_handling.html"><LINK
+REL="NEXT"
+TITLE="Objects"
+HREF="objects.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="task_exception_handling.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel Concepts</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="objects.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="system_states"
+>System States</A
+></H1
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="system_status_in_nontask"
+>System States While Non-task Portion Is Executing</A
+></H2
+><P
+>When programming tasks to run on μT-Kernel, one can keep track of the changes in task states by using a task state transition diagram. In the case of routines such as interrupt handlers or extended SVC handlers, however, the user must perform programming at a level closer to the kernel than tasks. In this case consideration must be made also of system states while a non-task portion is being executed, for application programs to work properly. An explanation of μT-Kernel system states is therefore given here.</P
+><P
+>System states are classified as in <A
+HREF="system_states.html#figure_system_status_in_nontask"
+>Figure 6</A
+>.</P
+><P
+>Of these shown in <A
+HREF="system_states.html#figure_system_status_in_nontask"
+>Figure 6</A
+>, a "transient state" is equivalent to the kernel running state (system call execution). From the standpoint of the user, it is important that each of the system calls issued by the user application program be executed indivisibly, and that the internal states while a system call is executing cannot be seen by the user. For this reason the state while the kernel running is considered a "transient state" and internally it is treated as a black box.</P
+><P
+>However, in the following case, for instance, a transient state may become visible to users. <P
+></P
+><UL
+><LI
+><P
+>When memory is being allocated or freed in the case of a system call that gets or releases memory (while a μT-Kernel/SM system memory management function is called).</P
+></LI
+></UL
+></P
+><P
+>When a task is in a transient state such as these, the behavior of a task termination (<A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+>) system call is not guaranteed. Moreover, task suspension (<A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+>) may cause a deadlock or other problem by stopping without clearing the transient state.</P
+><P
+>Accordingly, as a rule <A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+> and <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> cannot be used in programs. These system calls should be used only in specific middleware or debugger, which is closely related to OS itself.</P
+><P
+>While being a "non-task portion," the portion that is considered to be running a processing requested from a specific task (called a "requesting task") is called "quasi-task portion." For example, an extended SVC handler is executed as a "quasi-task portion." The invoking task can be identified in a "quasi-task portion" and the requesting task becomes the invoking task. Similar to the task portion, in the quasi-task portion, the task state transitions can be defined and system calls can be issued to enter into WAITING state from the quasi-task portion. In this way, the quasi-task portion behaves similarly to a subroutine called from a requesting task. "Quasi-task portion" is, however, positioned as an extended part of OS and its processor operation mode and stack space are different from those of the task portion. It means that when a state enters into a quasi-task portion from a task portion, its processor operation mode and stack space are switched. This behavior is different from when a function or subroutine is called in a task portion.</P
+><P
+>Among the "non-task portion," a "task-independent portion" is activated due to a factor that completely ignore the progress of the task portion or quasi-task portion processing. Specifically, an interrupt handler that is triggered by an external interrupt or a time event handler (cyclic handler and alarm handler) that is triggered due to the specified elapsed time is executed as a "task-independent portion." Note that both the external interrupt and the specified elapsed time are the factors that is independent from a task that is incidentally running at that moment.</P
+><P
+>Finally, "non-task portion" is separated into three classes: "transient state," "quasi-task portion," and "task-independent portion." The states other than these represent a state where a program for the task is running, this is, the state where "task portion is running."</P
+><DIV
+CLASS="figure"
+><A
+NAME="figure_system_status_in_nontask"
+></A
+><P
+><B
+>Figure 6. Classification of System States</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_04s.png"></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="task_independent"
+>Task-Independent Portion and Quasi-Task Portion</A
+></H2
+><P
+>A feature of a task-independent portion (interrupt handlers, time event handlers, etc.) is that it is meaningless to identify the task that was running immediately prior to entering a task-independent portion, and the concept of "invoking task" does not exist. Accordingly, a system call that enters WAITING state, or one that is issued implicitly specifying the invoking task, cannot be called from a task-independent portion. Moreover, since the currently running task cannot be identified in a task-independent portion, there is no task switching (dispatching). If dispatching is necessary, it is delayed until processing leaves the task-independent portion. This is called delayed dispatching.</P
+><P
+>If dispatching were to take place in the interrupt handler, which is a task-independent portion, the rest of the interrupt handler routine would be delayed for execution after the task started by the dispatching, causing problems in case of interrupt nesting. This is illustrated in <A
+HREF="system_states.html#figure_task_independent"
+>Figure 7</A
+>.</P
+><P
+>In <A
+HREF="system_states.html#figure_task_independent"
+>Figure 7</A
+>, Interrupt X is raised during Task A execution, and while its interrupt handler is running, a higher-priority interrupt Y is raised. In this case, if dispatching were to occur immediately on return from interrupt Y at (1),<A
+NAME="AEN1285"
+HREF="#FTN.AEN1285"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+> starting Task B, the processing of parts (2) to (3) of Interrupt X would be put off until after Task B relinquishes CPU, with parts (2) to (3) executed only after Task A goes to RUNNING state. The danger is that the low-priority Interrupt X handler would be preempted not only by a higher-priority interrupt but even by Task B started by that interrupt. There would no longer be any guarantee of the interrupt handler execution maintaining priority over task execution, making it impossible to write an interrupt handler. This is the reason for introducing the principle of delayed dispatching.</P
+><P
+>A feature of a quasi-task portion, on the other hand, is that the task executing prior to entering the quasi-task portion (the requesting task) can be identified, making it possible to define task states just as in the task portion; moreover, it is possible to enter WAITING state while in a quasi-task portion. Accordingly, dispatching occurs in a quasi-task portion in the same way as in ordinary task execution. As a result, even though the OS extended part and other quasi-task portion is a non-task portion, its execution does not necessarily have priority at all times over the task portion. This is in contrast to interrupt handlers, which must always be given execution precedence over tasks.</P
+><P
+>The following two examples illustrate the difference between a task-independent portion and quasi-task portion.</P
+><P
+></P
+><UL
+><LI
+><P
+>An interrupt is raised while Task A (priority 8 = low) is running, and in its interrupt handler (task-independent portion) <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> is issued for Task B (priority 2 = high). In accordance with the principle of delayed dispatching, however, dispatching does not yet occur at this point. Instead, after <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> execution, first the remaining part of the interrupt handler are executed. Only when <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> is executed at the end of the interrupt handler does dispatching occur, causing Task B to run.</P
+></LI
+><LI
+><P
+>An extended SVC is executed in Task A (priority 8 = low), and in its extended SVC handler (quasi-task portion), <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> is issued for Task B (priority 2 = high). In this case the principle of delayed dispatching is not applied, so dispatching occurs in <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> processing. Task A goes to READY state in a quasi-task portion, and Task B goes to RUNNING state. Task B is therefore executed before the rest of the extended SVC handler is completed. The rest of the extended SVC handler is executed after dispatching occurs again and Task A goes to RUNNING state.</P
+></LI
+></UL
+><DIV
+CLASS="figure"
+><A
+NAME="figure_task_independent"
+></A
+><P
+><B
+>Figure 7. Interrupt Nesting and Delayed Dispatching</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_05s.png"></P
+></DIV
+></DIV
+></DIV
+></DIV
+><H3
+CLASS="FOOTNOTES"
+>Notes</H3
+><TABLE
+BORDER="0"
+CLASS="FOOTNOTES"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="5%"
+><A
+NAME="FTN.AEN1285"
+HREF="system_states.html#AEN1285"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="95%"
+><P
+>If dispatching takes place at (1), the remainder of the handler routine for Interrupt X ((2) to (3)) ends up being put off until later.</P
+></TD
+></TR
+></TABLE
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="task_exception_handling.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="objects.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Task Exception Handling</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="concepts_underlying_utk.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Objects</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

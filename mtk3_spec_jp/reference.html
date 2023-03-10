@@ -1,0 +1,4277 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>リファレンス</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="キーワード"
+HREF="list_of_keywords.html"><LINK
+REL="NEXT"
+TITLE="エラーコード一覧"
+HREF="list_of_error_codes.html"></HEAD
+><BODY
+CLASS="chapter"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="list_of_keywords.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="list_of_error_codes.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="chapter"
+><H1
+><A
+NAME="reference"
+></A
+>リファレンス</H1
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="list_of_c_language_interface"
+>C言語インタフェース一覧</A
+></H1
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="list_of_c_language_interface_utk_os"
+>μT-Kernel/OS</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34288"
+>タスク管理機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>tskid</SPAN
+> = <A
+HREF="utk_os_functions.html#tk_cre_tsk"
+>tk_cre_tsk</A
+> ( CONST T_CTSK *<CODE
+CLASS="varname"
+>pk_ctsk</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_os_functions.html#tk_del_tsk"
+>tk_del_tsk</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_os_functions.html#tk_sta_tsk"
+>tk_sta_tsk</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, INT <CODE
+CLASS="varname"
+>stacd</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="utk_os_functions.html#tk_ext_tsk"
+>tk_ext_tsk</A
+> ( void );</P
+></LI
+><LI
+><P
+>void <A
+HREF="utk_os_functions.html#tk_exd_tsk"
+>tk_exd_tsk</A
+> ( void );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, PRI <CODE
+CLASS="varname"
+>tskpri</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_os_functions.html#tk_get_reg"
+>tk_get_reg</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, T_REGS *<CODE
+CLASS="varname"
+>pk_regs</CODE
+>, T_EIT *<CODE
+CLASS="varname"
+>pk_eit</CODE
+>, T_CREGS *<CODE
+CLASS="varname"
+>pk_cregs</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_os_functions.html#tk_set_reg"
+>tk_set_reg</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, CONST T_REGS *<CODE
+CLASS="varname"
+>pk_regs</CODE
+>, CONST T_EIT *<CODE
+CLASS="varname"
+>pk_eit</CODE
+>, CONST T_CREGS *<CODE
+CLASS="varname"
+>pk_cregs</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_os_functions.html#tk_get_cpr"
+>tk_get_cpr</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, INT <CODE
+CLASS="varname"
+>copno</CODE
+>, T_COPREGS *<CODE
+CLASS="varname"
+>pk_copregs</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_os_functions.html#tk_set_cpr"
+>tk_set_cpr</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, INT <CODE
+CLASS="varname"
+>copno</CODE
+>, CONST T_COPREGS *<CODE
+CLASS="varname"
+>pk_copregs</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, T_RTSK *<CODE
+CLASS="varname"
+>pk_rtsk</CODE
+> );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34360"
+>タスク付属同期機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> ( TMO <CODE
+CLASS="varname"
+>tmout</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk_u"
+>tk_slp_tsk_u</A
+> ( TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>wupcnt</SPAN
+> = <A
+HREF="task_dependent_synchronization_functions.html#tk_can_wup"
+>tk_can_wup</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="task_dependent_synchronization_functions.html#tk_frsm_tsk"
+>tk_frsm_tsk</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk"
+>tk_dly_tsk</A
+> ( RELTIM <CODE
+CLASS="varname"
+>dlytim</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk_u"
+>tk_dly_tsk_u</A
+> ( RELTIM_U <CODE
+CLASS="varname"
+>dlytim_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="task_dependent_synchronization_functions.html#tk_sig_tev"
+>tk_sig_tev</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, INT <CODE
+CLASS="varname"
+>tskevt</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>tevptn</SPAN
+> = <A
+HREF="task_dependent_synchronization_functions.html#tk_wai_tev"
+>tk_wai_tev</A
+> ( INT <CODE
+CLASS="varname"
+>waiptn</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>tevptn</SPAN
+> = <A
+HREF="task_dependent_synchronization_functions.html#tk_wai_tev_u"
+>tk_wai_tev_u</A
+> ( INT <CODE
+CLASS="varname"
+>waiptn</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>tskwait</SPAN
+> = <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, UW <CODE
+CLASS="varname"
+>waitmask</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="task_dependent_synchronization_functions.html#tk_ena_wai"
+>tk_ena_wai</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+> );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34442"
+>タスク例外処理機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="task_exception_handling_functions.html#tk_def_tex"
+>tk_def_tex</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, CONST T_DTEX *<CODE
+CLASS="varname"
+>pk_dtex</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="task_exception_handling_functions.html#tk_ena_tex"
+>tk_ena_tex</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, UINT <CODE
+CLASS="varname"
+>texptn</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="task_exception_handling_functions.html#tk_dis_tex"
+>tk_dis_tex</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, UINT <CODE
+CLASS="varname"
+>texptn</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, INT <CODE
+CLASS="varname"
+>texcd</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>texcd</SPAN
+> = <A
+HREF="task_exception_handling_functions.html#tk_end_tex"
+>tk_end_tex</A
+> ( BOOL <CODE
+CLASS="varname"
+>enatex</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="task_exception_handling_functions.html#tk_ref_tex"
+>tk_ref_tex</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, T_RTEX *<CODE
+CLASS="varname"
+>pk_rtex</CODE
+> );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34480"
+>同期・通信機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>semid</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_cre_sem"
+>tk_cre_sem</A
+> ( CONST T_CSEM *<CODE
+CLASS="varname"
+>pk_csem</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_del_sem"
+>tk_del_sem</A
+> ( ID <CODE
+CLASS="varname"
+>semid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_sig_sem"
+>tk_sig_sem</A
+> ( ID <CODE
+CLASS="varname"
+>semid</CODE
+>, INT <CODE
+CLASS="varname"
+>cnt</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_sem"
+>tk_wai_sem</A
+> ( ID <CODE
+CLASS="varname"
+>semid</CODE
+>, INT <CODE
+CLASS="varname"
+>cnt</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_sem_u"
+>tk_wai_sem_u</A
+> ( ID <CODE
+CLASS="varname"
+>semid</CODE
+>, INT <CODE
+CLASS="varname"
+>cnt</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_ref_sem"
+>tk_ref_sem</A
+> ( ID <CODE
+CLASS="varname"
+>semid</CODE
+>, T_RSEM *<CODE
+CLASS="varname"
+>pk_rsem</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>flgid</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_cre_flg"
+>tk_cre_flg</A
+> ( CONST T_CFLG *<CODE
+CLASS="varname"
+>pk_cflg</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_del_flg"
+>tk_del_flg</A
+> ( ID <CODE
+CLASS="varname"
+>flgid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+> ( ID <CODE
+CLASS="varname"
+>flgid</CODE
+>, UINT <CODE
+CLASS="varname"
+>setptn</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_clr_flg"
+>tk_clr_flg</A
+> ( ID <CODE
+CLASS="varname"
+>flgid</CODE
+>, UINT <CODE
+CLASS="varname"
+>clr</CODE
+>ptn );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> ( ID <CODE
+CLASS="varname"
+>flgid</CODE
+>, UINT <CODE
+CLASS="varname"
+>waiptn</CODE
+>, UINT <CODE
+CLASS="varname"
+>wfmode</CODE
+>, UINT *<CODE
+CLASS="varname"
+>p_flgptn</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg_u"
+>tk_wai_flg_u</A
+> ( ID <CODE
+CLASS="varname"
+>flgid</CODE
+>, UINT <CODE
+CLASS="varname"
+>waiptn</CODE
+>, UINT <CODE
+CLASS="varname"
+>wfmode</CODE
+>, UINT *<CODE
+CLASS="varname"
+>p_flgptn</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_ref_flg"
+>tk_ref_flg</A
+> ( ID <CODE
+CLASS="varname"
+>flgid</CODE
+>, T_RFLG *<CODE
+CLASS="varname"
+>pk_rflg</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>mbxid</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_cre_mbx"
+>tk_cre_mbx</A
+> ( CONST T_CMBX* <CODE
+CLASS="varname"
+>pk_cmbx</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_del_mbx"
+>tk_del_mbx</A
+> ( ID <CODE
+CLASS="varname"
+>mbxid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_snd_mbx"
+>tk_snd_mbx</A
+> ( ID <CODE
+CLASS="varname"
+>mbxid</CODE
+>, T_MSG *<CODE
+CLASS="varname"
+>pk_msg</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+> ( ID <CODE
+CLASS="varname"
+>mbxid</CODE
+>, T_MSG **<CODE
+CLASS="varname"
+>ppk_msg</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx_u"
+>tk_rcv_mbx_u</A
+> ( ID <CODE
+CLASS="varname"
+>mbxid</CODE
+>, T_MSG **<CODE
+CLASS="varname"
+>ppk_msg</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="synchronzation_and_communication_functions.html#tk_ref_mbx"
+>tk_ref_mbx</A
+> ( ID <CODE
+CLASS="varname"
+>mbxid</CODE
+>, T_RMBX *<CODE
+CLASS="varname"
+>pk_rmbx</CODE
+> );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34601"
+>拡張同期・通信機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>mtxid</SPAN
+> = <A
+HREF="extended_synchronization_and_communication_functions.html#tk_cre_mtx"
+>tk_cre_mtx</A
+> ( CONST T_CMTX *<CODE
+CLASS="varname"
+>pk_cmtx</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="extended_synchronization_and_communication_functions.html#tk_del_mtx"
+>tk_del_mtx</A
+> ( ID <CODE
+CLASS="varname"
+>mtxid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="extended_synchronization_and_communication_functions.html#tk_loc_mtx"
+>tk_loc_mtx</A
+> ( ID <CODE
+CLASS="varname"
+>mtxid</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="extended_synchronization_and_communication_functions.html#tk_loc_mtx_u"
+>tk_loc_mtx_u</A
+> ( ID <CODE
+CLASS="varname"
+>mtxid</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="extended_synchronization_and_communication_functions.html#tk_unl_mtx"
+>tk_unl_mtx</A
+> ( ID <CODE
+CLASS="varname"
+>mtxid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="extended_synchronization_and_communication_functions.html#tk_ref_mtx"
+>tk_ref_mtx</A
+> ( ID <CODE
+CLASS="varname"
+>mtxid</CODE
+>, T_RMTX *<CODE
+CLASS="varname"
+>pk_rmtx</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>mbfid</SPAN
+> = <A
+HREF="extended_synchronization_and_communication_functions.html#tk_cre_mbf"
+>tk_cre_mbf</A
+> ( CONST T_CMBF *<CODE
+CLASS="varname"
+>pk_cmbf</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="extended_synchronization_and_communication_functions.html#tk_del_mbf"
+>tk_del_mbf</A
+> ( ID <CODE
+CLASS="varname"
+>mbfid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+> ( ID <CODE
+CLASS="varname"
+>mbfid</CODE
+>, CONST void *<CODE
+CLASS="varname"
+>msg</CODE
+>, INT <CODE
+CLASS="varname"
+>msgsz</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf_u"
+>tk_snd_mbf_u</A
+> ( ID <CODE
+CLASS="varname"
+>mbfid</CODE
+>, CONST void *<CODE
+CLASS="varname"
+>msg</CODE
+>, INT <CODE
+CLASS="varname"
+>msgsz</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>msgsz</SPAN
+> = <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+> ( ID <CODE
+CLASS="varname"
+>mbfid</CODE
+>, void *<CODE
+CLASS="varname"
+>msg</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>msgsz</SPAN
+> = <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf_u"
+>tk_rcv_mbf_u</A
+> ( ID <CODE
+CLASS="varname"
+>mbfid</CODE
+>, void *<CODE
+CLASS="varname"
+>msg</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="extended_synchronization_and_communication_functions.html#tk_ref_mbf"
+>tk_ref_mbf</A
+> ( ID <CODE
+CLASS="varname"
+>mbfid</CODE
+>, T_RMBF *<CODE
+CLASS="varname"
+>pk_rmbf</CODE
+> );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34683"
+>メモリプール管理機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>mpfid</SPAN
+> = <A
+HREF="memory_pool_management_functions.html#tk_cre_mpf"
+>tk_cre_mpf</A
+> ( CONST T_CMPF *<CODE
+CLASS="varname"
+>pk_cmpf</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="memory_pool_management_functions.html#tk_del_mpf"
+>tk_del_mpf</A
+> ( ID <CODE
+CLASS="varname"
+>mpfid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="memory_pool_management_functions.html#tk_get_mpf"
+>tk_get_mpf</A
+> ( ID <CODE
+CLASS="varname"
+>mpfid</CODE
+>, void **<CODE
+CLASS="varname"
+>p_blf</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="memory_pool_management_functions.html#tk_get_mpf_u"
+>tk_get_mpf_u</A
+> ( ID <CODE
+CLASS="varname"
+>mpfid</CODE
+>, void **<CODE
+CLASS="varname"
+>p_blf</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="memory_pool_management_functions.html#tk_rel_mpf"
+>tk_rel_mpf</A
+> ( ID <CODE
+CLASS="varname"
+>mpfid</CODE
+>, void *<CODE
+CLASS="varname"
+>blf</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="memory_pool_management_functions.html#tk_ref_mpf"
+>tk_ref_mpf</A
+> ( ID <CODE
+CLASS="varname"
+>mpfid</CODE
+>, T_RMPF *<CODE
+CLASS="varname"
+>pk_rmpf</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>mplid</SPAN
+> = <A
+HREF="memory_pool_management_functions.html#tk_cre_mpl"
+>tk_cre_mpl</A
+> ( CONST T_CMPL *<CODE
+CLASS="varname"
+>pk_cmpl</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="memory_pool_management_functions.html#tk_del_mpl"
+>tk_del_mpl</A
+> ( ID <CODE
+CLASS="varname"
+>mplid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="memory_pool_management_functions.html#tk_get_mpl"
+>tk_get_mpl</A
+> ( ID <CODE
+CLASS="varname"
+>mplid</CODE
+>, SZ <CODE
+CLASS="varname"
+>blksz</CODE
+>, void **<CODE
+CLASS="varname"
+>p_blk</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="memory_pool_management_functions.html#tk_get_mpl_u"
+>tk_get_mpl_u</A
+> ( ID <CODE
+CLASS="varname"
+>mplid</CODE
+>, SZ <CODE
+CLASS="varname"
+>blksz</CODE
+>, void **<CODE
+CLASS="varname"
+>p_blk</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="memory_pool_management_functions.html#tk_rel_mpl"
+>tk_rel_mpl</A
+> ( ID <CODE
+CLASS="varname"
+>mplid</CODE
+>, void *<CODE
+CLASS="varname"
+>blk</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="memory_pool_management_functions.html#tk_ref_mpl"
+>tk_ref_mpl</A
+> ( ID <CODE
+CLASS="varname"
+>mplid</CODE
+>, T_RMPL *<CODE
+CLASS="varname"
+>pk_rmpl</CODE
+> );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34760"
+>時間管理機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_set_utc"
+>tk_set_utc</A
+> ( CONST SYSTIM *<CODE
+CLASS="varname"
+>pk_tim</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_set_utc_u"
+>tk_set_utc_u</A
+> ( SYSTIM_U <CODE
+CLASS="varname"
+>tim_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_set_tim"
+>tk_set_tim</A
+> ( CONST SYSTIM *<CODE
+CLASS="varname"
+>pk_tim</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_set_tim_u"
+>tk_set_tim_u</A
+> ( SYSTIM_U <CODE
+CLASS="varname"
+>tim_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_get_utc"
+>tk_get_utc</A
+> ( SYSTIM *<CODE
+CLASS="varname"
+>pk_tim</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_get_utc_u"
+>tk_get_utc_u</A
+> ( SYSTIM_U *<CODE
+CLASS="varname"
+>tim_u</CODE
+>, UW *<CODE
+CLASS="varname"
+>ofs</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_get_tim"
+>tk_get_tim</A
+> ( SYSTIM *<CODE
+CLASS="varname"
+>pk_tim</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_get_tim_u"
+>tk_get_tim_u</A
+> ( SYSTIM_U *<CODE
+CLASS="varname"
+>tim_u</CODE
+>, UW *<CODE
+CLASS="varname"
+>ofs</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_get_otm"
+>tk_get_otm</A
+> ( SYSTIM *<CODE
+CLASS="varname"
+>pk_tim</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_get_otm_u"
+>tk_get_otm_u</A
+> ( SYSTIM_U *<CODE
+CLASS="varname"
+>tim_u</CODE
+>, UW *<CODE
+CLASS="varname"
+>ofs</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>cycid</SPAN
+> = <A
+HREF="time_management_functions.html#tk_cre_cyc"
+>tk_cre_cyc</A
+> ( CONST T_CCYC *<CODE
+CLASS="varname"
+>pk_ccyc</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>cycid</SPAN
+> = <A
+HREF="time_management_functions.html#tk_cre_cyc_u"
+>tk_cre_cyc_u</A
+> ( CONST T_CCYC_U *<CODE
+CLASS="varname"
+>pk_ccyc_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_del_cyc"
+>tk_del_cyc</A
+> ( ID <CODE
+CLASS="varname"
+>cycid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_sta_cyc"
+>tk_sta_cyc</A
+> ( ID <CODE
+CLASS="varname"
+>cycid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_stp_cyc"
+>tk_stp_cyc</A
+> ( ID <CODE
+CLASS="varname"
+>cycid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_ref_cyc"
+>tk_ref_cyc</A
+> ( ID <CODE
+CLASS="varname"
+>cycid</CODE
+>, T_RCYC *<CODE
+CLASS="varname"
+>pk_rcyc</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_ref_cyc_u"
+>tk_ref_cyc_u</A
+> ( ID <CODE
+CLASS="varname"
+>cycid</CODE
+>, T_RCYC_U *<CODE
+CLASS="varname"
+>pk_rcyc_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>almid</SPAN
+> = <A
+HREF="time_management_functions.html#tk_cre_alm"
+>tk_cre_alm</A
+> ( CONST T_CALM *<CODE
+CLASS="varname"
+>pk_calm</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_del_alm"
+>tk_del_alm</A
+> ( ID <CODE
+CLASS="varname"
+>almid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_sta_alm"
+>tk_sta_alm</A
+> ( ID <CODE
+CLASS="varname"
+>almid</CODE
+>, RELTIM <CODE
+CLASS="varname"
+>almtim</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_sta_alm_u"
+>tk_sta_alm_u</A
+> ( ID <CODE
+CLASS="varname"
+>almid</CODE
+>, RELTIM_U <CODE
+CLASS="varname"
+>almtim_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_stp_alm"
+>tk_stp_alm</A
+> ( ID <CODE
+CLASS="varname"
+>almid</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_ref_alm"
+>tk_ref_alm</A
+> ( ID <CODE
+CLASS="varname"
+>almid</CODE
+>, T_RALM *<CODE
+CLASS="varname"
+>pk_ralm</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="time_management_functions.html#tk_ref_alm_u"
+>tk_ref_alm_u</A
+> ( ID <CODE
+CLASS="varname"
+>almid</CODE
+>, T_RALM_U *<CODE
+CLASS="varname"
+>pk_ralm_u</CODE
+> );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34892"
+>割込み管理機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="interrupt_management_functions_os.html#tk_def_int"
+>tk_def_int</A
+> ( UINT <CODE
+CLASS="varname"
+>intno</CODE
+>, CONST T_DINT *<CODE
+CLASS="varname"
+>pk_dint</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> ( void );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34904"
+>システム状態管理機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="system_management_functions.html#tk_rot_rdq"
+>tk_rot_rdq</A
+> ( PRI <CODE
+CLASS="varname"
+>tskpri</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>tskid</SPAN
+> = <A
+HREF="system_management_functions.html#tk_get_tid"
+>tk_get_tid</A
+> ( void );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="system_management_functions.html#tk_dis_dsp"
+>tk_dis_dsp</A
+> ( void );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="system_management_functions.html#tk_ena_dsp"
+>tk_ena_dsp</A
+> ( void );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="system_management_functions.html#tk_ref_sys"
+>tk_ref_sys</A
+> ( T_RSYS *<CODE
+CLASS="varname"
+>pk_rsys</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="system_management_functions.html#tk_set_pow"
+>tk_set_pow</A
+> ( UINT <CODE
+CLASS="varname"
+>powmode</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="system_management_functions.html#tk_ref_ver"
+>tk_ref_ver</A
+> ( T_RVER *<CODE
+CLASS="varname"
+>pk_rver</CODE
+> );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34939"
+>サブシステム管理機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="subsystem_management_functions.html#tk_def_ssy"
+>tk_def_ssy</A
+> ( ID <CODE
+CLASS="varname"
+>ssid</CODE
+>, CONST T_DSSY *<CODE
+CLASS="varname"
+>pk_dssy</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+> ( ID <CODE
+CLASS="varname"
+>ssid</CODE
+>, INT <CODE
+CLASS="varname"
+>evttyp</CODE
+>, INT <CODE
+CLASS="varname"
+>info</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="subsystem_management_functions.html#tk_ref_ssy"
+>tk_ref_ssy</A
+> ( ID <CODE
+CLASS="varname"
+>ssid</CODE
+>, T_RSSY *<CODE
+CLASS="varname"
+>pk_rssy</CODE
+> );</P
+></LI
+></UL
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="list_of_c_language_interface_utk_sm"
+>μT-Kernel/SM</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34963"
+>システムメモリ管理機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>void* <A
+HREF="utk_sm_functions.html#Kmalloc"
+>Kmalloc</A
+> ( size_t <CODE
+CLASS="varname"
+>size</CODE
+> );</P
+></LI
+><LI
+><P
+>void* <A
+HREF="utk_sm_functions.html#Kcalloc"
+>Kcalloc</A
+> ( size_t <CODE
+CLASS="varname"
+>nmemb</CODE
+>, size_t <CODE
+CLASS="varname"
+>size</CODE
+> );</P
+></LI
+><LI
+><P
+>void* <A
+HREF="utk_sm_functions.html#Krealloc"
+>Krealloc</A
+> ( void *<CODE
+CLASS="varname"
+>ptr</CODE
+>, size_t <CODE
+CLASS="varname"
+>size</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="utk_sm_functions.html#Kfree"
+>Kfree</A
+> ( void *<CODE
+CLASS="varname"
+>ptr</CODE
+> );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34984"
+>デバイス管理機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>dd</SPAN
+> = <A
+HREF="device_management_functions.html#tk_opn_dev"
+>tk_opn_dev</A
+> ( CONST UB *<CODE
+CLASS="varname"
+>devnm</CODE
+>, UINT <CODE
+CLASS="varname"
+>omode</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="device_management_functions.html#tk_cls_dev"
+>tk_cls_dev</A
+> ( ID <CODE
+CLASS="varname"
+>dd</CODE
+>, UINT <CODE
+CLASS="varname"
+>option</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>reqid</SPAN
+> = <A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+> ( ID <CODE
+CLASS="varname"
+>dd</CODE
+>, W <CODE
+CLASS="varname"
+>start</CODE
+>, void *<CODE
+CLASS="varname"
+>buf</CODE
+>, SZ <CODE
+CLASS="varname"
+>size</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>reqid</SPAN
+> = <A
+HREF="device_management_functions.html#tk_rea_dev_du"
+>tk_rea_dev_du</A
+> ( ID <CODE
+CLASS="varname"
+>dd</CODE
+>, D <CODE
+CLASS="varname"
+>start_d</CODE
+>, void *<CODE
+CLASS="varname"
+>buf</CODE
+>, SZ <CODE
+CLASS="varname"
+>size</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="device_management_functions.html#tk_srea_dev"
+>tk_srea_dev</A
+> ( ID <CODE
+CLASS="varname"
+>dd</CODE
+>, W <CODE
+CLASS="varname"
+>start</CODE
+>, void *<CODE
+CLASS="varname"
+>buf</CODE
+>, SZ <CODE
+CLASS="varname"
+>size</CODE
+>, SZ *<CODE
+CLASS="varname"
+>asize</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="device_management_functions.html#tk_srea_dev_d"
+>tk_srea_dev_d</A
+> ( ID <CODE
+CLASS="varname"
+>dd</CODE
+>, D <CODE
+CLASS="varname"
+>start_d</CODE
+>, void *<CODE
+CLASS="varname"
+>buf</CODE
+>, SZ <CODE
+CLASS="varname"
+>size</CODE
+>, SZ *<CODE
+CLASS="varname"
+>asize</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>reqid</SPAN
+> = <A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+> ( ID <CODE
+CLASS="varname"
+>dd</CODE
+>, W <CODE
+CLASS="varname"
+>start</CODE
+>, CONST void *<CODE
+CLASS="varname"
+>buf</CODE
+>, SZ <CODE
+CLASS="varname"
+>size</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>reqid</SPAN
+> = <A
+HREF="device_management_functions.html#tk_wri_dev_du"
+>tk_wri_dev_du</A
+> ( ID <CODE
+CLASS="varname"
+>dd</CODE
+>, D <CODE
+CLASS="varname"
+>start_d</CODE
+>, CONST void *<CODE
+CLASS="varname"
+>buf</CODE
+>, SZ <CODE
+CLASS="varname"
+>size</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="device_management_functions.html#tk_swri_dev"
+>tk_swri_dev</A
+> ( ID <CODE
+CLASS="varname"
+>dd</CODE
+>, W <CODE
+CLASS="varname"
+>start</CODE
+>, CONST void *<CODE
+CLASS="varname"
+>buf</CODE
+>, SZ <CODE
+CLASS="varname"
+>size</CODE
+>, SZ *<CODE
+CLASS="varname"
+>asize</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="device_management_functions.html#tk_swri_dev_d"
+>tk_swri_dev_d</A
+> ( ID <CODE
+CLASS="varname"
+>dd</CODE
+>, D <CODE
+CLASS="varname"
+>start_d</CODE
+>, CONST void *<CODE
+CLASS="varname"
+>buf</CODE
+>, W <CODE
+CLASS="varname"
+>size</CODE
+>, W *<CODE
+CLASS="varname"
+>asize</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>creqid</SPAN
+> = <A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> ( ID <CODE
+CLASS="varname"
+>dd</CODE
+>, ID <CODE
+CLASS="varname"
+>reqid</CODE
+>, SZ *<CODE
+CLASS="varname"
+>asize</CODE
+>, ER *<CODE
+CLASS="varname"
+>ioer</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>creqid</SPAN
+> = <A
+HREF="device_management_functions.html#tk_wai_dev_u"
+>tk_wai_dev_u</A
+> ( ID <CODE
+CLASS="varname"
+>dd</CODE
+>, ID <CODE
+CLASS="varname"
+>reqid</CODE
+>, SZ *<CODE
+CLASS="varname"
+>asize</CODE
+>, ER *<CODE
+CLASS="varname"
+>ioer</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>dissus</SPAN
+> = <A
+HREF="device_management_functions.html#tk_sus_dev"
+>tk_sus_dev</A
+> ( UINT <CODE
+CLASS="varname"
+>mode</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>pdevid</SPAN
+> = <A
+HREF="device_management_functions.html#tk_get_dev"
+>tk_get_dev</A
+> ( ID <CODE
+CLASS="varname"
+>devid</CODE
+>, UB *<CODE
+CLASS="varname"
+>devnm</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>devid</SPAN
+> = <A
+HREF="device_management_functions.html#tk_ref_dev"
+>tk_ref_dev</A
+> ( CONST UB *<CODE
+CLASS="varname"
+>devnm</CODE
+>, T_RDEV *<CODE
+CLASS="varname"
+>rdev</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>devid</SPAN
+> = <A
+HREF="device_management_functions.html#tk_oref_dev"
+>tk_oref_dev</A
+> ( ID <CODE
+CLASS="varname"
+>dd</CODE
+>, T_RDEV *<CODE
+CLASS="varname"
+>rdev</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>remcnt</SPAN
+> = <A
+HREF="device_management_functions.html#tk_lst_dev"
+>tk_lst_dev</A
+> ( T_LDEV *<CODE
+CLASS="varname"
+>ldev</CODE
+>, INT <CODE
+CLASS="varname"
+>start</CODE
+>, INT <CODE
+CLASS="varname"
+>ndev</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>retcode</SPAN
+> = <A
+HREF="device_management_functions.html#tk_evt_dev"
+>tk_evt_dev</A
+> ( ID <CODE
+CLASS="varname"
+>devid</CODE
+>, INT <CODE
+CLASS="varname"
+>evttyp</CODE
+>, void *<CODE
+CLASS="varname"
+>evtinf</CODE
+> );</P
+></LI
+><LI
+><P
+>ID <SPAN
+CLASS="returnvalue"
+>devid</SPAN
+> = <A
+HREF="device_management_functions.html#tk_def_dev"
+>tk_def_dev</A
+> ( CONST UB *<CODE
+CLASS="varname"
+>devnm</CODE
+>, CONST T_DDEV *<CODE
+CLASS="varname"
+>dd</CODE
+>ev, T_IDEV *<CODE
+CLASS="varname"
+>idev</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="device_management_functions.html#tk_ref_idv"
+>tk_ref_idv</A
+> ( T_IDEV *<CODE
+CLASS="varname"
+>idev</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="device_management_functions.html#openfn"
+>openfn</A
+> ( ID <CODE
+CLASS="varname"
+>devid</CODE
+>, UINT <CODE
+CLASS="varname"
+>omode</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="device_management_functions.html#closefn"
+>closefn</A
+> ( ID <CODE
+CLASS="varname"
+>devid</CODE
+>, UINT <CODE
+CLASS="varname"
+>option</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> ( T_DEVREQ *<CODE
+CLASS="varname"
+>devreq</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> ( T_DEVREQ_D *<CODE
+CLASS="varname"
+>devreq_d</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> ( T_DEVREQ *<CODE
+CLASS="varname"
+>devreq</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> ( T_DEVREQ_D *<CODE
+CLASS="varname"
+>devreq_d</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>creqno</SPAN
+> = <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> ( T_DEVREQ *<CODE
+CLASS="varname"
+>devreq</CODE
+>, INT <CODE
+CLASS="varname"
+>nreq</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>creqno</SPAN
+> = <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> ( T_DEVREQ_D *<CODE
+CLASS="varname"
+>devreq_d</CODE
+>, INT <CODE
+CLASS="varname"
+>nreq</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>creqno</SPAN
+> = <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> ( T_DEVREQ *<CODE
+CLASS="varname"
+>devreq</CODE
+>, INT <CODE
+CLASS="varname"
+>nreq</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>creqno</SPAN
+> = <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> ( T_DEVREQ_D *<CODE
+CLASS="varname"
+>devreq_d</CODE
+>, INT <CODE
+CLASS="varname"
+>nreq</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, T_DEVREQ *<CODE
+CLASS="varname"
+>devreq</CODE
+>, INT <CODE
+CLASS="varname"
+>nreq</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, T_DEVREQ_D *<CODE
+CLASS="varname"
+>devreq_d</CODE
+>, INT <CODE
+CLASS="varname"
+>nreq</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>retcode</SPAN
+> = <A
+HREF="device_management_functions.html#eventfn"
+>eventfn</A
+> ( INT <CODE
+CLASS="varname"
+>evttyp</CODE
+>, void *<CODE
+CLASS="varname"
+>evtinf</CODE
+>, void *<CODE
+CLASS="varname"
+>exinf</CODE
+> );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN35235"
+>割込み管理機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+><A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI</A
+> ( UINT <CODE
+CLASS="varname"
+>intsts</CODE
+> );</P
+></LI
+><LI
+><P
+><A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI</A
+> ( UINT <CODE
+CLASS="varname"
+>intsts</CODE
+> );</P
+></LI
+><LI
+><P
+>BOOL <SPAN
+CLASS="returnvalue"
+>disint</SPAN
+> = <A
+HREF="interrupt_management_functions_sm.html#isDI"
+>isDI</A
+> ( UINT <CODE
+CLASS="varname"
+>intsts</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="interrupt_management_functions_sm.html#SetCpuIntLevel"
+>SetCpuIntLevel</A
+> ( INT <CODE
+CLASS="varname"
+>level</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>level</SPAN
+> = <A
+HREF="interrupt_management_functions_sm.html#GetCpuIntLevel"
+>GetCpuIntLevel</A
+> ( void );</P
+></LI
+><LI
+><P
+>void <A
+HREF="interrupt_management_functions_sm.html#EnableInt"
+>EnableInt</A
+> ( UINT <CODE
+CLASS="varname"
+>intno</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="interrupt_management_functions_sm.html#EnableInt"
+>EnableInt</A
+> ( UINT <CODE
+CLASS="varname"
+>intno</CODE
+>, INT <CODE
+CLASS="varname"
+>level</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="interrupt_management_functions_sm.html#DisableInt"
+>DisableInt</A
+> ( UINT <CODE
+CLASS="varname"
+>intno</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="interrupt_management_functions_sm.html#ClearInt"
+>ClearInt</A
+> ( UINT <CODE
+CLASS="varname"
+>intno</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="interrupt_management_functions_sm.html#EndOfInt"
+>EndOfInt</A
+> ( UINT <CODE
+CLASS="varname"
+>intno</CODE
+> );</P
+></LI
+><LI
+><P
+>BOOL <SPAN
+CLASS="returnvalue"
+>rasint</SPAN
+> = <A
+HREF="interrupt_management_functions_sm.html#CheckInt"
+>CheckInt</A
+> ( UINT <CODE
+CLASS="varname"
+>intno</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="interrupt_management_functions_sm.html#SetIntMode"
+>SetIntMode</A
+> ( UINT <CODE
+CLASS="varname"
+>intno</CODE
+>, UINT <CODE
+CLASS="varname"
+>mode</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="interrupt_management_functions_sm.html#SetCtrlIntLevel"
+>SetCtrlIntLevel</A
+> ( INT <CODE
+CLASS="varname"
+>level</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>level</SPAN
+> = <A
+HREF="interrupt_management_functions_sm.html#GetCtrlIntLevel"
+>GetCtrlIntLevel</A
+> ( void );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN35298"
+>I/Oポートアクセスサポート機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>void <A
+HREF="io_port_management_functions.html#out_b"
+>out_b</A
+> ( INT <CODE
+CLASS="varname"
+>port</CODE
+>, UB <CODE
+CLASS="varname"
+>data</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="io_port_management_functions.html#out_h"
+>out_h</A
+> ( INT <CODE
+CLASS="varname"
+>port</CODE
+>, UH <CODE
+CLASS="varname"
+>data</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="io_port_management_functions.html#out_w"
+>out_w</A
+> ( INT <CODE
+CLASS="varname"
+>port</CODE
+>, UW <CODE
+CLASS="varname"
+>data</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="io_port_management_functions.html#out_d"
+>out_d</A
+> ( INT <CODE
+CLASS="varname"
+>port</CODE
+>, UD <CODE
+CLASS="varname"
+>data</CODE
+> );</P
+></LI
+><LI
+><P
+>UB <SPAN
+CLASS="returnvalue"
+>data</SPAN
+> = <A
+HREF="io_port_management_functions.html#in_b"
+>in_b</A
+> ( INT <CODE
+CLASS="varname"
+>port</CODE
+> );</P
+></LI
+><LI
+><P
+>UH <SPAN
+CLASS="returnvalue"
+>data</SPAN
+> = <A
+HREF="io_port_management_functions.html#in_h"
+>in_h</A
+> ( INT <CODE
+CLASS="varname"
+>port</CODE
+> );</P
+></LI
+><LI
+><P
+>UW <SPAN
+CLASS="returnvalue"
+>data</SPAN
+> = <A
+HREF="io_port_management_functions.html#in_w"
+>in_w</A
+> ( INT <CODE
+CLASS="varname"
+>port</CODE
+> );</P
+></LI
+><LI
+><P
+>UD <SPAN
+CLASS="returnvalue"
+>data</SPAN
+> = <A
+HREF="io_port_management_functions.html#in_d"
+>in_d</A
+> ( INT <CODE
+CLASS="varname"
+>port</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="io_port_management_functions.html#WaitUsec"
+>WaitUsec</A
+> ( UW <CODE
+CLASS="varname"
+>usec</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="io_port_management_functions.html#WaitNsec"
+>WaitNsec</A
+> ( UW <CODE
+CLASS="varname"
+>nsec</CODE
+> );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN35349"
+>省電力機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>void <A
+HREF="power_management_functions.html#low_pow"
+>low_pow</A
+> ( void );</P
+></LI
+><LI
+><P
+>void <A
+HREF="power_management_functions.html#off_pow"
+>off_pow</A
+> ( void );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN35358"
+>システム構成情報管理機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="system_configuration_information_management_functions.html#tk_get_cfn"
+>tk_get_cfn</A
+> ( CONST UB *<CODE
+CLASS="varname"
+>name</CODE
+>, W *<CODE
+CLASS="varname"
+>val</CODE
+>, INT <CODE
+CLASS="varname"
+>max</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>rlen</SPAN
+> = <A
+HREF="system_configuration_information_management_functions.html#tk_get_cfs"
+>tk_get_cfs</A
+> ( CONST UB *<CODE
+CLASS="varname"
+>name</CODE
+>, UB *<CODE
+CLASS="varname"
+>buf</CODE
+>, INT <CODE
+CLASS="varname"
+>max</CODE
+> );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN35375"
+>メモリキャッシュ制御機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>SZ <SPAN
+CLASS="returnvalue"
+>rlen</SPAN
+> = <A
+HREF="memory_cache_control_functions.html#SetCacheMode"
+>SetCacheMode</A
+> ( void *<CODE
+CLASS="varname"
+>addr</CODE
+>, SZ <CODE
+CLASS="varname"
+>len</CODE
+>, UINT <CODE
+CLASS="varname"
+>mode</CODE
+> );</P
+></LI
+><LI
+><P
+>SZ <SPAN
+CLASS="returnvalue"
+>rlen</SPAN
+> = <A
+HREF="memory_cache_control_functions.html#ControlCache"
+>ControlCache</A
+> ( void *<CODE
+CLASS="varname"
+>addr</CODE
+>, SZ <CODE
+CLASS="varname"
+>len</CODE
+>, UINT <CODE
+CLASS="varname"
+>mode</CODE
+> );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN35392"
+>物理タイマ機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="physical_timer_functions.html#StartPhysicalTimer"
+>StartPhysicalTimer</A
+> ( UINT <CODE
+CLASS="varname"
+>ptmrno</CODE
+>, UW <CODE
+CLASS="varname"
+>limit</CODE
+>, UINT <CODE
+CLASS="varname"
+>mode</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="physical_timer_functions.html#StopPhysicalTimer"
+>StopPhysicalTimer</A
+> ( UINT <CODE
+CLASS="varname"
+>ptmrno</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="physical_timer_functions.html#GetPhysicalTimerCount"
+>GetPhysicalTimerCount</A
+> ( UINT <CODE
+CLASS="varname"
+>ptmrno</CODE
+>, UW *<CODE
+CLASS="varname"
+>p_count</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="physical_timer_functions.html#DefinePhysicalTimerHandler"
+>DefinePhysicalTimerHandler</A
+> ( UINT <CODE
+CLASS="varname"
+>ptmrno</CODE
+>, CONST T_DPTMR *<CODE
+CLASS="varname"
+>pk_dptmr</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="physical_timer_functions.html#GetPhysicalTimerConfig"
+>GetPhysicalTimerConfig</A
+> ( UINT <CODE
+CLASS="varname"
+>ptmrno</CODE
+>, T_RPTMR *<CODE
+CLASS="varname"
+>pk_rptmr</CODE
+> );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN35425"
+>ユーティリティ機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>void <A
+HREF="utility_functions.html#SetOBJNAME"
+>SetOBJNAME</A
+> ( void *<CODE
+CLASS="varname"
+>exinf</CODE
+>, CONST UB *<CODE
+CLASS="varname"
+>name</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utility_functions.html#CreateLock"
+>CreateLock</A
+> ( FastLock *<CODE
+CLASS="varname"
+>lock</CODE
+>, CONST UB *<CODE
+CLASS="varname"
+>name</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="utility_functions.html#DeleteLock"
+>DeleteLock</A
+> ( FastLock *<CODE
+CLASS="varname"
+>lock</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="utility_functions.html#Lock"
+>Lock</A
+> ( FastLock *<CODE
+CLASS="varname"
+>lock</CODE
+> );</P
+></LI
+><LI
+><P
+>void <A
+HREF="utility_functions.html#Unlock"
+>Unlock</A
+> ( FastLock *<CODE
+CLASS="varname"
+>lock</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utility_functions.html#CreateMLock"
+>CreateMLock</A
+> ( FastMLock *<CODE
+CLASS="varname"
+>lock</CODE
+>, CONST UB *<CODE
+CLASS="varname"
+>name</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utility_functions.html#DeleteMLock"
+>DeleteMLock</A
+> ( FastMLock *<CODE
+CLASS="varname"
+>lock</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utility_functions.html#MLock"
+>MLock</A
+> ( FastMLock *<CODE
+CLASS="varname"
+>lock</CODE
+>, INT <CODE
+CLASS="varname"
+>no</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utility_functions.html#MLockTmo"
+>MLockTmo</A
+> ( FastMLock *<CODE
+CLASS="varname"
+>lock</CODE
+>, INT <CODE
+CLASS="varname"
+>no</CODE
+>, TMO <CODE
+CLASS="varname"
+>tmout</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utility_functions.html#MLockTmo_u"
+>MLockTmo_u</A
+> ( FastMLock *<CODE
+CLASS="varname"
+>lock</CODE
+>, INT <CODE
+CLASS="varname"
+>no</CODE
+>, TMO_U <CODE
+CLASS="varname"
+>tmout_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utility_functions.html#MUnlock"
+>MUnlock</A
+> ( FastMLock *<CODE
+CLASS="varname"
+>lock</CODE
+>, INT <CODE
+CLASS="varname"
+>no</CODE
+> );</P
+></LI
+></UL
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="list_of_c_language_interface_utk_ds"
+>μT-Kernel/DS</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN35490"
+>カーネル内部状態取得機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_lst_tsk"
+>td_lst_tsk</A
+> ( ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_lst_sem"
+>td_lst_sem</A
+> ( ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_lst_flg"
+>td_lst_flg</A
+> ( ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_lst_mbx"
+>td_lst_mbx</A
+> ( ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_lst_mtx"
+>td_lst_mtx</A
+> ( ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_lst_mbf"
+>td_lst_mbf</A
+> ( ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_lst_mpf"
+>td_lst_mpf</A
+> ( ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_lst_mpl"
+>td_lst_mpl</A
+> ( ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_lst_cyc"
+>td_lst_cyc</A
+> ( ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_lst_alm"
+>td_lst_alm</A
+> ( ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_lst_ssy"
+>td_lst_ssy</A
+> ( ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_rdy_que"
+>td_rdy_que</A
+> ( PRI <CODE
+CLASS="varname"
+>pri</CODE
+>, ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_sem_que"
+>td_sem_que</A
+> ( ID <CODE
+CLASS="varname"
+>semid</CODE
+>, ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_flg_que"
+>td_flg_que</A
+> ( ID <CODE
+CLASS="varname"
+>flgid</CODE
+>, ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_mbx_que"
+>td_mbx_que</A
+> ( ID <CODE
+CLASS="varname"
+>mbxid</CODE
+>, ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_mtx_que"
+>td_mtx_que</A
+> ( ID <CODE
+CLASS="varname"
+>mtxid</CODE
+>, ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_smbf_que"
+>td_smbf_que</A
+> ( ID <CODE
+CLASS="varname"
+>mbfid</CODE
+>, ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_rmbf_que"
+>td_rmbf_que</A
+> ( ID <CODE
+CLASS="varname"
+>mbfid</CODE
+>, ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_mpf_que"
+>td_mpf_que</A
+> ( ID <CODE
+CLASS="varname"
+>mpfid</CODE
+>, ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>INT <SPAN
+CLASS="returnvalue"
+>ct</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_mpl_que"
+>td_mpl_que</A
+> ( ID <CODE
+CLASS="varname"
+>mplid</CODE
+>, ID <CODE
+CLASS="varname"
+>list[]</CODE
+>, INT <CODE
+CLASS="varname"
+>nent</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_ref_tsk"
+>td_ref_tsk</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, TD_RTSK *<CODE
+CLASS="varname"
+>rtsk</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_ref_tex"
+>td_ref_tex</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, TD_RTEX *<CODE
+CLASS="varname"
+>pk_rtex</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_ref_sem"
+>td_ref_sem</A
+> ( ID <CODE
+CLASS="varname"
+>semid</CODE
+>, TD_RSEM *<CODE
+CLASS="varname"
+>rsem</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_ref_flg"
+>td_ref_flg</A
+> ( ID <CODE
+CLASS="varname"
+>flgid</CODE
+>, TD_RFLG *<CODE
+CLASS="varname"
+>rflg</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_ref_mbx"
+>td_ref_mbx</A
+> ( ID <CODE
+CLASS="varname"
+>mbxid</CODE
+>, TD_RMBX *<CODE
+CLASS="varname"
+>rmbx</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_ref_mtx"
+>td_ref_mtx</A
+> ( ID <CODE
+CLASS="varname"
+>mtxid</CODE
+>, TD_RMTX *<CODE
+CLASS="varname"
+>rmtx</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_ref_mbf"
+>td_ref_mbf</A
+> ( ID <CODE
+CLASS="varname"
+>mbfid</CODE
+>, TD_RMBF *<CODE
+CLASS="varname"
+>rmbf</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_ref_mpf"
+>td_ref_mpf</A
+> ( ID <CODE
+CLASS="varname"
+>mpfid</CODE
+>, TD_RMPF *<CODE
+CLASS="varname"
+>rmpf</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_ref_mpl"
+>td_ref_mpl</A
+> ( ID <CODE
+CLASS="varname"
+>mplid</CODE
+>, TD_RMPL *<CODE
+CLASS="varname"
+>rmpl</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_ref_cyc"
+>td_ref_cyc</A
+> ( ID <CODE
+CLASS="varname"
+>cycid</CODE
+>, TD_RCYC *<CODE
+CLASS="varname"
+>rcyc</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_ref_cyc_u"
+>td_ref_cyc_u</A
+> ( ID <CODE
+CLASS="varname"
+>cycid</CODE
+>, TD_RCYC_U *<CODE
+CLASS="varname"
+>rcyc_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_ref_alm"
+>td_ref_alm</A
+> ( ID <CODE
+CLASS="varname"
+>almid</CODE
+>, TD_RALM *<CODE
+CLASS="varname"
+>ralm</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_ref_alm_u"
+>td_ref_alm_u</A
+> ( ID <CODE
+CLASS="varname"
+>almid</CODE
+>, TD_RALM_U *<CODE
+CLASS="varname"
+>ralm_u</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_ref_sys"
+>td_ref_sys</A
+> ( TD_RSYS *<CODE
+CLASS="varname"
+>pk_rsys</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_ref_ssy"
+>td_ref_ssy</A
+> ( ID <CODE
+CLASS="varname"
+>ssid</CODE
+>, TD_RSSY *<CODE
+CLASS="varname"
+>rssy</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_get_reg"
+>td_get_reg</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, T_REGS *<CODE
+CLASS="varname"
+>pk_regs</CODE
+>, T_EIT *<CODE
+CLASS="varname"
+>pk_eit</CODE
+>, T_CREGS *<CODE
+CLASS="varname"
+>pk_cregs</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_set_reg"
+>td_set_reg</A
+> ( ID <CODE
+CLASS="varname"
+>tskid</CODE
+>, CONST T_REGS *<CODE
+CLASS="varname"
+>pk_regs</CODE
+>, CONST T_EIT *<CODE
+CLASS="varname"
+>pk_eit</CODE
+>, CONST T_CREGS *<CODE
+CLASS="varname"
+>pk_cregs</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_get_utc"
+>td_get_utc</A
+> ( SYSTIM *<CODE
+CLASS="varname"
+>tim</CODE
+>, UW *<CODE
+CLASS="varname"
+>ofs</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_get_utc_u"
+>td_get_utc_u</A
+> ( SYSTIM_U *<CODE
+CLASS="varname"
+>tim_u</CODE
+>, UW *<CODE
+CLASS="varname"
+>ofs</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_get_tim"
+>td_get_tim</A
+> ( SYSTIM *<CODE
+CLASS="varname"
+>tim</CODE
+>, UW *<CODE
+CLASS="varname"
+>ofs</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_get_tim_u"
+>td_get_tim_u</A
+> ( SYSTIM_U *<CODE
+CLASS="varname"
+>tim_u</CODE
+>, UW *<CODE
+CLASS="varname"
+>ofs</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_get_otm"
+>td_get_otm</A
+> ( SYSTIM *<CODE
+CLASS="varname"
+>tim</CODE
+>, UW *<CODE
+CLASS="varname"
+>ofs</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_get_otm_u"
+>td_get_otm_u</A
+> ( SYSTIM_U *<CODE
+CLASS="varname"
+>tim_u</CODE
+>, UW *<CODE
+CLASS="varname"
+>ofs</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> ( UINT <CODE
+CLASS="varname"
+>type</CODE
+>, ID <CODE
+CLASS="varname"
+>id</CODE
+>, UB *<CODE
+CLASS="varname"
+>dsname</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> ( UINT <CODE
+CLASS="varname"
+>type</CODE
+>, ID <CODE
+CLASS="varname"
+>id</CODE
+>, CONST UB *<CODE
+CLASS="varname"
+>dsname</CODE
+> );</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN35777"
+>実行トレース機能</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="trace_functions.html#td_hok_svc"
+>td_hok_svc</A
+> ( CONST TD_HSVC *<CODE
+CLASS="varname"
+>hsvc</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="trace_functions.html#td_hok_dsp"
+>td_hok_dsp</A
+> ( CONST TD_HDSP *<CODE
+CLASS="varname"
+>hdsp</CODE
+> );</P
+></LI
+><LI
+><P
+>ER <SPAN
+CLASS="returnvalue"
+>ercd</SPAN
+> = <A
+HREF="trace_functions.html#td_hok_int"
+>td_hok_int</A
+> ( CONST TD_HINT *<CODE
+CLASS="varname"
+>hint</CODE
+> );</P
+></LI
+></UL
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="list_of_keywords.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="list_of_error_codes.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>キーワード</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>エラーコード一覧</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

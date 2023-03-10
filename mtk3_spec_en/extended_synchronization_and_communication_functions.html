@@ -1,0 +1,6614 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Extended Synchronization and Communication Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/OS Functions"
+HREF="utk_os_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Synchronization and Communication Functions"
+HREF="synchronzation_and_communication_functions.html"><LINK
+REL="NEXT"
+TITLE="Memory Pool Management Functions"
+HREF="memory_pool_management_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="synchronzation_and_communication_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/OS Functions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="memory_pool_management_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="extended_synchronization_and_communication_functions"
+>Extended Synchronization and Communication Functions</A
+></H1
+><P
+>Extended synchronization and communication functions use objects independent of tasks to realize more sophisticated synchronization and communication between tasks. The functions specified here include mutex and message buffer functions.</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="mutex"
+>Mutex</A
+></H2
+><P
+>A mutex is an object for mutual exclusion control among tasks that use shared resources. Priority inheritance mutexes and priority ceiling mutexes are supported, as a mechanism to prevent the problem of unbounded priority inversion that can occur in mutual exclusion control.</P
+><P
+>Functions are provided for creating and deleting a mutex, locking and unlocking a mutex, and referencing mutex status. A mutex is identified by an ID number. The ID number for the mutex is called a mutex ID.</P
+><P
+>A mutex has a status (locked or unlocked) and a queue for tasks waiting to lock the mutex. For each mutex, T-Kernel keeps track of the tasks locking it; and for each task, it keeps track of the mutexes it has locked. Before a task uses a resource, it locks a mutex associated with that resource. If the mutex is already locked by another task, the task waits for the mutex to become unlocked. Tasks in mutex lock waiting state are put in the mutex queue. When a task finishes with a resource, it unlocks the mutex.</P
+><P
+>A mutex with <TT
+CLASS="literal"
+>TA_INHERIT</TT
+> (= 0x02) specified as mutex attribute supports priority inheritance protocol while one with <TT
+CLASS="literal"
+>TA_CEILING</TT
+> (= 0x03) specified supports priority ceiling protocol. When a mutex with <TT
+CLASS="literal"
+>TA_CEILING</TT
+> attribute is created, a ceiling priority is assigned to it, indicating the base priority of the task having the highest base priority among the tasks that will lock that mutex. If a task having a higher base priority than the ceiling priority of the mutex with <TT
+CLASS="literal"
+>TA_CEILING</TT
+> attribute tries to lock it, error code <SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+> is returned. If <A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+> is issued in an attempt to set the base priority of a task having locked a mutex with <TT
+CLASS="literal"
+>TA_CEILING</TT
+> attribute to a value higher than the ceiling priority of that mutex, <SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+> is returned by the <A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+> system call.</P
+><P
+>When these protocols are used, unbounded priority inversion is prevented by automatically changing the current priority of a task in a mutex operation. Strict adherence to the priority inheritance protocol and priority ceiling protocol requires that the task current priority must always be changed to match the peak value of the following priorities. This is called strict priority control.<P
+></P
+><UL
+><LI
+><P
+>Task base priority</P
+></LI
+><LI
+><P
+>When tasks lock mutexes with <TT
+CLASS="literal"
+>TA_INHERIT</TT
+> attribute, the current priority of the task having the highest current priority of the tasks waiting for those mutexes.</P
+></LI
+><LI
+><P
+>When tasks lock mutexes with <TT
+CLASS="literal"
+>TA_CEILING</TT
+> attribute, the highest ceiling priority of the mutex among those mutexes.</P
+></LI
+></UL
+></P
+><P
+>Note that when the current priority of a task waiting for a mutex with <TT
+CLASS="literal"
+>TA_INHERIT</TT
+> attribute changes as the result of a base priority change brought about by mutex operation or <A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+>, it may become necessary to change the current priority of the task locking that mutex. This is called dynamic priority inheritance. Further, if this task is waiting for another mutex with <TT
+CLASS="literal"
+>TA_INHERIT</TT
+> attribute, dynamic priority inheritance processing may become necessary also for the task locking that mutex.</P
+><P
+>The T-Kernel defines, in addition to the above strict priority control, a simplified priority control limiting the situations in which the current priority is changed. The choice between the two is implementation-dependent. In the simplified priority control, whereas all changes in the direction of raising the task current priority are carried out, changes in the direction of lowering that priority are made only when a task is no longer locking any mutexes. (In this case the task current priority reverts to the base priority.) More specifically, processing to change the current priority is needed only in the following circumstances.<P
+></P
+><UL
+><LI
+><P
+>When a task with a higher current priority than that of the task locking a mutex with <TT
+CLASS="literal"
+>TA_INHERIT</TT
+> attribute starts waiting for that mutex.</P
+></LI
+><LI
+><P
+>When task B is waiting for a mutex with <TT
+CLASS="literal"
+>TA_INHERIT</TT
+> attribute being locked by another task called A, and if the current priority of B is changed to a higher one than that of task A.</P
+></LI
+><LI
+><P
+>When a task locks a mutex with <TT
+CLASS="literal"
+>TA_CEILING</TT
+> attribute having a higher ceiling priority than the task's current priority.</P
+></LI
+><LI
+><P
+>When a task is no longer locking any mutexes.</P
+></LI
+></UL
+></P
+><P
+>When the current priority of a task is changed in connection with a mutex operation, the following processing is performed.</P
+><P
+>If the task whose priority changed is in a run state, the task precedence is changed in accordance with the new priority. Its precedence among other tasks having the same priority is implementation-dependent. Likewise, if the task whose priority changes is waiting in a queue of some kind, its order in that queue is changed based on its new priority. Its order among other tasks having the same priority is implementation-dependent. When a task terminates and there are mutexes still locked by that task, all the mutexes are unlocked. The order in which multiple locked mutexes are unlocked is implementation-dependent. See the description of <A
+HREF="extended_synchronization_and_communication_functions.html#tk_unl_mtx"
+>tk_unl_mtx</A
+> for the specific processing involved.</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Additional Notes</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+><TT
+CLASS="literal"
+>TA_TFIFO</TT
+> attribute mutex or <TT
+CLASS="literal"
+>TA_TPRI</TT
+> attribute mutex has functionality equivalent to that of a semaphore with a maximum of one resource (binary semaphore). The main differences are that a mutex can be unlocked only by the task that locked it, and a mutex is automatically unlocked when the task locking it terminates.</P
+><P
+>The term "priority ceiling protocol" is used here in a broad sense. The protocol described here is not the same as the algorithm originally proposed. Strictly speaking, it is what is otherwise referred to as a highest locker protocol or by other names.</P
+><P
+>When the change in current priority of a task due to a mutex operation results in that task's order being changed in a priority-based queue, it may be necessary to release the waiting state of other tasks waiting for that task or for that queue.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Rationale for the Specification</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>The precedence of tasks having the same priority as the result of a change in task current priority in a mutex operation is left as implementation-dependent, for the following reason. Depending on the application, the mutex function may lead to frequent changes in current priority. It would not be desirable for this to result in constant task switching, which is what would happen if the precedence were made the lowest each time among tasks of the same priority. Ideally task precedence rather than priority should be inherited, but that results in large overhead in implementation. This aspect of the specification is therefore made an implementation-dependent matter.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_cre_mtx"
+>tk_cre_mtx - Create Mutex</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9763"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN9765"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID mtxid = tk_cre_mtx</CODE
+>(CONST T_CMTX *pk_cmtx);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9772"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9774"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST T_CMTX*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_cmtx</CODE
+>
+              </TD
+><TD
+>Packet to Create Mutex</TD
+><TD
+>Information about the mutex to be created</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_cmtx</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9789"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Extended information</TD
+></TR
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mtxatr</CODE
+>
+              </TD
+><TD
+>Mutex Attribute</TD
+><TD
+>Mutex attributes</TD
+></TR
+><TR
+><TD
+>PRI</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ceilpri</CODE
+>
+              </TD
+><TD
+>Ceiling Priority of Mutex</TD
+><TD
+>Mutex ceiling priority</TD
+></TR
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dsname[8]</CODE
+>
+              </TD
+><TD
+>DS Object name</TD
+><TD
+>DS object name</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9822"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9824"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mtxid</CODE
+>
+              </TD
+><TD
+>Mutex ID</TD
+><TD
+>Mutex ID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9841"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9843"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>Insufficient memory (memory for control block cannot be allocated)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>Number of mutexes exceeds the system limit</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>Reserved attribute (<CODE
+CLASS="varname"
+>mtxatr</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>pk_cmtx</CODE
+> or <CODE
+CLASS="varname"
+>ceilpri</CODE
+> is invalid)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9867"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9869"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9884"
+>Related Service Profile Items</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9886"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+> (reject request to disable wait) to mutex attribute</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> for mutex attribute</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9901"
+>Description</A
+></H4
+><P
+>Creates a mutex, assigning to it a mutex ID. This system call allocates a control block, etc. for the created mutex.</P
+><P
+><CODE
+CLASS="varname"
+>exinf</CODE
+> can be used freely by the user to set miscellaneous information about the created mutex. The information set in this parameter can be referenced by <A
+HREF="extended_synchronization_and_communication_functions.html#tk_ref_mtx"
+>tk_ref_mtx</A
+>. If a larger area is needed for indicating user information, or if the information may need to be changed after the message buffer is created, this can be done by allocating separate memory for this purpose and putting the memory packet address in <CODE
+CLASS="varname"
+>exinf</CODE
+>. The kernel pays no attention to the contents of <CODE
+CLASS="varname"
+>exinf</CODE
+>.</P
+><P
+><CODE
+CLASS="varname"
+>mtxatr</CODE
+> indicates system attributes in its lower bits and implementation-dependent attributes in its higher bits. The system attribute part of <CODE
+CLASS="varname"
+>mtxatr</CODE
+> is specified as follows.</P
+><PRE
+CLASS="synopsis"
+>&#13;mtxatr := (TA_TFIFO || TA_TPRI || TA_INHERIT || TA_CEILING) | [TA_DSNAME] | [TA_NODISWAI]
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9913"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>
+              </TD
+><TD
+>Tasks are queued in FIFO order</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TPRI</TT
+>
+              </TD
+><TD
+>Tasks are queued in priority order</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_INHERIT</TT
+>
+              </TD
+><TD
+>Priority inheritance protocol</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_CEILING</TT
+>
+              </TD
+><TD
+>Priority ceiling protocol</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_DSNAME</TT
+>
+              </TD
+><TD
+>Specifies DS object name</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>
+              </TD
+><TD
+>Disabling of wait by <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> is prohibited</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>When the <TT
+CLASS="literal"
+>TA_TFIFO</TT
+> attribute is specified, the order of the mutex task queue is FIFO. If <TT
+CLASS="literal"
+>TA_TPRI</TT
+>, <TT
+CLASS="literal"
+>TA_INHERIT</TT
+>, or <TT
+CLASS="literal"
+>TA_CEILING</TT
+> is specified, tasks are ordered by their priority. <TT
+CLASS="literal"
+>TA_INHERIT</TT
+> indicates that priority inheritance protocol is used, and <TT
+CLASS="literal"
+>TA_CEILING</TT
+> specifies priority ceiling protocol.</P
+><P
+>Only when <TT
+CLASS="literal"
+>TA_CEILING</TT
+> is specified, <CODE
+CLASS="varname"
+>ceilpri</CODE
+> is valid and specifies the mutex ceiling priority.</P
+><P
+>When <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> is specified, <CODE
+CLASS="varname"
+>dsname</CODE
+> is valid and specifies the DS object name. DS object name is used to identify objects by debugger, and it is handled only by T-Kernel/DS API, <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>. For more details, see the description of <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>. If <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> is not specified, <CODE
+CLASS="varname"
+>dsname</CODE
+> is ignored. Then <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> return <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> error.</P
+><PRE
+CLASS="programlisting"
+>&#13;#define TA_TFIFO        0x00000000      /* manage queue by FIFO */
+#define TA_TPRI         0x00000001      /* manage queue by priority */
+#define TA_INHERIT      0x00000002      /* priority inheritance protocol */
+#define TA_CEILING      0x00000003      /* priority ceiling protocol */
+#define TA_DSNAME       0x00000040      /* DS object name */
+#define TA_NODISWAI     0x00000080      /* reject request to disable wait */
+</PRE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_del_mtx"
+>tk_del_mtx - Delete Mutex</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9968"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN9970"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_del_mtx</CODE
+>(ID mtxid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9977"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9979"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mtxid</CODE
+>
+              </TD
+><TD
+>Mutex ID</TD
+><TD
+>Mutex ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9992"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9994"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10007"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10009"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mtxid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the mutex specified in <CODE
+CLASS="varname"
+>mtxid</CODE
+> does not exist)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10028"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10030"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10045"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10048"
+>Description</A
+></H4
+><P
+>Deletes the mutex specified in <CODE
+CLASS="varname"
+>mtxid</CODE
+>.</P
+><P
+>Issuing this system call releases the mutex ID and control block memory space allocated to the mutex.</P
+><P
+>This system call completes normally even if there are tasks waiting to lock the deleted mutex, but error code <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+> is returned to each of the tasks in WAITING state.</P
+><P
+>When a mutex is deleted, a task locking the mutex will have one fewer locked mutexes. If the mutex to be deleted was a priority inheritance mutex (<TT
+CLASS="literal"
+>TA_INHERIT</TT
+>) or priority ceiling mutex (<TT
+CLASS="literal"
+>TA_CEILING</TT
+>), then deleting the mutex might change the priority of the task that has locked it.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_loc_mtx"
+>tk_loc_mtx - Lock Mutex</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10060"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN10062"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_loc_mtx</CODE
+>(ID mtxid, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10071"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10073"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mtxid</CODE
+>
+              </TD
+><TD
+>Mutex ID</TD
+><TD
+>Mutex ID</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (ms)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10092"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10094"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10107"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10109"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mtxid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the mutex specified in <CODE
+CLASS="varname"
+>mtxid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>tmout</CODE
+> ≦ (-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>The object being waited for was deleted (the mutex was deleted while waiting for a lock)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+>
+              </TD
+><TD
+>Illegal use (multiple lock, or upper priority limit exceeded)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10158"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10160"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10175"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10178"
+>Description</A
+></H4
+><P
+>Locks the mutex specified in <CODE
+CLASS="varname"
+>mtxid</CODE
+>. If the mutex can be locked immediately, the task issuing this system call continue executing without entering WAITING state, and the mutex goes to locked status. If the mutex cannot be locked, the task issuing this system call enters WAITING state. That is, the task is put in the queue of this mutex.</P
+><P
+>A maximum wait time (timeout) can be set in <CODE
+CLASS="varname"
+>tmout</CODE
+>. The time unit for <CODE
+CLASS="varname"
+>tmout</CODE
+> is the same as that for system time (= 1 ms). If the <CODE
+CLASS="varname"
+>tmout</CODE
+> time elapses before the wait release condition is met, the system call terminates, returning timeout error code <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>.</P
+><P
+>When <TT
+CLASS="literal"
+>TMO_POL</TT
+>＝0 is set in <CODE
+CLASS="varname"
+>tmout</CODE
+>, this means 0 was specified as the timeout value, and <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> is returned without entering WAITING state even if the resource cannot be locked. When <TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1) is set in <CODE
+CLASS="varname"
+>tmout</CODE
+>, this means infinity was specified as the timeout value, and the task continues wait to until the resource is locked.</P
+><P
+>If the invoking task has already locked the specified mutex, error code <SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+> (multiple lock) is returned.</P
+><P
+>If the specified mutex is a priority ceiling mutex (<TT
+CLASS="literal"
+>TA_CEILING</TT
+>) and the base priority<A
+NAME="AEN10197"
+HREF="#FTN.AEN10197"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+>of the invoking task is higher than the ceiling priority of the mutex, error code <SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+> (upper priority limit exceeded) is returned.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10202"
+>Additional Notes</A
+></H4
+><P
+></P
+><UL
+><LI
+><P
+>Priority inheritance mutex (<TT
+CLASS="literal"
+>TA_INHERIT</TT
+> attribute)</P
+><P
+>If the invoking task is waiting to lock a mutex and the current priority of the task currently locking that mutex is lower than that of the invoking task, the priority of the locking task is raised to the same level as the invoking task. If the wait ends before the waiting task can obtain a lock (timeout or other reason), the priority of the task locking that mutex can be lowered to the highest of the following three priorities. Whether this lowering takes place is implementation-dependent.</P
+><P
+></P
+><OL
+TYPE="a"
+><LI
+><P
+>The highest priority among the current priorities of tasks waiting to lock the mutex.</P
+></LI
+><LI
+><P
+>The highest priority among all the other mutexes locked by the task currently locking this mutex.</P
+></LI
+><LI
+><P
+>The base priority of the locking task.</P
+></LI
+></OL
+></LI
+><LI
+><P
+>Priority ceiling mutex (<TT
+CLASS="literal"
+>TA_CEILING</TT
+> attribute)</P
+><P
+>If the invoking task obtains a lock and its current priority is lower than the mutex ceiling priority, the priority of the invoking task is raised to the mutex ceiling priority.</P
+></LI
+></UL
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_loc_mtx_u"
+>tk_loc_mtx_u - Lock Mutex (Microseconds)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10222"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN10224"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_loc_mtx_u</CODE
+>(ID mtxid, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10233"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10235"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mtxid</CODE
+>
+              </TD
+><TD
+>Mutex ID</TD
+><TD
+>Mutex ID</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (in microseconds)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10254"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10256"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10269"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10271"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mtxid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the mutex specified in <CODE
+CLASS="varname"
+>mtxid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>tmout_u</CODE
+> ≦ (-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>The object being waited for was deleted (the mutex was deleted while waiting for a lock)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+>
+              </TD
+><TD
+>Illegal use (multiple lock, or upper priority limit exceeded)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10320"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10322"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10337"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10340"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>Support of microsecond</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10349"
+>Description</A
+></H4
+><P
+>This system call takes 64-bit <CODE
+CLASS="varname"
+>tmout_u</CODE
+> in microseconds instead of the parameter <CODE
+CLASS="varname"
+>tmout</CODE
+> of <A
+HREF="extended_synchronization_and_communication_functions.html#tk_loc_mtx"
+>tk_loc_mtx</A
+>.</P
+><P
+>The specification of this system call is same as that of <A
+HREF="extended_synchronization_and_communication_functions.html#tk_loc_mtx"
+>tk_loc_mtx</A
+>, except that the parameter is replaced with <CODE
+CLASS="varname"
+>tmout_u</CODE
+>. For more details, see the description of <A
+HREF="extended_synchronization_and_communication_functions.html#tk_loc_mtx"
+>tk_loc_mtx</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_unl_mtx"
+>tk_unl_mtx - Unlock Mutex</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10361"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN10363"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_unl_mtx</CODE
+>(ID mtxid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10370"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10372"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mtxid</CODE
+>
+              </TD
+><TD
+>Mutex ID</TD
+><TD
+>Mutex ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10385"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10387"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10400"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10402"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mtxid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the mutex specified in <CODE
+CLASS="varname"
+>mtxid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+>
+              </TD
+><TD
+>Illegal use (not a mutex locked by the invoking task)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10425"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10427"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10442"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10445"
+>Description</A
+></H4
+><P
+>Unlocks the mutex specified in <CODE
+CLASS="varname"
+>mtxid</CODE
+>.</P
+><P
+>If there are tasks waiting to lock the mutex, the WAITING state of the task at the head of the queue for that mutex is released and that task locks the mutex.</P
+><P
+>If a mutex that was not locked by the invoking task is specified, error code <SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+> is returned.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10452"
+>Additional Notes</A
+></H4
+><P
+>If the unlocked mutex is a priority inheritance mutex (<TT
+CLASS="literal"
+>TA_INHERIT</TT
+>) or priority ceiling mutex (<TT
+CLASS="literal"
+>TA_CEILING</TT
+>), task priority must be lowered as follows.</P
+><P
+>If as a result of this operation the invoking task no longer has any locked mutexes, the invoking task priority is lowered to its base priority.</P
+><P
+>If the invoking task continues to have locked mutexes after the operation above, the invoking task priority is lowered to whichever of the following priority is highest.</P
+><P
+></P
+><OL
+TYPE="a"
+><LI
+><P
+>The highest priority among the current priority of the tasks in the queue of the mutex with the <TT
+CLASS="literal"
+>TA_INHERIT</TT
+> attribute locked by the invoking task</P
+></LI
+><LI
+><P
+>The highest priority among the ceiling priority of the mutexes with the <TT
+CLASS="literal"
+>TA_CEILING</TT
+> attribute locked by the invoking task</P
+></LI
+><LI
+><P
+>Base priority of the invoking task</P
+></LI
+></OL
+><P
+>Note that the lowering of priority when locked mutexes remain is implementation-dependent.</P
+><P
+>If a task terminates (goes to DORMANT state or NON-EXISTENT state) without explicitly unlocking mutexes, all its locked mutexes are automatically unlocked by μT-Kernel.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_ref_mtx"
+>tk_ref_mtx - Refer Mutex Status</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10472"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN10474"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_mtx</CODE
+>(ID mtxid, T_RMTX *pk_rmtx);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10483"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10485"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mtxid</CODE
+>
+              </TD
+><TD
+>Mutex ID</TD
+><TD
+>Mutex ID</TD
+></TR
+><TR
+><TD
+>T_RMTX*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rmtx</CODE
+>
+              </TD
+><TD
+>Packet to Return Mutex Status</TD
+><TD
+>Pointer to the area to return the mutex status</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10504"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10506"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rmtx</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10521"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Extended information</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>htsk</CODE
+>
+              </TD
+><TD
+>Locking Task ID</TD
+><TD
+>ID of task locking the mutex</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wtsk</CODE
+>
+              </TD
+><TD
+>Lock Waiting Task ID</TD
+><TD
+>ID of tasks waiting to lock the mutex</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10548"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10550"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mtxid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the mutex specified in <CODE
+CLASS="varname"
+>mtxid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (invalid <CODE
+CLASS="varname"
+>pk_rmtx</CODE
+>)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10574"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10576"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10591"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10594"
+>Description</A
+></H4
+><P
+>References the status of the mutex specified in <CODE
+CLASS="varname"
+>mtxid</CODE
+>, passing in the return parameters the task currently locking the mutex (<CODE
+CLASS="varname"
+>htsk</CODE
+>), tasks waiting to lock the mutex (<CODE
+CLASS="varname"
+>wtsk</CODE
+>), and extended information (<CODE
+CLASS="varname"
+>exinf</CODE
+>).</P
+><P
+><CODE
+CLASS="varname"
+>htsk</CODE
+> indicates the ID of the task locking the mutex. If no task is locking it, <CODE
+CLASS="varname"
+>htsk</CODE
+> = 0 is returned.</P
+><P
+><CODE
+CLASS="varname"
+>wtsk</CODE
+> indicates the ID of a task waiting to lock the mutex. If there are two or more such tasks, the ID of the task at the head of the queue is returned. If there are no waiting tasks, <CODE
+CLASS="varname"
+>wtsk</CODE
+> = 0 is returned.</P
+><P
+>If the specified mutex does not exist, error code <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> is returned.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="message_buffer"
+>Message Buffer</A
+></H2
+><P
+>A message buffer is an object for achieving synchronization and communication by the passing of variable-size messages. Functions are provided for creating and deleting a message buffer, sending and receiving messages using a message buffer, and referencing message buffer status. A message buffer is an object identified by an ID number. The ID number for the message buffer is called a message buffer ID.</P
+><P
+>A message buffer keeps a queue of tasks waiting to send a message (send queue) and a queue of tasks waiting for receive a message (receive queue). It also has a message buffer space for holding sent messages. The message sender (the side posting event notification) copies a message it wants to send to the message buffer. If there is insufficient space in the message buffer area, the task trying to send the message is queued for sending until enough space is available.</P
+><P
+>A task waiting to send a message to the message buffer is put in the send queue. On the message receive side (waiting for event notification), one message is fetched from the message buffer. If the message buffer has no messages, the task enters WAITING state until the next message is sent. A task waiting for receiving a message from a message buffer is put in the receive queue of that message buffer.</P
+><P
+>A synchronous message function can be realized by setting the message buffer space size to 0. In that case both the sending task and receiving task wait for a system call to be invoked by each other, and the message is passed when both sides issue system calls.</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Additional Notes</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>The message buffer behavior when the size of the message buffer space is set to 0 is explained here using the example in <A
+HREF="extended_synchronization_and_communication_functions.html#figure_message_buffer"
+>Figure 3</A
+>. In this example Task A and Task B run asynchronously.<P
+></P
+><UL
+><LI
+><P
+>If Task A calls <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+> first, it goes to WAITING state until Task B calls <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+>. In this case Task A is put in the message buffer send queue [<A
+HREF="extended_synchronization_and_communication_functions.html#figure_message_buffer"
+>Figure 3</A
+> (a)]</P
+></LI
+><LI
+><P
+>If Task B calls <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+> first, on the other hand, Task B goes to WAITING state until Task A calls <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+>. Task B is put in the message buffer receive queue [<A
+HREF="extended_synchronization_and_communication_functions.html#figure_message_buffer"
+>Figure 3</A
+> (b)].</P
+></LI
+><LI
+><P
+>At the point where both Task A has called <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+> and Task B has called <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+>, a message is passed from Task A to Task B; Thereafter both tasks enter a run state.</P
+></LI
+></UL
+></P
+><DIV
+CLASS="figure"
+><A
+NAME="figure_message_buffer"
+></A
+><P
+><B
+>Figure 3. Synchronous Communication by Message Buffer</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_10s.png"></P
+></DIV
+></DIV
+><P
+>Tasks waiting to send to a message buffer send messages in their queued order. Suppose Task A wanting to send a 40-byte message to a message buffer, and Task B wanting to send a 10-byte message, are queued in that order. If another task receives a message opening 20 bytes of space in the message buffer, Task B is still required to wait until Task A sends its message.</P
+><P
+>A message buffer is used to pass variable-size messages by copying them. It is the copying of messages that makes this function different from the mailbox function.</P
+><P
+>It is assumed that the message buffer will be implemented as a ring buffer.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_cre_mbf"
+>tk_cre_mbf - Create Message Buffer</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10646"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN10648"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID mbfid = tk_cre_mbf</CODE
+>(CONST T_CMBF *pk_cmbf);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10655"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10657"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST T_CMBF*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_cmbf</CODE
+>
+              </TD
+><TD
+>Packet to Create Message Buffer</TD
+><TD
+>Message buffer creation information</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_cmbf</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10672"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Extended information</TD
+></TR
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfatr</CODE
+>
+              </TD
+><TD
+>Message Buffer Attribute</TD
+><TD
+>Message buffer attribute</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>bufsz</CODE
+>
+              </TD
+><TD
+>Buffer Size</TD
+><TD
+>Message buffer size (in bytes)</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>maxmsz</CODE
+>
+              </TD
+><TD
+>Max Message Size</TD
+><TD
+>Maximum message size (in bytes)</TD
+></TR
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dsname[8]</CODE
+>
+              </TD
+><TD
+>DS Object name</TD
+><TD
+>DS object name</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>bufptr</CODE
+>
+              </TD
+><TD
+>Buffer Pointer</TD
+><TD
+>User buffer pointer</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10717"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10719"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfid</CODE
+>
+              </TD
+><TD
+>Message Buffer ID</TD
+><TD
+>Message buffer ID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10736"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10738"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>Insufficient memory (memory for control block or ring buffer area cannot be allocated)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>Number of message buffers exceeds the system limit</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>Reserved attribute (<CODE
+CLASS="varname"
+>mbfatr</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>pk_cmbf</CODE
+> is illegal, <CODE
+CLASS="varname"
+>bufsz</CODE
+>, <CODE
+CLASS="varname"
+>maxmsz</CODE
+> is negative or invalid, <CODE
+CLASS="varname"
+>bufptr</CODE
+> is illegal)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10764"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10766"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10781"
+>Related Service Profile Items</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10783"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USERBUF</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> for message buffer attribute</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_AUTOBUF</TT
+>
+              </TD
+><TD
+>Automatic buffer allocation is supported (by not specifying <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> to message buffer attribute)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+> (reject request to disable wait) to message buffer attribute</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> for message buffer attribute</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10808"
+>Description</A
+></H4
+><P
+>Creates a message buffer, assigning to it a message buffer ID. This system call allocates a control block to the created message buffer. Based on the information specified in <CODE
+CLASS="varname"
+>bufsz</CODE
+>, it allocates a ring buffer area for message queue use (for messages waiting to be received).</P
+><P
+>A message buffer is an object for managing the sending and receiving of variable-size messages. If differs from a mailbox (mbx) in that the contents of the variable-size messages are copied when the message is sent and received. It also has a function for putting the sending task in WAITING state when the buffer is full.</P
+><P
+><CODE
+CLASS="varname"
+>exinf</CODE
+> can be used freely by the user to set miscellaneous information about the created message buffer. The information set in this parameter can be referenced by <A
+HREF="extended_synchronization_and_communication_functions.html#tk_ref_mbf"
+>tk_ref_mbf</A
+>. If a larger area is needed for indicating user information, or if the information may need to be changed after the message buffer is created, this can be done by allocating separate memory for this purpose and putting the memory packet address in <CODE
+CLASS="varname"
+>exinf</CODE
+>. The kernel pays no attention to the contents of <CODE
+CLASS="varname"
+>exinf</CODE
+>.</P
+><P
+><CODE
+CLASS="varname"
+>mbfatr</CODE
+> indicates system attributes in its lower bits and implementation-dependent attributes in its higher bits. The system attribute part of <CODE
+CLASS="varname"
+>mbfatr</CODE
+> is specified as follows.</P
+><PRE
+CLASS="synopsis"
+>&#13;mbfatr := (TA_TFIFO || TA_TPRI) | [TA_DSNAME] | [TA_USERBUF] | [TA_NODISWAI]
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10822"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>
+              </TD
+><TD
+>Tasks waiting on call are queued in FIFO order</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TPRI</TT
+>
+              </TD
+><TD
+>Tasks waiting on call are queued in priority order</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_DSNAME</TT
+>
+              </TD
+><TD
+>Specifies DS object name</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_USERBUF</TT
+>
+              </TD
+><TD
+>Support of user-specified memory area as message buffer area</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>
+              </TD
+><TD
+>Disabling of wait by <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> is prohibited</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>The queuing order of tasks waiting for sending a message when the buffer is full can be specified in <TT
+CLASS="literal"
+>TA_TFIFO</TT
+> or <TT
+CLASS="literal"
+>TA_TPRI</TT
+>. If the attribute is <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>, tasks are ordered by FIFO, whereas <TT
+CLASS="literal"
+>TA_TPRI</TT
+> specifies queuing of tasks in order of their priority setting. Messages themselves are queued in FIFO order only.</P
+><P
+>Tasks waiting for receiving a message from a message buffer are queued in FIFO order only.</P
+><P
+>When <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> is specified, <CODE
+CLASS="varname"
+>bufptr</CODE
+> becomes effective, and the memory area starting at <CODE
+CLASS="varname"
+>bufptr</CODE
+> and containing <CODE
+CLASS="varname"
+>bufsz</CODE
+> octets is used as message buffer area. In this case, the message buffer area is not provided by he OS, but must be allocated by the caller. When <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> is not specified, <CODE
+CLASS="varname"
+>bufptr</CODE
+> is ineffective、and the message buffer area is provided by the kernel.</P
+><P
+>When <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> is specified, <CODE
+CLASS="varname"
+>dsname</CODE
+> is valid and specifies the DS object name. DS object name is used to identify objects by debugger, and it is handled only by T-Kernel/DS API, <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>. For more details, see the description of <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>. If <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> is not specified, <CODE
+CLASS="varname"
+>dsname</CODE
+> is ignored. Then <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> return <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> error.</P
+><PRE
+CLASS="programlisting"
+>&#13;#define TA_TFIFO        0x00000000      /* manage task queue by FIFO */
+#define TA_TPRI         0x00000001      /* manage task queue by priority */
+#define TA_USERBUF      0x00000020      /* Use user-specified buffer */
+#define TA_DSNAME       0x00000040      /* DS object name */
+#define TA_NODISWAI     0x00000080      /* reject request to disable wait */
+</PRE
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10874"
+>Additional Notes</A
+></H4
+><P
+>When there are multiple tasks waiting to send messages, the order in which their messages are sent when buffer space becomes available is always in their queued order.</P
+><P
+>If, for example, a Task A wanting to send a 30-byte message is queued with a Task B wanting to send a 10-byte message, in the order A-B, even if 20 bytes of message buffer space becomes available, Task B never sends its message before Task A.</P
+><P
+>The ring buffer in which messages are queued also contains information for managing each message. For this reason the total size of queued messages will ordinarily not be identical to the ring buffer size specified in <CODE
+CLASS="varname"
+>bufsz</CODE
+>. Normally the total message size will be smaller than bufsz. In this sense <CODE
+CLASS="varname"
+>bufsz</CODE
+> does not strictly represent the total message capacity.</P
+><P
+>It is possible to create a message buffer with <CODE
+CLASS="varname"
+>bufsz</CODE
+> = 0. In this case communication using the message buffer is completely synchronous between the sending and receiving tasks. That is, if either <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+> or <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+> is executed ahead of the other, the task executing the first system call goes to WAITING state. When the other system call is executed, the message is passed (copied), then both tasks resume running.</P
+><P
+>In the case of a <CODE
+CLASS="varname"
+>bufsz</CODE
+> = 0 message buffer, the specific functioning is as follows.</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>In <A
+HREF="extended_synchronization_and_communication_functions.html#figure_tk_cre_mbf"
+>Figure 4</A
+>, Task A and Task B operate asynchronously. If Task A arrives at point (1) first and executes <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+>(<CODE
+CLASS="varname"
+>mbfid</CODE
+>), Task A goes to send waiting state until Task B arrives at point (2). If <A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+> is issued for Task A in this state, <CODE
+CLASS="varname"
+>tskwait</CODE
+>=<TT
+CLASS="literal"
+>TTW_SMBF</TT
+> is returned. If, on the other hand, Task B gets to point (2) first and calls <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+>(<CODE
+CLASS="varname"
+>mbfid</CODE
+>), Task B goes to receive waiting state until Task A gets to point (1). If <A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+> is issued for Task B in this state, <CODE
+CLASS="varname"
+>tskwait</CODE
+>=<TT
+CLASS="literal"
+>TTW_RMBF</TT
+> is returned.</P
+></LI
+><LI
+><P
+>At the point where both Task A has executed <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+>(<CODE
+CLASS="varname"
+>mbfid</CODE
+>) and Task B has executed <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+>(<CODE
+CLASS="varname"
+>mbfid</CODE
+>), a message is passed from Task A to Task B, their wait states are released and both tasks resume running.</P
+></LI
+></OL
+><DIV
+CLASS="figure"
+><A
+NAME="figure_tk_cre_mbf"
+></A
+><P
+><B
+>Figure 4. Synchronous Communication Using Message Buffer of <CODE
+CLASS="varname"
+>bufsz</CODE
+> = 0</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_11s.png"></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10916"
+>Porting Guideline</A
+></H4
+><P
+>Note that member, <CODE
+CLASS="varname"
+>maxmsz</CODE
+>, of T_CMBF is INT type, and its value range is implementation-dependent, so care must be taken.</P
+><P
+>The T-Kernel 2.0 specification does not define <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> and its associated notion of <CODE
+CLASS="varname"
+>bufptr</CODE
+>. So if this feature is used, a modification is necessary to port the software to T-Kernel 2.0. However, if <CODE
+CLASS="varname"
+>bufsz</CODE
+> is properly set already, simply removing <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> and <CODE
+CLASS="varname"
+>bufptr</CODE
+> will complete the modification for porting.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_del_mbf"
+>tk_del_mbf - Delete Message Buffer</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10928"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN10930"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_del_mbf</CODE
+>(ID mbfid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10937"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10939"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfid</CODE
+>
+              </TD
+><TD
+>Message Buffer ID</TD
+><TD
+>Message buffer ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10952"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10954"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10967"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10969"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mbfid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the message buffer specified in <CODE
+CLASS="varname"
+>mbfid</CODE
+> does not exist)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10988"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10990"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11005"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11008"
+>Description</A
+></H4
+><P
+>Deletes the message buffer specified in <CODE
+CLASS="varname"
+>mbfid</CODE
+>.</P
+><P
+>Issuing this system call releases the corresponding message buffer and control block memory space, as well as the message buffer space.</P
+><P
+>This system call completes normally even if there were tasks queued in the message buffer for message receipt or message sending, but error code <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+> is returned to the tasks in WAITING state. If there are messages left in the message buffer when it is deleted, the message buffer is deleted anyway. No error code is returned and the messages are discarded.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_snd_mbf"
+>tk_snd_mbf - Send Message to Message Buffer</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11017"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN11019"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_snd_mbf</CODE
+>(ID mbfid, CONST void *msg, INT msgsz, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11032"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11034"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfid</CODE
+>
+              </TD
+><TD
+>Message Buffer ID</TD
+><TD
+>Message buffer ID</TD
+></TR
+><TR
+><TD
+>CONST void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msg</CODE
+>
+              </TD
+><TD
+>Send Message</TD
+><TD
+>Start address of send message</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msgsz</CODE
+>
+              </TD
+><TD
+>Send Message Size</TD
+><TD
+>Send message size (in bytes)</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (ms)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11065"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11067"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11080"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11082"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mbfid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the message buffer specified in <CODE
+CLASS="varname"
+>mbfid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>msgsz</CODE
+> ≦ 0, <CODE
+CLASS="varname"
+>msgsz</CODE
+> &#62; <CODE
+CLASS="varname"
+>maxmsz</CODE
+>, invalid <CODE
+CLASS="varname"
+>msg</CODE
+>, or <CODE
+CLASS="varname"
+>tmout</CODE
+> ≦ (-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>The object being waited for was deleted (message buffer was deleted while waiting)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11131"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11133"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO(* Available in some circumstances)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11148"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11151"
+>Description</A
+></H4
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+> sends the message at the address specified in <CODE
+CLASS="varname"
+>msg</CODE
+> to the message buffer indicated in <CODE
+CLASS="varname"
+>mbfid</CODE
+>. The message size is specified in <CODE
+CLASS="varname"
+>msgsz</CODE
+>. This system call copies <CODE
+CLASS="varname"
+>msgsz</CODE
+> bytes starting from <CODE
+CLASS="varname"
+>msg</CODE
+> to the message queue of message buffer <CODE
+CLASS="varname"
+>mbfid</CODE
+>. The message queue is assumed to be implemented as a ring buffer.</P
+><P
+>If <CODE
+CLASS="varname"
+>msgsz</CODE
+> is larger than the <CODE
+CLASS="varname"
+>maxmsz</CODE
+> specified in <A
+HREF="extended_synchronization_and_communication_functions.html#tk_cre_mbf"
+>tk_cre_mbf</A
+>, error code <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> is returned.</P
+><P
+>If there is not enough available buffer space to accommodate message <CODE
+CLASS="varname"
+>msg</CODE
+> in the message queue, the task issuing this system call goes to send waiting state and is put in the send queue of the message buffer waiting for buffer space to become available. Waiting tasks are queued in either FIFO or priority order, depending on the attribute specified in <A
+HREF="extended_synchronization_and_communication_functions.html#tk_cre_mbf"
+>tk_cre_mbf</A
+>.</P
+><P
+>A maximum wait time (timeout) can be set in <CODE
+CLASS="varname"
+>tmout</CODE
+>. The time unit for <CODE
+CLASS="varname"
+>tmout</CODE
+> is the same as that for system time (= 1 ms). If the <CODE
+CLASS="varname"
+>tmout</CODE
+> time elapses before the wait release condition is met (before there is sufficient buffer space), the system call terminates, returning timeout error code <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>.</P
+><P
+>When <TT
+CLASS="literal"
+>TMO_POL</TT
+>＝0 is specified in <CODE
+CLASS="varname"
+>tmout</CODE
+>, it means 0 is specified as the timeout value, and if there is not enough buffer space, then <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> is returned without entering WAITING state. When <TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1) is specified in <CODE
+CLASS="varname"
+>tmout</CODE
+>, this means infinity was specified as the timeout value, and the task continues to wait for buffer space to become available, without timing out.</P
+><P
+>A message of size 0 cannot be sent. When <CODE
+CLASS="varname"
+>msgsz</CODE
+> ≦ 0, error code <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> is returned.</P
+><P
+>When this system call is invoked from a task-independent portion or in dispatch disabled state, error code <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+> is returned; but in the case of <CODE
+CLASS="varname"
+>tmout</CODE
+> = <TT
+CLASS="literal"
+>TMO_POL</TT
+>, there may be implementations where execution from a task-independent portion or in dispatch disabled state is possible.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11187"
+>Porting Guideline</A
+></H4
+><P
+>Note that <CODE
+CLASS="varname"
+>msgsz</CODE
+> is INT type, and its value range is implementation-dependent, so care must be taken. For example, there is a chance that the message size that can sent at once might be limited to 32767 octets on 16-bit CPU.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_snd_mbf_u"
+>tk_snd_mbf_u - Send Message to Message Buffer (Microseconds)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11193"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN11195"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_snd_mbf_u</CODE
+>(ID mbfid, CONST void *msg, INT msgsz, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11208"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11210"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfid</CODE
+>
+              </TD
+><TD
+>Message Buffer ID</TD
+><TD
+>Message buffer ID</TD
+></TR
+><TR
+><TD
+>CONST void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msg</CODE
+>
+              </TD
+><TD
+>Send Message</TD
+><TD
+>Start address of send message</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msgsz</CODE
+>
+              </TD
+><TD
+>Send Message Size</TD
+><TD
+>Send message size (in bytes)</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (in microseconds)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11241"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11243"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11256"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11258"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mbfid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the message buffer specified in <CODE
+CLASS="varname"
+>mbfid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>msgsz</CODE
+> ≦ 0, <CODE
+CLASS="varname"
+>msgsz</CODE
+> &#62; <CODE
+CLASS="varname"
+>maxmsz</CODE
+>, invalid <CODE
+CLASS="varname"
+>msg</CODE
+>, or <CODE
+CLASS="varname"
+>tmout_u</CODE
+> ≦ (-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>The object being waited for was deleted (message buffer was deleted while waiting)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11307"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11309"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO(* Available in certain circumstance)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11324"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11327"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>Support of microsecond</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11336"
+>Description</A
+></H4
+><P
+>This system call takes 64-bit <CODE
+CLASS="varname"
+>tmout_u</CODE
+> in microseconds instead of the parameter <CODE
+CLASS="varname"
+>tmout</CODE
+> of <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+>.</P
+><P
+>The specification of this system call is same as that of <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+>, except that the parameter is replaced with <CODE
+CLASS="varname"
+>tmout_u</CODE
+>. For more details, see the description of <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+>.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11346"
+>Porting Guideline</A
+></H4
+><P
+>Note that <CODE
+CLASS="varname"
+>msgsz</CODE
+> is INT type, and its value range is implementation-dependent, so care must be taken. For example, there is a chance that the message size that can sent at once might be limited to 32767 octets on 16-bit CPU.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_rcv_mbf"
+>tk_rcv_mbf - Receive Message from Message Buffer</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11352"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN11354"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT msgsz = tk_rcv_mbf</CODE
+>(ID mbfid, void *msg, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11365"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11367"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfid</CODE
+>
+              </TD
+><TD
+>Message Buffer ID</TD
+><TD
+>Message buffer ID</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msg</CODE
+>
+              </TD
+><TD
+>Receive Message</TD
+><TD
+>Address of the receive message</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (ms)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11392"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11394"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msgsz</CODE
+>
+              </TD
+><TD
+>Receive Message Size</TD
+><TD
+>Received message size (in bytes)</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11411"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11413"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mbfid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the message buffer specified in <CODE
+CLASS="varname"
+>mbfid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (invalid <CODE
+CLASS="varname"
+>msg</CODE
+>, or <CODE
+CLASS="varname"
+>tmout</CODE
+> ≦ (-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>The object being waited for was deleted (message buffer was deleted while waiting)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11455"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11457"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11472"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11475"
+>Description</A
+></H4
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+> receives a message from the message buffer specified in <CODE
+CLASS="varname"
+>mbfid</CODE
+>, copying it in the location specified in <CODE
+CLASS="varname"
+>msg</CODE
+>. This system call copies the contents of the first queued message in the message buffer specified in <CODE
+CLASS="varname"
+>mbfid</CODE
+>, and copies it to an area of <CODE
+CLASS="varname"
+>msgsz</CODE
+> bytes starting at address <CODE
+CLASS="varname"
+>msg</CODE
+>.</P
+><P
+>If no message has been sent to the message buffer specified in <CODE
+CLASS="varname"
+>mbfid</CODE
+> (the message queue is empty), the task issuing this system call goes to WAITING state and is put in the receive queue of the message buffer to wait for message arrival. Tasks in the receive queue are ordered by FIFO only.</P
+><P
+>A maximum wait time (timeout) can be set in <CODE
+CLASS="varname"
+>tmout</CODE
+>. The time unit for <CODE
+CLASS="varname"
+>tmout</CODE
+> is the same as that for system time (= 1 ms). If the <CODE
+CLASS="varname"
+>tmout</CODE
+> time elapses before the wait release condition is met (before a message arrives), the system call terminates, returning timeout error code <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>.</P
+><P
+>When <TT
+CLASS="literal"
+>TMO_POL</TT
+>＝0 is set in <CODE
+CLASS="varname"
+>tmout</CODE
+>, this means 0 was specified as the timeout value, and <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> is returned without entering WAITING state even if there is no message. When <TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1) is set in <CODE
+CLASS="varname"
+>tmout</CODE
+>, this means infinity was specified as the timeout value, and the task continues to wait for message arrival without timing out.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_rcv_mbf_u"
+>tk_rcv_mbf_u - Receive Message from Message Buffer (Microseconds)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11499"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN11501"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT msgsz = tk_rcv_mbf_u</CODE
+>(ID mbfid, void *msg, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11512"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11514"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfid</CODE
+>
+              </TD
+><TD
+>Message Buffer ID</TD
+><TD
+>Message buffer ID</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msg</CODE
+>
+              </TD
+><TD
+>Receive Message</TD
+><TD
+>Address of the receive message</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (in microseconds)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11539"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11541"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msgsz</CODE
+>
+              </TD
+><TD
+>Receive Message Size</TD
+><TD
+>Received message size (in bytes)</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11558"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11560"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mbfid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the message buffer specified in <CODE
+CLASS="varname"
+>mbfid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (invalid <CODE
+CLASS="varname"
+>msg</CODE
+>, or <CODE
+CLASS="varname"
+>tmout_u</CODE
+> ≦ (-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>The object being waited for was deleted (message buffer was deleted while waiting)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11602"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11604"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11619"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11622"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>Support of microsecond</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11631"
+>Description</A
+></H4
+><P
+>This system call takes 64-bit <CODE
+CLASS="varname"
+>tmout_u</CODE
+> in microseconds instead of the parameter <CODE
+CLASS="varname"
+>tmout</CODE
+> of <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+>.</P
+><P
+>The specification of this system call is same as that of <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+>, except that the parameter is replaced with <CODE
+CLASS="varname"
+>tmout_u</CODE
+>. For more details, see the description of <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_ref_mbf"
+>tk_ref_mbf - Reference Message Buffer Status</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11643"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN11645"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_mbf</CODE
+>(ID mbfid, T_RMBF *pk_rmbf);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11654"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11656"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="9%"
+TITLE="c1"><COL
+WIDTH="18%"
+TITLE="c2"><COL
+WIDTH="36%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfid</CODE
+>
+              </TD
+><TD
+>Message Buffer ID</TD
+><TD
+>Message buffer ID</TD
+></TR
+><TR
+><TD
+>T_RMBF*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rmbf</CODE
+>
+              </TD
+><TD
+>Packet to Return Message Buffer Status</TD
+><TD
+>Pointer to the area to return the message buffer status</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11675"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11677"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="9%"><COL
+WIDTH="18%"><COL
+WIDTH="36%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rmbf</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11692"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="9%"
+TITLE="c1"><COL
+WIDTH="18%"
+TITLE="c2"><COL
+WIDTH="36%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Extended information</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wtsk</CODE
+>
+              </TD
+><TD
+>Waiting Task ID</TD
+><TD
+>Receive waiting task ID</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>stsk</CODE
+>
+              </TD
+><TD
+>Send Waiting Task ID</TD
+><TD
+>Send waiting task ID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msgsz</CODE
+>
+              </TD
+><TD
+>Message Size</TD
+><TD
+>Size of the next message to be received (in bytes)</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>frbufsz</CODE
+>
+              </TD
+><TD
+>Free Buffer Size</TD
+><TD
+>Free buffer size (in bytes)</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>maxmsz</CODE
+>
+              </TD
+><TD
+>Maximum Message Size</TD
+><TD
+>Maximum message size (in bytes)</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11737"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11739"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mbfid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the message buffer specified in <CODE
+CLASS="varname"
+>mbfid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (invalid <CODE
+CLASS="varname"
+>pk_rmbf</CODE
+>)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11763"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11765"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11780"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11783"
+>Description</A
+></H4
+><P
+>References the status of the message buffer specified in <CODE
+CLASS="varname"
+>mbfid</CODE
+>, passing in the return parameters the send waiting task ID( <CODE
+CLASS="varname"
+>stsk</CODE
+>), the size of the next message to be received (<CODE
+CLASS="varname"
+>msgsz</CODE
+>), free buffer size (<CODE
+CLASS="varname"
+>frbufsz</CODE
+>), maximum message size (<CODE
+CLASS="varname"
+>maxmsz</CODE
+>), receive waiting task ID (<CODE
+CLASS="varname"
+>wtsk</CODE
+>), and extended information (<CODE
+CLASS="varname"
+>exinf</CODE
+>).</P
+><P
+><CODE
+CLASS="varname"
+>wtsk</CODE
+> indicates the ID of a task waiting to receive a message from the message buffer. <CODE
+CLASS="varname"
+>stsk</CODE
+> indicates the ID of a task waiting to send a message to the message buffer. If multiple tasks are waiting in the message buffer queues, the ID of the task at the head of the queue is returned. If no tasks are waiting, 0 is returned.</P
+><P
+>If the specified message buffer does not exist, error code <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> is returned.</P
+><P
+>The size of the message at the head of the queue (the next message to be received) is returned in <CODE
+CLASS="varname"
+>msgsz</CODE
+>. If there are no queued messages, <CODE
+CLASS="varname"
+>msgsz</CODE
+> = 0 is returned. A message of size 0 cannot be sent.</P
+><P
+>At least one of <CODE
+CLASS="varname"
+>msgsz</CODE
+> = 0 and <CODE
+CLASS="varname"
+>wtsk</CODE
+> = 0 is always true for this system call.</P
+><P
+><CODE
+CLASS="varname"
+>frbufsz</CODE
+> indicates the free space in the ring buffer of which the message queue consists. This value indicates the approximate size of messages that can be sent.</P
+><P
+>The maximum message size as specified in <A
+HREF="extended_synchronization_and_communication_functions.html#tk_cre_mbf"
+>tk_cre_mbf</A
+> is returned to <CODE
+CLASS="varname"
+>maxmsz</CODE
+>.</P
+></DIV
+></DIV
+></DIV
+></DIV
+><H3
+CLASS="FOOTNOTES"
+>Notes</H3
+><TABLE
+BORDER="0"
+CLASS="FOOTNOTES"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="5%"
+><A
+NAME="FTN.AEN10197"
+HREF="extended_synchronization_and_communication_functions.html#AEN10197"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="95%"
+><P
+>Base priority: The task priority before it is automatically raised by the mutex. This is the priority last set by <A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+> (including while the mutex is locked), or if <A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+> has never been issued, the priority that was set when the task was created.</P
+></TD
+></TR
+></TABLE
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="synchronzation_and_communication_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="memory_pool_management_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Synchronization and Communication Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Memory Pool Management Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

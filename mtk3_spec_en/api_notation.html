@@ -1,0 +1,375 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>API Notation</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="NEXT"
+TITLE="Index of μT-Kernel/OS APIs"
+HREF="index_of_utk_os_api.html"></HEAD
+><BODY
+CLASS="chapter"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="index.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="index_of_utk_os_api.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="chapter"
+><H1
+><A
+NAME="api_notation"
+></A
+>API Notation</H1
+><P
+>In the parts of this specification that describe APIs, the specification of each API (Application Programming Interface) is explained in the format illustrated below. In addition to system calls that directly call kernel functions, APIs include functions implemented as extended SVCs (extended system calls), macros, and libraries.</P
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="api_name_summary_description"
+>API Name - Description</A
+></H1
+><P
+>This is an API name and its description.</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="api_notation_c_language_interface"
+>C Language Interface</A
+></H2
+><P
+>This is an API's C language interface and header file(s) to include.</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="api_notation_parameters"
+>Parameter</A
+></H2
+><P
+>Describes an API's parameter(s), i.e. information passed to the μT-Kernel when the API is issued.</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="api_notation_return_parameters"
+>Return Parameter</A
+></H2
+><P
+>Describes an API's return parameter(s), i.e. information returned by the μT-Kernel when the execution of the API ends.</P
+><P
+>A return parameter that is returned as an API's function value may be called "return code." A return parameter can include, besides return code, a value stored at a pointer that points at memory location where some information can be stored.</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="api_notation_error_codes"
+>Error Code</A
+></H2
+><P
+>Describes errors that can occur in an API.</P
+><P
+>The following error codes are common to all APIs and are not included in the error code listings for each API:</P
+><SPAN
+CLASS="errorname"
+>E_SYS</SPAN
+>, <SPAN
+CLASS="errorname"
+>E_NOSPT</SPAN
+>, <SPAN
+CLASS="errorname"
+>E_RSFN</SPAN
+>, <SPAN
+CLASS="errorname"
+>E_MACV</SPAN
+>, <SPAN
+CLASS="errorname"
+>E_OACV</SPAN
+>.<P
+>The detection of the error conditions that may result in the following error codes is implementation-dependent; such conditions may not always be detected as errors:</P
+><SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>, <SPAN
+CLASS="errorname"
+>E_MACV</SPAN
+>, <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>.<P
+>Error code <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+> is included in the error code section of individual API only when API can encounter an error due to a semantically wrong caller context: e.g., the case of task-independent portion's calling an API that can block. If an API's constraints in the caller's context are implementation-dependent, and such semantic errors are not universal across all implementations, the explanation of <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+> is not included in the error section of the API under discussion.</P
+><P
+>Implementations may generate errors that are not explained in the explanation section of error codes.</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="api_notation_context"
+>Valid Context</A
+></H2
+><P
+>Indicates the context (task portion, quasi-task portion, and task-independent portion) that can issue the API under consideration. Note that items marked with "x" are sometimes clearly impossible to use in the context discussed, but the usability of some items in the context discussed may be implementation-dependent, and some may be usable in some implementations.</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="api_notation_service_profile"
+>Related Service Profile Items</A
+></H2
+><P
+>The relation of the service profile item(s) associated with API is shown.</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="api_notation_description"
+>Description</A
+></H2
+><P
+>Describes the API functions.</P
+><P
+>When the values to be passed in a parameter are selected from various choices, the following notation is used in the parameter descriptions:<P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>( x || y || z )</DT
+><DD
+><P
+>Set one of x, y, or z.</P
+></DD
+><DT
+>x | y</DT
+><DD
+><P
+>Both x and y can be set at the same time (in which case the logical sum of x and y is taken).</P
+></DD
+><DT
+>[ x ]</DT
+><DD
+><P
+>x is optional.</P
+></DD
+></DL
+></DIV
+>
+          <DIV
+CLASS="example"
+><A
+NAME="AEN102"
+></A
+><P
+><B
+>Example 1. Example of Using Parameters Notation</B
+></P
+><PRE
+CLASS="synopsis"
+>&#13;wfmode := (TWF_ANDW || TWF_ORW) | [TWF_CLR]
+</PRE
+><P
+>The above description means that wfmode can be specified in any of the following four ways:</P
+><P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+><TT
+CLASS="literal"
+>TWF_ANDW</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="literal"
+>TWF_ORW</TT
+></TD
+></TR
+><TR
+><TD
+>(<TT
+CLASS="literal"
+>TWF_ANDW</TT
+> | <TT
+CLASS="literal"
+>TWF_CLR</TT
+>)</TD
+></TR
+><TR
+><TD
+>(<TT
+CLASS="literal"
+>TWF_ORW</TT
+> | <TT
+CLASS="literal"
+>TWF_CLR</TT
+>)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="api_notation_additional_notes"
+>Additional Notes</A
+></H2
+><P
+>Supplements the description by noting matters that need special attention or caution, etc.</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="api_notation_rationale_for_the_specification"
+>Rationale for the Specification</A
+></H2
+><P
+>Explains the reason for adopting a particular approach and specification.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="index_of_utk_os_api.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>μT-Kernel 3.0 Specification</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Index of μT-Kernel/OS APIs</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

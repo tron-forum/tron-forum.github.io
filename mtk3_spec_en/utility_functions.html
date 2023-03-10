@@ -1,0 +1,3270 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Utility Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/SM Functions"
+HREF="utk_sm_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Physical Timer Functions"
+HREF="physical_timer_functions.html"><LINK
+REL="NEXT"
+TITLE="μT-Kernel/DS Functions"
+HREF="utk_ds_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="physical_timer_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/SM Functions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="utk_ds_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="utility_functions"
+>Utility Functions</A
+></H1
+><P
+>Utility functions are used commonly from general programs such as applications, middleware, and device drivers on the μT-Kernel.</P
+><P
+>Utility functions are provided as library functions or C language macros.</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="object_name_setting"
+>Set Object Name</A
+></H2
+><P
+>API for setting object name is provided as C language macros. It can be called from a task-independent portion and while task dispatching and interrupts are disabled.</P
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="SetOBJNAME"
+>SetOBJNAME - Set Object Name</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27005"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN27007"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void SetOBJNAME</CODE
+>(void *exinf, CONST UB *name);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27016"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27018"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Variable to set as extended information</TD
+></TR
+><TR
+><TD
+>CONST UB*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>name</CODE
+>
+              </TD
+><TD
+>Object Name</TD
+><TD
+>Object name to be set</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27037"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27040"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27043"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27045"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27060"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27063"
+>Description</A
+></H4
+><P
+>Interprets the ASCII string of four or less characters specified in <CODE
+CLASS="varname"
+>name</CODE
+> as a single 32-bit data to store it in <CODE
+CLASS="varname"
+>exinf</CODE
+>.</P
+><P
+>This API is defined as a C language macro and <CODE
+CLASS="varname"
+>exinf</CODE
+> is not a pointer. Write a variable directly.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27070"
+>Additional Notes</A
+></H4
+><P
+>This API can assign the ASCII string names (such as task name) to the kernel objects, and the names are stored in the extended information <CODE
+CLASS="varname"
+>exinf</CODE
+> of the kernel objects. It is possible to list the object names set by this API by printing the information in <CODE
+CLASS="varname"
+>exinf</CODE
+> as ASCII string using the debugger, etc. to investigate the state of the kernel objects.</P
+><DIV
+CLASS="example"
+><A
+NAME="AEN27075"
+></A
+><P
+><B
+>Example 7. Sample Usage of SetOBJNAME</B
+></P
+><PRE
+CLASS="programlisting"
+>&#13;T_CTSK  ctsk;
+...
+/* Set the object name "TEST" for the task ctsk */
+SetOBJNAME(ctsk.exinf, "TEST");
+task_id = tk_cre_tsk ( &#38;ctsk );
+</PRE
+></DIV
+><P
+>Note that you need to add '\0' which indicates the end of the string if you would like to manipulate the string by C language functions.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="high_speed_lock_and_multi_lock_libraries"
+>Fast Lock and Multi-lock Libraries</A
+></H2
+><P
+>Fast lock and multi-lock libraries are for performing exclusion control faster between multiple tasks in the device drivers or subsystems. In order to perform the exclusion control, while semaphore or mutex can be used, fast lock is implemented as the μT-Kernel/SM library functions that processes the lock acquisition operation with specially higher speed when the task is not queued.</P
+><P
+>Fast lock and multi-lock libraries are for performing exclusion control quicker than semaphore and mutexes between multiple tasks in the device drivers or subsystems. Fast multi-lock is one object built by combining independent binary semaphores for mutual exclusion control. The number of binary semaphores is the number of the bits in UINT data type, and each binary semaphore is distinguished by the number from 0 to (bit width of UINT) - 1.</P
+><P
+>For example, when exclusion control is performed at ten locations, one fast multi-lock can be created and then the binary semaphores with lock numbers from 0 to 9 can be used to perform exclusion control while ten fast locks can be used. While using ten fast locks bring faster result, the total required resources is lower when the fast multi-lock is used.</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Additional Notes</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Fast lock function is implemented by using counters that show the lock states and a semaphore. Fast multi-lock function is implemented by using a counter that shows the lock states and event flags. When the invoking task is not queued at the lock acquisition, it performs faster than the usual semaphores or event flags because only counter operation is performed. On the other hand, when the invoking task is queued at lock acquisition, it is not necessarily faster than the usual semaphores or event flags because it uses usual semaphores and event flags to manage transitions to waiting state or queues. Fast lock and multi-lock are effective when possibility of being queued is low due to mutual exclusion control.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="CreateLock"
+>CreateLock - Create Fast Lock</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27089"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN27091"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = CreateLock</CODE
+>(FastLock *lock, CONST UB *name);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27100"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27102"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FastLock*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>lock</CODE
+>
+              </TD
+><TD
+>Control Block of FastLock</TD
+><TD
+>Control block of fast lock</TD
+></TR
+><TR
+><TD
+>CONST UB*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>name</CODE
+>
+              </TD
+><TD
+>Name of FastLock</TD
+><TD
+>Name of fast lock</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27121"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27123"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27136"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27138"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>Insufficient memory (memory for control block cannot be allocated)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>Number of fast locks exceeds the system limit</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27155"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27157"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27172"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27175"
+>Description</A
+></H4
+><P
+>Creates a fast lock.</P
+><P
+><CODE
+CLASS="varname"
+>lock</CODE
+> is a structure to control a fast lock. <CODE
+CLASS="varname"
+>name</CODE
+> is the name of the fast lock and can be <TT
+CLASS="literal"
+>NULL</TT
+>.</P
+><P
+>Fast lock is a binary semaphore used for mutual exclusion control and is implemented to be operated as fast as possible.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="DeleteLock"
+>DeleteLock - Delete Fast Lock</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27185"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN27187"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void DeleteLock</CODE
+>(FastLock *lock);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27194"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27196"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FastLock*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>lock</CODE
+>
+              </TD
+><TD
+>Control Block of FastLock</TD
+><TD
+>Control block of fast lock</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27209"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27212"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27215"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27217"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27232"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27235"
+>Description</A
+></H4
+><P
+>Deletes a fast lock.</P
+><P
+>Error detection is omitted for faster operation.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="Lock"
+>Lock - Lock Fast Lock</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27241"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN27243"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void Lock</CODE
+>(FastLock *lock);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27250"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27252"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FastLock*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>lock</CODE
+>
+              </TD
+><TD
+>Control Block of FastLock</TD
+><TD
+>Control block of fast lock</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27265"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27268"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27271"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27273"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27288"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27291"
+>Description</A
+></H4
+><P
+>Locks a fast lock.</P
+><P
+>If the lock is already locked, the invoking task goes to the waiting state and is put in the task queue until it is unlocked. Tasks are queued in the priority order.</P
+><P
+>Error detection is omitted for faster operation.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="Unlock"
+>Unlock - Unlock Fast Lock</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27298"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN27300"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void Unlock</CODE
+>(FastLock *lock);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27307"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27309"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FastLock*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>lock</CODE
+>
+              </TD
+><TD
+>Control Block of FastLock</TD
+><TD
+>Control block of fast lock</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27322"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27325"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27328"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27330"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27345"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27348"
+>Description</A
+></H4
+><P
+>Unlocks a fast lock.</P
+><P
+>If there are tasks waiting for the fast lock, the first task in the task queue newly acquires the lock.</P
+><P
+>Error detection is omitted for faster operation.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="CreateMLock"
+>CreateMLock - Create Fast Multi-lock</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27355"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN27357"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = CreateMLock</CODE
+>(FastMLock *lock, CONST UB *name);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27366"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27368"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FastMLock*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>lock</CODE
+>
+              </TD
+><TD
+>Control Block of FastMLock</TD
+><TD
+>Control block of fast multi-lock</TD
+></TR
+><TR
+><TD
+>CONST UB*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>name</CODE
+>
+              </TD
+><TD
+>Name of FastMLock</TD
+><TD
+>Name of fast multi-lock</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27387"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27389"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27402"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27404"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>Insufficient memory (memory for control block cannot be allocated)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>Number of fast multi-locks exceeds the system limit</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27421"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27423"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27438"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27441"
+>Description</A
+></H4
+><P
+>Creates a fast multi-lock.</P
+><P
+><CODE
+CLASS="varname"
+>lock</CODE
+> is a structure to control a fast multi-lock. <CODE
+CLASS="varname"
+>name</CODE
+> is the name of the fast multi-lock and can be <TT
+CLASS="literal"
+>NULL</TT
+>.</P
+><P
+>Fast multi-lock is one object built by combining independent binary semaphores for mutual exclusion control, and is implemented for very fast execution. The number of binary semaphores is the number of the bits in UINT data type, and each binary semaphore is distinguished by the number from 0 to (bit width of UINT data type) - 1. For example, if UINT is 16 bits, a number from 0 to 15 can be used as lock number.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27449"
+>Porting Guideline</A
+></H4
+><P
+>Be warned that the number of available lock numbers is now dependent on the bit width of UINT data type. For example, the number of binary semaphores can take the value from 0 to 15 in 16-bit environment.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="DeleteMLock"
+>DeleteMLock - Delete Fast Multi-lock</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27454"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN27456"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = DeleteMLock</CODE
+>(FastMLock *lock);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27463"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27465"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FastMLock*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>lock</CODE
+>
+              </TD
+><TD
+>Control Block of FastMLock</TD
+><TD
+>Control block of fast multi-lock</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27478"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27480"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27493"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27495"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27508"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27510"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27525"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27528"
+>Description</A
+></H4
+><P
+>Deletes a fast multi-lock.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="MLock"
+>MLock - Lock Fast Multi-lock</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27533"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN27535"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = MLock</CODE
+>(FastMLock *lock, INT no);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27544"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27546"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FastMLock*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>lock</CODE
+>
+              </TD
+><TD
+>Control Block of FastMLock</TD
+><TD
+>Control block of fast multi-lock</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>no</CODE
+>
+              </TD
+><TD
+>Lock Number</TD
+><TD
+>Lock number</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27565"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27567"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27580"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27582"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>Waiting object was deleted</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state was forcibly released</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27607"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27609"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27624"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27627"
+>Description</A
+></H4
+><P
+>Locks a fast multi-lock.</P
+><P
+><CODE
+CLASS="varname"
+>no</CODE
+> is the lock number and is from 0 to (the bit width of UINT data type) - 1. For example, if UINT is 16 bits, a number from 0 to 15 can be used as lock number.</P
+><P
+>If the lock is already locked with the same lock number, the invoking task goes to the waiting state and is put in the task queue until it is unlocked with the same lock number. Tasks are queued in the priority order.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27633"
+>Porting Guideline</A
+></H4
+><P
+>Be warned that the number of available lock numbers is now dependent on the bit width of UINT data type. For example, the number of binary semaphores can take the value from 0 to 15 in 16-bit environment.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="MLockTmo"
+>MLockTmo - Lock Fast Multi-lock (with Timeout)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27638"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN27640"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = MLockTmo</CODE
+>(FastMLock *lock, INT no, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27651"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27653"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FastMLock*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>lock</CODE
+>
+              </TD
+><TD
+>Control Block of FastMLock</TD
+><TD
+>Control block of fast multi-lock</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>no</CODE
+>
+              </TD
+><TD
+>Lock Number</TD
+><TD
+>Lock number</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (ms)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27678"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27680"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27693"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27695"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>Waiting object was deleted</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state was forcibly released</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27724"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27726"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27741"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27744"
+>Description</A
+></H4
+><P
+>Locks a fast multi-lock with timeout.</P
+><P
+>This API is identical to <A
+HREF="utility_functions.html#MLock"
+>MLock</A
+>, except that it can specify the timeout interval in <CODE
+CLASS="varname"
+>tmout</CODE
+>. If the lock cannot be acquired before the timeout interval specified in <CODE
+CLASS="varname"
+>tmout</CODE
+> has elapsed, <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> is returned.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27752"
+>Porting Guideline</A
+></H4
+><P
+>Be warned that the number of available lock numbers is now dependent on the bit width of UINT data type. For example, the number of binary semaphores can take the value from 0 to 15 in 16-bit environment.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="MLockTmo_u"
+>MLockTmo_u - Lock Fast Multi-lock (with Timeout, Microseconds)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27757"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN27759"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = MLockTmo_u</CODE
+>(FastMLock *lock, INT no, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27770"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27772"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FastMLock*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>lock</CODE
+>
+              </TD
+><TD
+>Control Block of FastMLock</TD
+><TD
+>Control block of fast multi-lock</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>no</CODE
+>
+              </TD
+><TD
+>Lock Number</TD
+><TD
+>Lock number</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (in microseconds)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27797"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27799"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27812"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27814"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>Waiting object was deleted</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state was forcibly released</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27843"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27845"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27860"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27863"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>Support of microsecond</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27872"
+>Description</A
+></H4
+><P
+>Locks a fast multi-lock with timeout in microseconds.</P
+><P
+>This API is identical to <A
+HREF="utility_functions.html#MLockTmo"
+>MLockTmo</A
+>, except that the timeout interval is specified with a 64-bit value in microseconds.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27877"
+>Porting Guideline</A
+></H4
+><P
+>Be warned that the number of available lock numbers is now dependent on the bit width of UINT data type. For example, the number of binary semaphores can take the value from 0 to 15 in 16-bit environment.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="MUnlock"
+>MUnlock - Unlock Fast Multi-lock</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27882"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN27884"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = MUnlock</CODE
+>(FastMLock *lock, INT no);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27893"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27895"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FastMLock*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>lock</CODE
+>
+              </TD
+><TD
+>Control Block of FastMLock</TD
+><TD
+>Control block of fast multi-lock</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>no</CODE
+>
+              </TD
+><TD
+>Lock Number</TD
+><TD
+>Lock number</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27914"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27916"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27929"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27931"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27940"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN27942"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27957"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27960"
+>Description</A
+></H4
+><P
+>Unlocks a fast multi-lock.</P
+><P
+><CODE
+CLASS="varname"
+>no</CODE
+> is the lock number and is from 0 to (the bit width of UINT data type) - 1. For example, if UINT is 16 bits, a number from 0 to 15 can be used as lock number.</P
+><P
+>If there are tasks in the waiting state for the same lock number, the first task in the task queue newly acquires the lock.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN27966"
+>Porting Guideline</A
+></H4
+><P
+>Be warned that the number of available lock numbers is now dependent on the bit width of UINT data type. For example, the number of binary semaphores can take the value from 0 to 15 in 16-bit environment.</P
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="physical_timer_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="utk_ds_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Physical Timer Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_sm_functions.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>μT-Kernel/DS Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,5748 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Memory Pool Management Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/OS Functions"
+HREF="utk_os_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Extended Synchronization and Communication Functions"
+HREF="extended_synchronization_and_communication_functions.html"><LINK
+REL="NEXT"
+TITLE="Time Management Functions"
+HREF="time_management_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="extended_synchronization_and_communication_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/OS Functions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="time_management_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="memory_pool_management_functions"
+>Memory Pool Management Functions</A
+></H1
+><P
+>Memory pool management functions are for managing memory pools and allocating memory blocks by using software.</P
+><P
+>There are fixed-size memory pools and variable-size memory pools, which are considered separate objects and require separate sets of system calls for their operation. Memory blocks allocated from a fixed-size memory pool are all of one fixed size, whereas memory blocks from a variable-size memory pool can be of various sizes.</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="fixed_size_memory_pool"
+>Fixed-size Memory Pool</A
+></H2
+><P
+>A fixed-size memory pool is an object used for dynamic management of fixed-size memory blocks. Functions are provided for creating and deleting a fixed-size memory pool, getting and returning memory blocks in a fixed-size memory pool, and referencing the status of a fixed-size memory pool. A fixed-size memory pool is an object identified by an ID number. The ID number for the fixed-size memory pool is called a fixed-size memory pool ID.</P
+><P
+>A fixed-size memory pool has a memory space used as the fixed-size memory pool (called a fixed-size memory pool area or simply memory pool area), and a queue for tasks waiting for memory block allocation. A task wanting to allocate a memory block from a fixed-size memory pool that lacks sufficient available memory space goes to WAITING state for fixed-size memory block until memory blocks are returned to the pool. A task in this state is put in the task queue of the fixed-size memory pool.</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Additional Notes</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>When memory blocks of various sizes are needed from fixed-size memory pools, it is necessary to provide multiple memory pools of different sizes.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_cre_mpf"
+>tk_cre_mpf - Create Fixed-size Memory Pool</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11822"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN11824"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID mpfid = tk_cre_mpf</CODE
+>(CONST T_CMPF *pk_cmpf);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11831"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11833"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST T_CMBX*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_cmpf</CODE
+>
+              </TD
+><TD
+>Packet to Create Memory Pool</TD
+><TD
+>Information about the fixed-size memory pool to be created</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_cmpf</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11848"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Extended information</TD
+></TR
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mpfatr</CODE
+>
+              </TD
+><TD
+>Memory Pool Attribute</TD
+><TD
+>Memory pool attribute</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mpfcnt</CODE
+>
+              </TD
+><TD
+>Memory Pool Block Count</TD
+><TD
+>Memory pool block count</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>blfsz</CODE
+>
+              </TD
+><TD
+>Memory Block Size</TD
+><TD
+>Fixed-size memory block size (in bytes)</TD
+></TR
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dsname[8]</CODE
+>
+              </TD
+><TD
+>DS Object name</TD
+><TD
+>DS object name</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>bufptr</CODE
+>
+              </TD
+><TD
+>Buffer Pointer</TD
+><TD
+>User buffer pointer</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11893"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11895"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mpfid</CODE
+>
+              </TD
+><TD
+>Memory Pool ID</TD
+><TD
+>Fixed-size memory pool ID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11912"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11914"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>Insufficient memory (memory for control block or memory pool area cannot be allocated)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>Number of fixed-size memory pools exceeds the system limit</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>Reserved attribute (<CODE
+CLASS="varname"
+>mpfatr</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>pk_cmpf</CODE
+> is illegal, <CODE
+CLASS="varname"
+>mpfcnt</CODE
+>, <CODE
+CLASS="varname"
+>blfsz</CODE
+> is negative or invalid, or <CODE
+CLASS="varname"
+>bufptr</CODE
+> is illegal)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11940"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11942"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11957"
+>Related Service Profile Items</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11959"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USERBUF</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> for fixed-size memory pool attribute</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_AUTOBUF</TT
+>
+              </TD
+><TD
+>Automatic buffer allocation is supported (by not specifying <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> to fixed-size memory pool attribute)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+> (reject request to disable wait) to fixed-size memory pool attribute</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> for fixed-size memory pool attribute</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11984"
+>Description</A
+></H4
+><P
+>Creates a fixed-size memory pool, assigning to it a fixed-size memory pool ID. This system call allocates a memory space for use as a memory pool based on the information specified in parameters <CODE
+CLASS="varname"
+>mpfcnt</CODE
+> and <CODE
+CLASS="varname"
+>blfsz</CODE
+>, and assigns a control block to the memory pool. A memory block of size <CODE
+CLASS="varname"
+>blfsz</CODE
+> can be allocated from the created memory pool by calling the <A
+HREF="memory_pool_management_functions.html#tk_get_mpf"
+>tk_get_mpf</A
+> system call.</P
+><P
+><CODE
+CLASS="varname"
+>exinf</CODE
+> can be used freely by the user to set miscellaneous information about the created memory pool. The information set in this parameter can be referenced by <A
+HREF="memory_pool_management_functions.html#tk_ref_mpf"
+>tk_ref_mpf</A
+>. If a larger area is needed for indicating user information, or if the information may need to be changed after the message buffer is created, this can be done by allocating separate memory for this purpose and putting the memory packet address in <CODE
+CLASS="varname"
+>exinf</CODE
+>. The kernel pays no attention to the contents of <CODE
+CLASS="varname"
+>exinf</CODE
+>.</P
+><P
+><CODE
+CLASS="varname"
+>mpfatr</CODE
+> indicates system attributes in its lower bits and implementation-dependent attributes in its higher bits. The system attribute part of <CODE
+CLASS="varname"
+>mpfatr</CODE
+> is as follows.</P
+><PRE
+CLASS="synopsis"
+>&#13;mpfatr := (TA_TFIFO || TA_TPRI) | [TA_DSNAME] | [TA_USERBUF] | [TA_NODISWAI]
+       | (TA_RNG0 || TA_RNG1 || TA_RNG2 || TA_RNG3)
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12000"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>
+              </TD
+><TD
+>Tasks waiting for memory allocation are queued in FIFO order</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TPRI</TT
+>
+              </TD
+><TD
+>Tasks waiting for memory allocation are queued in priority order</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_RNGn</TT
+>
+              </TD
+><TD
+>Memory access privilege is set to protection level n</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_DSNAME</TT
+>
+              </TD
+><TD
+>Specifies DS object name</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_USERBUF</TT
+>
+              </TD
+><TD
+>Support of user-specified memory area as memory pool area</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>
+              </TD
+><TD
+>Disabling of wait by <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> is prohibited</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><PRE
+CLASS="programlisting"
+>&#13;#define TA_TFIFO        0x00000000      /* manage queue by FIFO */
+#define TA_TPRI         0x00000001      /* manage queue by priority */
+#define TA_USERBUF      0x00000020      /* Use user-specified buffer */
+#define TA_DSNAME       0x00000040      /* DS object name */
+#define TA_NODISWAI     0x00000080      /* reject request to disable wait */
+#define TA_RNG0         0x00000000      /* Protection level 0 */
+#define TA_RNG1         0x00000100      /* Protection level 1 */
+#define TA_RNG2         0x00000200      /* Protection level 2 */
+#define TA_RNG3         0x00000300      /* Protection level 3 */
+</PRE
+><P
+>The queuing order of tasks waiting for memory block allocation from a memory pool can be specified in <TT
+CLASS="literal"
+>TA_TFIFO</TT
+> or <TT
+CLASS="literal"
+>TA_TPRI</TT
+>. If the attribute is <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>, tasks are ordered by FIFO, whereas <TT
+CLASS="literal"
+>TA_TPRI</TT
+> specifies queuing of tasks in order of their priority setting.</P
+><P
+><TT
+CLASS="literal"
+>TA_RNGn</TT
+> is specified to limit the protection levels from which memory can be accessed. Only tasks running at the same or higher protection level than the one specified can access the allocated memory. If a task running at a lower protection level attempts an access, a CPU protection fault exception is raised. For example, memory allocated from a memory pool specified as <TT
+CLASS="literal"
+>TA_RNG1</TT
+> can be accessed by tasks running at levels <TT
+CLASS="literal"
+>TA_RNG0</TT
+> or <TT
+CLASS="literal"
+>TA_RNG1</TT
+>, but not by tasks running at levels <TT
+CLASS="literal"
+>TA_RNG2</TT
+> or <TT
+CLASS="literal"
+>TA_RNG3</TT
+>.</P
+><P
+>When <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> is specified, <CODE
+CLASS="varname"
+>dsname</CODE
+> is valid and specifies the DS object name. DS object name is used to identify objects by debugger, and it is handled only by T-Kernel/DS API, <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>. For more details, see the description of <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>. If <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> is not specified, <CODE
+CLASS="varname"
+>dsname</CODE
+> is ignored. Then <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> return <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> error.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12055"
+>Additional Notes</A
+></H4
+><P
+>In the case of a fixed-size memory pool, separate memory pools must be provided for different block sizes. That is, if various memory block sizes are required, memory pools must be created for each block size.</P
+><P
+>For the sake of portability, the <TT
+CLASS="literal"
+>TA_RNGn</TT
+> attribute must be accepted even by a system with a single CPU's operating mode. It is possible, for example, to handle all <TT
+CLASS="literal"
+>TA_RNGn</TT
+> as equivalent to <TT
+CLASS="literal"
+>TA_RNG0</TT
+>, but error must not be returned.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12062"
+>Porting Guideline</A
+></H4
+><P
+>The T-Kernel 2.0 specification does not define <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> and its associated notion of <CODE
+CLASS="varname"
+>bufptr</CODE
+>. So if this feature is used, a modification is necessary to port the software to T-Kernel 2.0. However, if <CODE
+CLASS="varname"
+>mpfcnt</CODE
+> and <CODE
+CLASS="varname"
+>blfsz</CODE
+> is properly set already, simply removing <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> and <CODE
+CLASS="varname"
+>bufptr</CODE
+> will complete the modification for porting.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_del_mpf"
+>tk_del_mpf - Delete Fixed-size Memory Pool</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12073"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN12075"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_del_mpf</CODE
+>(ID mpfid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12082"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12084"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mpfid</CODE
+>
+              </TD
+><TD
+>Memory Pool ID</TD
+><TD
+>Fixed-size memory pool ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12097"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12099"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12112"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12114"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mpfid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the fixed-size memory pool specified in <CODE
+CLASS="varname"
+>mpfid</CODE
+> does not exist)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12133"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12135"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12150"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12153"
+>Description</A
+></H4
+><P
+>Deletes the fixed-size memory pool specified in <CODE
+CLASS="varname"
+>mpfid</CODE
+>.</P
+><P
+>No check or notification is made as to whether there are tasks using memory allocated from this memory pool. The system call completes normally even if not all blocks have been returned to the pool.</P
+><P
+>Issuing this system call releases the memory pool ID number, the control block memory space and the memory pool space itself.</P
+><P
+>This system call completes normally even if there are tasks waiting for memory block allocation from the deleted memory pool, but error code <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+> is returned to the tasks in WAITING state.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_get_mpf"
+>tk_get_mpf - Get Fixed-size Memory Block</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12163"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN12165"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_get_mpf</CODE
+>(ID mpfid, void **p_blf, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12176"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12178"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mpfid</CODE
+>
+              </TD
+><TD
+>Memory Pool ID</TD
+><TD
+>Fixed-size memory pool ID</TD
+></TR
+><TR
+><TD
+>void**</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>p_blf</CODE
+>
+              </TD
+><TD
+>Pointer to Block Start Address</TD
+><TD
+>Pointer to the area to return the block start address <CODE
+CLASS="varname"
+>blf</CODE
+></TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (ms)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12204"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12206"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>blf</CODE
+>
+              </TD
+><TD
+>Block Start Address</TD
+><TD
+>Memory block start address</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12225"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12227"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mpfid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the fixed-size memory pool specified in <CODE
+CLASS="varname"
+>mpfid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>tmout</CODE
+> ≦ (-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>The object being waited for was deleted (the memory pool was deleted while waiting)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12272"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12274"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12289"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12292"
+>Description</A
+></H4
+><P
+>Gets a memory block from the fixed-size memory pool specified in <CODE
+CLASS="varname"
+>mpfid</CODE
+>. The start address of the allocated memory block is returned in <CODE
+CLASS="varname"
+>blf</CODE
+>. The size of the allocated memory block is the value specified in the <CODE
+CLASS="varname"
+>blfsz</CODE
+> parameter when the fixed-size memory pool was created.</P
+><P
+>The allocated memory is not cleared to zero, and the memory block contents are indeterminate.</P
+><P
+>If a block cannot be allocated from the specified memory pool, the task that issued <A
+HREF="memory_pool_management_functions.html#tk_get_mpf"
+>tk_get_mpf</A
+> is put in the queue of tasks waiting for memory allocation from that memory pool, and waits until memory can be allocated.</P
+><P
+>A maximum wait time (timeout) can be set in <CODE
+CLASS="varname"
+>tmout</CODE
+>. The time unit for <CODE
+CLASS="varname"
+>tmout</CODE
+> is the same as that for system time (= 1 ms). If the <CODE
+CLASS="varname"
+>tmout</CODE
+> time elapses before the wait release condition is met (memory space does not become available), the system call terminates, returning timeout error code <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>.</P
+><P
+>When <TT
+CLASS="literal"
+>TMO_POL</TT
+>＝0 is set in <CODE
+CLASS="varname"
+>tmout</CODE
+>, this means 0 was specified as the timeout value, and <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> is returned without entering WAITInG state even if memory cannot be allocated.</P
+><P
+>When <TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1) is set in <CODE
+CLASS="varname"
+>tmout</CODE
+>, this means infinity was specified as the timeout value, and the task continues to wait for memory allocation without timing out.</P
+><P
+>The queuing order of tasks waiting for memory block allocation is either FIFO or task priority order, depending on the memory pool attribute.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_get_mpf_u"
+>tk_get_mpf_u - Get Fixed-size Memory Block (Microseconds)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12316"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN12318"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_get_mpf_u</CODE
+>(ID mpfid, void **p_blf, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12329"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12331"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mpfid</CODE
+>
+              </TD
+><TD
+>Memory Pool ID</TD
+><TD
+>Fixed-size memory pool ID</TD
+></TR
+><TR
+><TD
+>void**</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>p_blf</CODE
+>
+              </TD
+><TD
+>Pointer to Block Start Address</TD
+><TD
+>Pointer to the area to return the block start address <CODE
+CLASS="varname"
+>blf</CODE
+></TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (in microseconds)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12357"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12359"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>blf</CODE
+>
+              </TD
+><TD
+>Block Start Address</TD
+><TD
+>Memory block start address</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12378"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12380"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mpfid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the fixed-size memory pool specified in <CODE
+CLASS="varname"
+>mpfid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>tmout_u</CODE
+> ≦ (-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>The object being waited for was deleted (the memory pool was deleted while waiting)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12425"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12427"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12442"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12445"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>Support of microsecond</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12454"
+>Description</A
+></H4
+><P
+>This system call takes 64-bit <CODE
+CLASS="varname"
+>tmout_u</CODE
+> in microseconds instead of the parameter <CODE
+CLASS="varname"
+>tmout</CODE
+> of <A
+HREF="memory_pool_management_functions.html#tk_get_mpf"
+>tk_get_mpf</A
+>.</P
+><P
+>The specification of this system call is same as that of <A
+HREF="memory_pool_management_functions.html#tk_get_mpf"
+>tk_get_mpf</A
+>, except that the parameter is replaced with <CODE
+CLASS="varname"
+>tmout_u</CODE
+>. For more details, see the description of <A
+HREF="memory_pool_management_functions.html#tk_get_mpf"
+>tk_get_mpf</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_rel_mpf"
+>tk_rel_mpf - Release Fixed-size Memory Block</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12466"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN12468"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_rel_mpf</CODE
+>(ID mpfid, void *blf);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12477"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12479"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mpfid</CODE
+>
+              </TD
+><TD
+>Memory Pool ID</TD
+><TD
+>Fixed-size memory pool ID</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>blf</CODE
+>
+              </TD
+><TD
+>Block Start Address</TD
+><TD
+>Memory block start address</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12498"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12500"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12513"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12515"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mpfid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the fixed-size memory pool specified in <CODE
+CLASS="varname"
+>mpfid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>blf</CODE
+> is invalid, or block returned to wrong memory pool)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12539"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12541"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12556"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12559"
+>Description</A
+></H4
+><P
+>Returns the memory block specified in <CODE
+CLASS="varname"
+>blf</CODE
+> to the fixed-size memory pool specified in <CODE
+CLASS="varname"
+>mpfid</CODE
+>.</P
+><P
+>Executing <A
+HREF="memory_pool_management_functions.html#tk_rel_mpf"
+>tk_rel_mpf</A
+> may enable memory block acquisition by another task waiting to allocate memory from the memory pool specified in <CODE
+CLASS="varname"
+>mpfid</CODE
+>, releasing the WAITING state of that task.</P
+><P
+>When a memory block is returned to a fixed-size memory pool, it must be the same fixed-size memory pool from which the block was allocated. If an attempt to return a memory block to a different memory pool is detected, error code <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> is returned. Whether this error detection is performed or not is implementation-dependent.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_ref_mpf"
+>tk_ref_mpf - Reference Fixed-size Memory Pool Status</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12571"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN12573"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_mpf</CODE
+>(ID mpfid, T_RMPF *pk_rmpf);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12582"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12584"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mpfid</CODE
+>
+              </TD
+><TD
+>Memory Pool ID</TD
+><TD
+>Fixed-size memory pool ID</TD
+></TR
+><TR
+><TD
+>T_RMPF*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rmpf</CODE
+>
+              </TD
+><TD
+>Packet to Return Memory Pool Status</TD
+><TD
+>Pointer to the area to return the memory pool status</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12603"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12605"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rmpf</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12620"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Extended information</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wtsk</CODE
+>
+              </TD
+><TD
+>Waiting Task ID</TD
+><TD
+>Waiting task ID</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>frbcnt</CODE
+>
+              </TD
+><TD
+>Free Block Count</TD
+><TD
+>Free block count</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12647"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12649"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mpfid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the fixed-size memory pool specified in <CODE
+CLASS="varname"
+>mpfid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (invalid <CODE
+CLASS="varname"
+>pk_rmpf</CODE
+>)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12673"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12675"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12690"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12693"
+>Description</A
+></H4
+><P
+>References the status of the fixed-size memory pool specified in <CODE
+CLASS="varname"
+>mpfid</CODE
+>, passing in return parameters the current free block count (<CODE
+CLASS="varname"
+>frbcnt</CODE
+>), waiting task ID (<CODE
+CLASS="varname"
+>wtsk</CODE
+>), and extended information (<CODE
+CLASS="varname"
+>exinf</CODE
+>).</P
+><P
+><CODE
+CLASS="varname"
+>wtsk</CODE
+> indicates the ID of a task waiting for memory block allocation from this fixed-size memory pool. If multiple tasks are waiting for the fixed-size memory pool, the ID of the task at the head of the queue is returned. If there are no waiting tasks, <CODE
+CLASS="varname"
+>wtsk</CODE
+> = 0 is returned.</P
+><P
+>If the fixed-size memory pool specified with <A
+HREF="memory_pool_management_functions.html#tk_ref_mpf"
+>tk_ref_mpf</A
+> does not exist, error code <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> is returned.</P
+><P
+>At least one of <CODE
+CLASS="varname"
+>frbcnt</CODE
+> = 0 and <CODE
+CLASS="varname"
+>wtsk</CODE
+> = 0 is always true for this system call.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12709"
+>Additional Notes</A
+></H4
+><P
+>Whereas <CODE
+CLASS="varname"
+>frsz</CODE
+> returned by <A
+HREF="memory_pool_management_functions.html#tk_ref_mpl"
+>tk_ref_mpl</A
+> gives the total free memory size in bytes, <CODE
+CLASS="varname"
+>frbcnt</CODE
+> returned by <A
+HREF="memory_pool_management_functions.html#tk_ref_mpf"
+>tk_ref_mpf</A
+> gives the number of unused memory blocks.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="variable_size_memory_pool"
+>Variable-size Memory Pool</A
+></H2
+><P
+>A variable-size memory pool is an object for dynamically managing memory blocks of any size. Functions are provided for creating and deleting a variable-size memory pool, allocating and returning memory blocks in a variable-size memory pool, and referencing the status of a variable-size memory pool. A variable-size memory pool is an object identified by an ID number. The ID number for the variable-size memory pool is called a variable-size memory pool ID.</P
+><P
+>A variable-size memory pool has a memory space used as the variable-size memory pool (called a variable-size memory pool area or simply memory pool area), and a queue for tasks waiting for memory block allocation. A task wanting to allocate a memory block from a variable-size memory pool that lacks sufficient available memory space goes to WAITING state for variable-size memory block until memory blocks are returned to the pool. A task in this state is put in the task queue of the variable-size memory pool.</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Additional Notes</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>When tasks are waiting for memory block allocation from a variable-size memory pool, they are served in queued order. If, for example, Task A requesting a 400-byte memory block from a variable-size memory pool is queued along with Task B requesting a 100-byte block, in A-B order, then even if 200-byte block of space are free, Task B is made to wait until Task A has acquired the requested memory block.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_cre_mpl"
+>tk_cre_mpl - Create Variable-size Memory Pool</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12725"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN12727"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID mplid = tk_cre_mpl</CODE
+>(CONST T_CMPL *pk_cmpl);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12734"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12736"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST T_CMPL*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_cmpl</CODE
+>
+              </TD
+><TD
+>Packet to Create Memory Pool</TD
+><TD
+>Information about the variable-size memory pool to be created</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_cmpl</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12751"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Extended information</TD
+></TR
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mplatr</CODE
+>
+              </TD
+><TD
+>Memory Pool Attribute</TD
+><TD
+>Memory pool attribute</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mplsz</CODE
+>
+              </TD
+><TD
+>Memory Pool Size</TD
+><TD
+>Memory pool size (in bytes)</TD
+></TR
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dsname[8]</CODE
+>
+              </TD
+><TD
+>DS Object name</TD
+><TD
+>DS object name</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>bufptr</CODE
+>
+              </TD
+><TD
+>Buffer Pointer</TD
+><TD
+>User buffer pointer</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12790"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12792"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mplid</CODE
+>
+              </TD
+><TD
+>Memory Pool ID</TD
+><TD
+>Variable-size memory pool ID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12809"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12811"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>Insufficient memory (memory for control block or memory pool area cannot be allocated)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>Number of variable-size memory pools exceeds the system limit</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>Reserved attribute (<CODE
+CLASS="varname"
+>mplatr</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error :(<CODE
+CLASS="varname"
+>pk_cmpl</CODE
+> is invalid, <CODE
+CLASS="varname"
+>mplsz</CODE
+> is negative or invalid, or <CODE
+CLASS="varname"
+>bufptr</CODE
+> is illegal)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12836"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12838"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12853"
+>Related Service Profile Items</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12855"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USERBUF</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> for variable-size memory pool attribute</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_AUTOBUF</TT
+>
+              </TD
+><TD
+>Automatic buffer allocation is supported (by not specifying <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> to variable-size memory pool attribute)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+> (reject request to disable wait) to variable-size memory pool attribute</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> for variable-size memory pool attribute</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12880"
+>Description</A
+></H4
+><P
+>Creates a variable-size memory pool, assigning to it a variable-size memory pool ID. This system call allocates a memory space for use as a memory pool, based on the information in parameter <CODE
+CLASS="varname"
+>mplsz</CODE
+>, and assigns a control block to the memory pool.</P
+><P
+><CODE
+CLASS="varname"
+>exinf</CODE
+> can be used freely by the user to set miscellaneous information about the created memory pool. The information set in this parameter can be referenced by <A
+HREF="memory_pool_management_functions.html#tk_ref_mpl"
+>tk_ref_mpl</A
+>. If a larger area is needed for indicating user information, or if the information may need to be changed after the message buffer is created, this can be done by allocating separate memory for this purpose and putting the memory packet address in <CODE
+CLASS="varname"
+>exinf</CODE
+>. The kernel pays no attention to the contents of <CODE
+CLASS="varname"
+>exinf</CODE
+>.</P
+><P
+><CODE
+CLASS="varname"
+>mplatr</CODE
+> indicates system attributes in its lower bits and implementation-dependent attributes in its higher bits. The system attribute part of <CODE
+CLASS="varname"
+>mplatr</CODE
+> is as follows.</P
+><PRE
+CLASS="synopsis"
+>&#13;mplatr := (TA_TFIFO || TA_TPRI) | [TA_DSNAME] | [TA_USERBUF] | [TA_NODISWAI]
+       | (TA_RNG0 || TA_RNG1 || TA_RNG2 || TA_RNG3)
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12893"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>
+              </TD
+><TD
+>Tasks waiting for memory allocation are queued in FIFO order</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TPRI</TT
+>
+              </TD
+><TD
+>Tasks waiting for memory allocation are queued in priority order</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_RNGn</TT
+>
+              </TD
+><TD
+>Memory access privilege is set to protection level n</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_DSNAME</TT
+>
+              </TD
+><TD
+>Specifies DS object name</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_USERBUF</TT
+>
+              </TD
+><TD
+>Support of user-specified memory area as memory pool area</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>
+              </TD
+><TD
+>Disabling of wait by <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> is prohibited</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><PRE
+CLASS="programlisting"
+>&#13;#define TA_TFIFO        0x00000000      /* manage task queue by FIFO */
+#define TA_TPRI         0x00000001      /* manage task queue by priority */
+#define TA_USERBUF      0x00000020      /* Use user-specified buffer */
+#define TA_DSNAME       0x00000040      /* DS object name */
+#define TA_NODISWAI     0x00000080      /* reject request to disable wait */
+#define TA_RNG0         0x00000000      /* protection level 0 */
+#define TA_RNG1         0x00000100      /* protection level 1 */
+#define TA_RNG2         0x00000200      /* protection level 2 */
+#define TA_RNG3         0x00000300      /* protection level 3 */
+</PRE
+><P
+>The queuing order of tasks waiting for memory block allocation from a memory pool can be specified in <TT
+CLASS="literal"
+>TA_TFIFO</TT
+> or <TT
+CLASS="literal"
+>TA_TPRI</TT
+>. If the attribute is <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>, tasks are ordered by FIFO, whereas <TT
+CLASS="literal"
+>TA_TPRI</TT
+> specifies queuing of tasks in order of their priority setting.</P
+><P
+>When tasks are queued waiting for memory allocation, memory is allocated in the order of queuing. Even if other tasks in the queue are requesting smaller amounts of memory than the task at the head of the queue, they do not acquire memory blocks before the first task. If, for example, Task A requesting a 400-byte memory block from a variable-size memory pool is queued along with Task B requesting a 100-byte block, in A-B order, then even if 200-byte block of space are freed by <A
+HREF="memory_pool_management_functions.html#tk_rel_mpl"
+>tk_rel_mpl</A
+> of another task, Task B is made to wait until Task A has acquired the requested memory block.</P
+><P
+><TT
+CLASS="literal"
+>TA_RNGn</TT
+> is specified to limit the protection levels from which memory can be accessed. Only tasks running at the same or higher protection level than the one specified can access the allocated memory. If a task running at a lower protection level attempts an access, a CPU protection fault exception is raised. For example, memory allocated from a memory pool specified as <TT
+CLASS="literal"
+>TA_RNG1</TT
+> can be accessed by tasks running at levels <TT
+CLASS="literal"
+>TA_RNG0</TT
+> or <TT
+CLASS="literal"
+>TA_RNG1</TT
+>, but not by tasks running at levels <TT
+CLASS="literal"
+>TA_RNG2</TT
+> or <TT
+CLASS="literal"
+>TA_RNG3</TT
+>.</P
+><P
+>When <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> is specified, <CODE
+CLASS="varname"
+>dsname</CODE
+> is valid and specifies the DS object name. DS object name is used to identify objects by debugger, and it is handled only by T-Kernel/DS API, <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>. For more details, see the description of <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>. If <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> is not specified, <CODE
+CLASS="varname"
+>dsname</CODE
+> is ignored. Then <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> return <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> error.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12950"
+>Additional Notes</A
+></H4
+><P
+>If the task at the head of the queue waiting for memory allocation has its WAITING state forcibly released, or if a different task becomes the first in the queue as a result of a change in task priority, memory allocation is attempted to that task. If memory can be allocated, the WAITInG state of that task is released. In this way it is possible under some circumstances for memory allocation to take place and task WAITING state to be released even when memory is not released by <A
+HREF="memory_pool_management_functions.html#tk_rel_mpl"
+>tk_rel_mpl</A
+>.</P
+><P
+>For the sake of portability, the <TT
+CLASS="literal"
+>TA_RNGn</TT
+> attribute must be accepted even by a system with a single CPU's operating mode. It is possible, for example, to handle all <TT
+CLASS="literal"
+>TA_RNGn</TT
+> as equivalent to <TT
+CLASS="literal"
+>TA_RNG0</TT
+>, but error must not be returned.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12958"
+>Rationale for the Specification</A
+></H4
+><P
+>The capability of creating multiple variable-size memory pools can be used for memory allocation as needed for error handling or in emergent situations in programming, etc.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12961"
+>Porting Guideline</A
+></H4
+><P
+>The T-Kernel 2.0 specification does not define <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> and its associated notion of <CODE
+CLASS="varname"
+>bufptr</CODE
+>. So if this feature is used, a modification is necessary to port the software to T-Kernel 2.0. However, if <CODE
+CLASS="varname"
+>mplsz</CODE
+> is properly set already, simply removing <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> and <CODE
+CLASS="varname"
+>bufptr</CODE
+> will complete the modification for porting.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_del_mpl"
+>tk_del_mpl - Delete Variable-size Memory Pool</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12971"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN12973"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_del_mpl</CODE
+>(ID mplid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12980"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12982"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mplid</CODE
+>
+              </TD
+><TD
+>Memory Pool ID</TD
+><TD
+>Variable-size memory pool ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN12995"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN12997"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13010"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13012"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mplid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the variable-size memory pool specified in <CODE
+CLASS="varname"
+>mplid</CODE
+> does not exist)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13031"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13033"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13048"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13051"
+>Description</A
+></H4
+><P
+>Deletes the variable-size memory pool specified in <CODE
+CLASS="varname"
+>mplid</CODE
+>.</P
+><P
+>No check or notification is made as to whether there are tasks using memory allocated from this memory pool. The system call completes normally even if not all blocks have been returned to the pool.</P
+><P
+>Issuing this system call releases the memory pool ID number, the control block memory space and the memory pool space itself.</P
+><P
+>This system call completes normally even if there are tasks waiting for memory block allocation from the deleted memory pool, but error code <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+> is returned to the tasks in WAITING state.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_get_mpl"
+>tk_get_mpl - Get Variable-size Memory Block</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13061"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN13063"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_get_mpl</CODE
+>(ID mplid, SZ blksz, void **p_blk, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13076"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13078"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mplid</CODE
+>
+              </TD
+><TD
+>Memory Pool ID</TD
+><TD
+>Variable-size memory pool ID</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>blksz</CODE
+>
+              </TD
+><TD
+>Memory Block Size</TD
+><TD
+>Memory block size (in bytes)</TD
+></TR
+><TR
+><TD
+>void**</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>p_blk</CODE
+>
+              </TD
+><TD
+>Pointer to Block Start Address</TD
+><TD
+>Pointer to the area to return the block start address <CODE
+CLASS="varname"
+>blk</CODE
+></TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (ms)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13110"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13112"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>blk</CODE
+>
+              </TD
+><TD
+>Block Start Address</TD
+><TD
+>Memory block start address</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13131"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13133"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mplid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the variable-size memory pool specified in <CODE
+CLASS="varname"
+>mplid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>tmout</CODE
+> ≦ (-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>The object being waited for was deleted (the memory pool was deleted while waiting)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13178"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13180"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13195"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13198"
+>Description</A
+></H4
+><P
+>Gets a memory block of size <CODE
+CLASS="varname"
+>blksz</CODE
+> (bytes) from the variable-size memory pool specified in <CODE
+CLASS="varname"
+>mplid</CODE
+>. The start address of the allocated memory block is returned in <CODE
+CLASS="varname"
+>blk</CODE
+>.</P
+><P
+>The allocated memory is not cleared to zero, and the memory block contents are indeterminate.</P
+><P
+>If memory cannot be allocated, the task issuing this system call enters WAITING state.</P
+><P
+>A maximum wait time (timeout) can be set in <CODE
+CLASS="varname"
+>tmout</CODE
+>. The time unit for <CODE
+CLASS="varname"
+>tmout</CODE
+> is the same as that for system time (= 1 ms). If the <CODE
+CLASS="varname"
+>tmout</CODE
+> time elapses before the wait release condition is met (memory space does not become available), the system call terminates, returning timeout error code <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>.</P
+><P
+>When <TT
+CLASS="literal"
+>TMO_POL</TT
+>＝0 is set in <CODE
+CLASS="varname"
+>tmout</CODE
+>, this means 0 was specified as the timeout value, and <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> is returned without entering WAITING state even if memory cannot be allocated.</P
+><P
+>When <TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1) is set in <CODE
+CLASS="varname"
+>tmout</CODE
+>, this means infinity was specified as the timeout value, and the task continues to wait for memory allocation without timing out.</P
+><P
+>The queuing order of tasks waiting for memory block allocation is either FIFO or task priority order, depending on the memory pool attribute.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_get_mpl_u"
+>tk_get_mpl_u - Get Variable-size Memory Block (Microseconds)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13221"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN13223"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_get_mpl_u</CODE
+>(ID mplid, SZ blksz, void **p_blk, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13236"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13238"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mplid</CODE
+>
+              </TD
+><TD
+>Memory Pool ID</TD
+><TD
+>Variable-size memory pool ID</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>blksz</CODE
+>
+              </TD
+><TD
+>Memory Block Size</TD
+><TD
+>Memory block size (in bytes)</TD
+></TR
+><TR
+><TD
+>void**</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>p_blk</CODE
+>
+              </TD
+><TD
+>Pointer to Block Start Address</TD
+><TD
+>Pointer to the area to return the block start address <CODE
+CLASS="varname"
+>blk</CODE
+></TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (in microseconds)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13270"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13272"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>blk</CODE
+>
+              </TD
+><TD
+>Block Start Address</TD
+><TD
+>Memory block start address</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13291"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13293"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mplid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the variable-size memory pool specified in <CODE
+CLASS="varname"
+>mplid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>tmout_u</CODE
+> ≦ (-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>The object being waited for was deleted (the memory pool was deleted while waiting)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13338"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13340"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13355"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13358"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>Support of microsecond</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13367"
+>Description</A
+></H4
+><P
+>This system call takes 64-bit <CODE
+CLASS="varname"
+>tmout_u</CODE
+> in microseconds instead of the parameter <CODE
+CLASS="varname"
+>tmout</CODE
+> of <A
+HREF="memory_pool_management_functions.html#tk_get_mpl"
+>tk_get_mpl</A
+>.</P
+><P
+>The specification of this system call is same as that of <A
+HREF="memory_pool_management_functions.html#tk_get_mpl"
+>tk_get_mpl</A
+>, except that the parameter is replaced with <CODE
+CLASS="varname"
+>tmout_u</CODE
+>. For more details, see the description of <A
+HREF="memory_pool_management_functions.html#tk_get_mpl"
+>tk_get_mpl</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_rel_mpl"
+>tk_rel_mpl - Release Variable-size Memory Block</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13379"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN13381"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_rel_mpl</CODE
+>(ID mplid, void *blk);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13390"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13392"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mplid</CODE
+>
+              </TD
+><TD
+>Memory Pool ID</TD
+><TD
+>Variable-size memory pool ID</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>blk</CODE
+>
+              </TD
+><TD
+>Block Start Address</TD
+><TD
+>Memory block start address</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13411"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13413"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13426"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13428"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mplid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the variable-size memory pool specified in <CODE
+CLASS="varname"
+>mplid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>blk</CODE
+> is invalid, or block returned to wrong memory pool)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13452"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13454"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13469"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13472"
+>Description</A
+></H4
+><P
+>Returns the memory block specified in <CODE
+CLASS="varname"
+>blk</CODE
+> to the variable-size memory pool specified in <CODE
+CLASS="varname"
+>mplid</CODE
+>.</P
+><P
+>Executing <A
+HREF="memory_pool_management_functions.html#tk_rel_mpl"
+>tk_rel_mpl</A
+> may enable memory block acquisition by another task waiting to allocate memory from the memory pool specified in <CODE
+CLASS="varname"
+>mplid</CODE
+>, releasing the WAITING state of that task.</P
+><P
+>When a memory block is returned to a variable-size memory pool, it must be the same variable-size memory pool from which the block was allocated. If an attempt to return a memory block to a different memory pool is detected, error code <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> is returned. Whether this error detection is performed or not is implementation-dependent.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13482"
+>Additional Notes</A
+></H4
+><P
+>When memory is returned to a variable-size memory pool in which multiple tasks are queued, multiple tasks may be released at the same time depending on the amount of memory returned and their requested memory size. The task precedence among tasks of the same priority after their WAITING state is released in such a case is the order in which they were queued.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_ref_mpl"
+>tk_ref_mpl - Reference Variable-size Memory Pool Status</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13487"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN13489"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_mpl</CODE
+>(ID mplid, T_RMPL *pk_rmpl);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13498"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13500"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mplid</CODE
+>
+              </TD
+><TD
+>Memory Pool ID</TD
+><TD
+>Variable-size memory pool ID</TD
+></TR
+><TR
+><TD
+>T_RMPL*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rmpl</CODE
+>
+              </TD
+><TD
+>Packet to Return Memory Pool Status</TD
+><TD
+>Pointer to the area to return the memory pool status</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13519"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13521"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rmpl</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13536"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Extended information</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wtsk</CODE
+>
+              </TD
+><TD
+>Waiting Task ID</TD
+><TD
+>Waiting task ID</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>frsz</CODE
+>
+              </TD
+><TD
+>Free Memory Size</TD
+><TD
+>Free memory size (in bytes)</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>maxsz</CODE
+>
+              </TD
+><TD
+>Max Memory Size</TD
+><TD
+>Maximum memory space size (in bytes)</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13569"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13571"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mplid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the variable-size memory pool specified in <CODE
+CLASS="varname"
+>mplid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (invalid <CODE
+CLASS="varname"
+>pk_rmpl</CODE
+>)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13595"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN13597"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13612"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN13615"
+>Description</A
+></H4
+><P
+>References the status of the variable-size memory pool specified in <CODE
+CLASS="varname"
+>mplid</CODE
+>, passing in return parameters the total size of free space (<CODE
+CLASS="varname"
+>frsz</CODE
+>), the maximum size of memory immediately available (<CODE
+CLASS="varname"
+>maxsz</CODE
+>), the waiting task ID (<CODE
+CLASS="varname"
+>wtsk</CODE
+>), and extended information (<CODE
+CLASS="varname"
+>exinf</CODE
+>).</P
+><P
+><CODE
+CLASS="varname"
+>wtsk</CODE
+> indicates the ID of a task waiting for memory block allocation from this variable-size memory pool. If multiple tasks are waiting for the variable-size memory pool, the ID of the task at the head of the queue is returned. If there are no waiting tasks, <CODE
+CLASS="varname"
+>wtsk</CODE
+> = 0 is returned.</P
+><P
+>If the variable-size memory pool specified with <A
+HREF="memory_pool_management_functions.html#tk_ref_mpl"
+>tk_ref_mpl</A
+> does not exist, error code <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> is returned.</P
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="extended_synchronization_and_communication_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="time_management_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Extended Synchronization and Communication Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Time Management Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

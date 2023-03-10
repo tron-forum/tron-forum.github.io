@@ -1,0 +1,2895 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>System Management Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/OS Functions"
+HREF="utk_os_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Interrupt Management Functions"
+HREF="interrupt_management_functions_os.html"><LINK
+REL="NEXT"
+TITLE="Subsystem Management Functions"
+HREF="subsystem_management_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="interrupt_management_functions_os.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/OS Functions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="subsystem_management_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="system_management_functions"
+>System Management Functions</A
+></H1
+><P
+>System management functions sets and references system states. Functions are provided for rotating task precedence in a queue, getting the ID of the task in RUNNING state, disabling and enabling task dispatching, referencing context and system states, setting low-power mode, and referencing the T-Kernel version.</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_rot_rdq"
+>tk_rot_rdq - Rotate Ready Queue</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17037"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN17039"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_rot_rdq</CODE
+>(PRI tskpri);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17046"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17048"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>PRI</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskpri</CODE
+>
+              </TD
+><TD
+>Task Priority</TD
+><TD
+>Task priority</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17061"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17063"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17076"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17078"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>tskpri</CODE
+> is invalid)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17092"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17094"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17109"
+>Related Service Profile Items</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17112"
+>Description</A
+></H3
+><P
+>Rotates the precedence among tasks having the priority specified in <CODE
+CLASS="varname"
+>tskpri</CODE
+>. This system call changes the precedence of tasks in RUN or READY state having the specified priority, so that the task with the highest precedence among those tasks is given the lowest precedence.</P
+><P
+>By setting <CODE
+CLASS="varname"
+>tskpri</CODE
+> = <TT
+CLASS="literal"
+>TPRI_RUN</TT
+> = 0, this system call rotates the precedence of tasks having the priority level of the task currently in RUNNING state. When <A
+HREF="system_management_functions.html#tk_rot_rdq"
+>tk_rot_rdq</A
+> is called from an ordinary task, it rotates the precedence of tasks having the same priority as the invoking task. When calling from a cyclic handler or other task-independent portion, it is also possible to call <A
+HREF="system_management_functions.html#tk_rot_rdq"
+>tk_rot_rdq</A
+> (<CODE
+CLASS="varname"
+>tskpri</CODE
+> = <TT
+CLASS="literal"
+>TPRI_RUN</TT
+>).</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17123"
+>Additional Notes</A
+></H3
+><P
+>If there are no tasks in a run state having the specified priority, or only one such task, the system call completes normally with no operation (no error code is returned).</P
+><P
+>When this system call is issued in dispatch enabled state, specifying as the priority either <TT
+CLASS="literal"
+>TPRI_RUN</TT
+> or the current priority of the invoking task, the precedence of the invoking task will be the lowest among tasks of the same priority. This system call can therefore be used to relinquish execution privilege.</P
+><P
+>In dispatch disabled state, the task with highest precedence among tasks of the same priority is not always the currently executing task. The precedence of the invoking task will therefore not always become the lowest among tasks having the same priority when the above method is used in dispatch disabled state.</P
+><P
+>Examples of <A
+HREF="system_management_functions.html#tk_rot_rdq"
+>tk_rot_rdq</A
+> execution are given in <A
+HREF="system_management_functions.html#figure_a_tk_rot_rdq"
+>Figure 5</A
+> and <A
+HREF="system_management_functions.html#figure_b_tk_rot_rdq"
+>Figure 6</A
+>. When this system call is issued in the state shown in <A
+HREF="system_management_functions.html#figure_a_tk_rot_rdq"
+>Figure 5</A
+> specifying <CODE
+CLASS="varname"
+>tskpri</CODE
+> = 2, the new precedence order becomes that in <A
+HREF="system_management_functions.html#figure_b_tk_rot_rdq"
+>Figure 6</A
+>, and Task C becomes the executing task.</P
+><DIV
+CLASS="figure"
+><A
+NAME="figure_a_tk_rot_rdq"
+></A
+><P
+><B
+>Figure 5. Precedence Before Issuing tk_rot_rdq</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_15_as.png"></P
+></DIV
+></DIV
+><DIV
+CLASS="figure"
+><A
+NAME="figure_b_tk_rot_rdq"
+></A
+><P
+><B
+>Figure 6. Precedence After Issuing tk_rot_rdq (<CODE
+CLASS="varname"
+>tskpri</CODE
+> = 2)</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_15_bs.png"></P
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_get_tid"
+>tk_get_tid - Get Task Identifier</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17154"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN17156"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID tskid = tk_get_tid</CODE
+>(void);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17162"
+>Parameter</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17165"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17167"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>ID of the task in RUNNING state</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17180"
+>Error Codes</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17183"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17185"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17200"
+>Related Service Profile Items</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17203"
+>Description</A
+></H3
+><P
+>Gets the ID number of the task currently in RUNNING state. Unless the task-independent portion is executing, the current RUNNING state task will be the invoking task.</P
+><P
+>If there is no task currently in RUNNING state, 0 is returned.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17207"
+>Additional Notes</A
+></H3
+><P
+>The task ID returned by <A
+HREF="system_management_functions.html#tk_get_tid"
+>tk_get_tid</A
+> is identical to <CODE
+CLASS="varname"
+>runtskid</CODE
+> returned by <A
+HREF="system_management_functions.html#tk_ref_sys"
+>tk_ref_sys</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_dis_dsp"
+>tk_dis_dsp - Disable Dispatch</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17215"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN17217"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_dis_dsp</CODE
+>(void);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17223"
+>Parameter</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17226"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17228"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17241"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17243"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17256"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17258"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17273"
+>Related Service Profile Items</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17276"
+>Description</A
+></H3
+><P
+>Disables task dispatching. Dispatch disabled state remains in effect until <A
+HREF="system_management_functions.html#tk_ena_dsp"
+>tk_ena_dsp</A
+> is called enabling task dispatching. While dispatching is disabled, the invoking task does not change from RUNNING state to READY state or to WAITING state. External interrupts, however, are still enabled, so even in dispatch disabled state an interrupt handler can be started. In dispatch disabled state, the running task can be preempted by an interrupt handler, but not by another task.</P
+><P
+>The specific operations during dispatch disabled state are as follows.</P
+><P
+></P
+><UL
+><LI
+><P
+>Even if a system call issued from an interrupt handler or by the task that called <A
+HREF="system_management_functions.html#tk_dis_dsp"
+>tk_dis_dsp</A
+> results in a task going to READY state with a higher priority than the task that called <A
+HREF="system_management_functions.html#tk_dis_dsp"
+>tk_dis_dsp</A
+>, that task will not be dispatched. Dispatching of the higher-priority task is delayed until dispatch disabled state ends.</P
+></LI
+><LI
+><P
+>If the task that called <A
+HREF="system_management_functions.html#tk_dis_dsp"
+>tk_dis_dsp</A
+> issues a system call that may cause the invoking task to be put in WAITING state (e.g., <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> or <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_sem"
+>tk_wai_sem</A
+>), error code <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+> is returned.</P
+></LI
+><LI
+><P
+>When system status is referenced by <A
+HREF="system_management_functions.html#tk_ref_sys"
+>tk_ref_sys</A
+>, <TT
+CLASS="literal"
+>TSS_DDSP</TT
+> is returned in <CODE
+CLASS="varname"
+>sysstat</CODE
+>.</P
+></LI
+></UL
+><P
+>If <A
+HREF="system_management_functions.html#tk_dis_dsp"
+>tk_dis_dsp</A
+> is called for a task already in dispatch disabled state, that state continues with no error code returned. No matter how many times <A
+HREF="system_management_functions.html#tk_dis_dsp"
+>tk_dis_dsp</A
+> is called, calling <A
+HREF="system_management_functions.html#tk_ena_dsp"
+>tk_ena_dsp</A
+> just one time is enough to enable dispatching again. The sophisticated operation when the pair of system calls <A
+HREF="system_management_functions.html#tk_dis_dsp"
+>tk_dis_dsp</A
+> and <A
+HREF="system_management_functions.html#tk_ena_dsp"
+>tk_ena_dsp</A
+> are used in a nested manner must therefore be managed by the user as necessary.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17303"
+>Additional Notes</A
+></H3
+><P
+>A task in RUNNING state cannot go to DORMANT state or NON-EXISTENT state while dispatching is disabled. If <A
+HREF="utk_os_functions.html#tk_ext_tsk"
+>tk_ext_tsk</A
+> or <A
+HREF="utk_os_functions.html#tk_exd_tsk"
+>tk_exd_tsk</A
+> is called for a task in RUNNING state while interrupts or dispatching is disabled, error code <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+> is detected. Since, however, <A
+HREF="utk_os_functions.html#tk_ext_tsk"
+>tk_ext_tsk</A
+> and <A
+HREF="utk_os_functions.html#tk_exd_tsk"
+>tk_exd_tsk</A
+> are system calls that do not return to their original context, such errors are not passed in return parameters by these system calls.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ena_dsp"
+>tk_ena_dsp - Enable Dispatch</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17313"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN17315"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ena_dsp</CODE
+>(void);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17321"
+>Parameter</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17324"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17326"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17339"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17341"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17354"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17356"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17371"
+>Related Service Profile Items</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17374"
+>Description</A
+></H3
+><P
+>Enables task dispatching. This system call cancels the disabling of dispatching by the <A
+HREF="system_management_functions.html#tk_dis_dsp"
+>tk_dis_dsp</A
+> system call.</P
+><P
+>If <A
+HREF="system_management_functions.html#tk_ena_dsp"
+>tk_ena_dsp</A
+> is called from a task not in dispatch disabled state, the dispatch enabled state continues and no error code is returned.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ref_sys"
+>tk_ref_sys - Reference System Status</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17382"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN17384"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_sys</CODE
+>(T_RSYS *pk_rsys);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17391"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17393"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>T_RSYS*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rsys</CODE
+>
+              </TD
+><TD
+>Packet to Refer System Status</TD
+><TD
+>Pointer to the area to return the system status</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17406"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17408"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rsys</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17423"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>sysstat</CODE
+>
+              </TD
+><TD
+>System State</TD
+><TD
+>System State</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>runtskid</CODE
+>
+              </TD
+><TD
+>Running Task ID</TD
+><TD
+>ID of the task currently in RUNNING state</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>schedtskid</CODE
+>
+              </TD
+><TD
+>Scheduled Task ID</TD
+><TD
+>ID of the task scheduled to run next</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17450"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17452"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (invalid <CODE
+CLASS="varname"
+>pk_rsys</CODE
+>)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17466"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17468"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17483"
+>Related Service Profile Items</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17486"
+>Description</A
+></H3
+><P
+>Gets the current system execution status, passing in return parameters such information as the dispatch disabled state and whether a task-independent portion is executing.</P
+><P
+>The following values are returned in <CODE
+CLASS="varname"
+>sysstat</CODE
+>.</P
+><PRE
+CLASS="synopsis"
+>&#13;sysstat := ( TSS_TSK  | [TSS_DDSP] | [TSS_DINT] )
+           || ( TSS_QTSK | [TSS_DDSP] | [TSS_DINT] )
+           || ( TSS_INDP )
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17492"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="14%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="71%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TSS_TSK</TT
+>
+              </TD
+><TD
+>0</TD
+><TD
+>Task portion is running</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TSS_DDSP</TT
+>
+              </TD
+><TD
+>1</TD
+><TD
+>Dispatch disabled</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TSS_DINT</TT
+>
+              </TD
+><TD
+>2</TD
+><TD
+>Interrupts disabled</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TSS_INDP</TT
+>
+              </TD
+><TD
+>4</TD
+><TD
+>Task-independent portion is running</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TSS_QTSK</TT
+>
+              </TD
+><TD
+>8</TD
+><TD
+>Quasi-task portion is running</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>The ID of the task currently in RUNNING state is returned in <CODE
+CLASS="varname"
+>runtskid</CODE
+>, while <CODE
+CLASS="varname"
+>schedtskid</CODE
+> indicates the ID of the next task scheduled to go to RUNNING state. Normally <CODE
+CLASS="varname"
+>runtskid</CODE
+> = <CODE
+CLASS="varname"
+>schedtskid</CODE
+>, but this is not necessarily true if, for example, a higher-priority task was wakened during dispatch disabled state.<CODE
+CLASS="varname"
+></CODE
+><CODE
+CLASS="varname"
+></CODE
+> If there is no such task, 0 is returned.</P
+><P
+>It must be possible to invoke this system call from an interrupt handler or time event handler.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17531"
+>Additional Notes</A
+></H3
+><P
+>Depending on the kernel implementation, the information returned by <A
+HREF="system_management_functions.html#tk_ref_sys"
+>tk_ref_sys</A
+> is not necessarily guaranteed to be accurate at all times.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_set_pow"
+>tk_set_pow - Set Power Mode</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17537"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN17539"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_set_pow</CODE
+>(UINT powmode);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17546"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17548"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>powmode</CODE
+>
+              </TD
+><TD
+>Power Mode</TD
+><TD
+>Low-power mode</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17561"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17563"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17576"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17578"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (value that cannot be used in <CODE
+CLASS="varname"
+>powmode</CODE
+> )</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_QOVR</SPAN
+>
+              </TD
+><TD
+>Low-power mode disable count overflow</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+><TT
+CLASS="literal"
+>TPW_ENALOWPOW</TT
+> was requested with low-power mode disable count at 0</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17601"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17603"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17618"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17621"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_LOWPOWER</TT
+>
+              </TD
+><TD
+>Support of power management functions</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17630"
+>Description</A
+></H3
+><P
+>The following two power-saving functions are supported.</P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>● Switching to low-power mode when the system is idle</DT
+><DD
+><P
+>When there are no tasks to be executed, the system switches to a low-power mode provided in hardware.</P
+><P
+>Low-power mode is a function for reducing power use during very short intervals, such as from one timer interrupt to the next. This is accomplished, for example, by lowering the CPU clock frequency. It does not require complicated mode-switching in software but is implemented mainly using hardware functionality.</P
+></DD
+><DT
+>● Automatic power-off</DT
+><DD
+><P
+>When the operator performs no operations for a certain length of time, the system automatically cuts the power and goes to suspended state. If there is a start request (interrupt, etc.) from a peripheral device or if the operator turns on the power, the system resumes from the state when the power was cut.</P
+><P
+>In the case of a power supply problem such as low battery, the system likewise cuts the power and goes to suspended state.</P
+><P
+>In suspended state, the power is cut to peripheral devices and circuits as well as to the CPU, but the main memory contents are retained.</P
+></DD
+></DL
+></DIV
+><P
+><A
+HREF="system_management_functions.html#tk_set_pow"
+>tk_set_pow</A
+> sets the low-power mode.</P
+><PRE
+CLASS="synopsis"
+>&#13;powmode:= ( TPW_DOSUSPEND || TPW_DISLOWPOW || TPW_ENALOWPOW )
+</PRE
+><PRE
+CLASS="programlisting"
+>&#13;#define TPW_DOSUSPEND   1       Suspended state
+#define TPW_DISLOWPOW   2       Switching to low-power mode disabled
+#define TPW_ENALOWPOW   3       Switching to low-power mode enabled (default)
+</PRE
+><P
+></P
+><UL
+><LI
+><P
+>&#13;            <TT
+CLASS="literal"
+>TPW_DOSUSPEND</TT
+>
+          </P
+><P
+>Execution of all tasks and handlers is stopped, peripheral circuits (timers, interrupt controllers, etc.) are stopped, and the power is cut (suspended). (<A
+HREF="power_management_functions.html#off_pow"
+>off_pow</A
+> is called.)</P
+><P
+>When power is turned back on, peripheral circuits are restarted, execution of all tasks and handlers is resumed, operations resume from the point before power was cut, and the system call returns.</P
+><P
+>If for some reason the resume processing fails, normal startup processing (for reset) is performed and the system boots fresh.</P
+></LI
+><LI
+><P
+>&#13;            <TT
+CLASS="literal"
+>TPW_DISLOWPOW</TT
+>
+          </P
+><P
+>Switching to low-power mode in the dispatcher is disabled.(<A
+HREF="power_management_functions.html#low_pow"
+>low_pow</A
+> is not called.)</P
+></LI
+><LI
+><P
+>&#13;            <TT
+CLASS="literal"
+>TPW_ENALOWPOW</TT
+>
+          </P
+><P
+>Switching to low-power mode in the dispatcher is enabled (<A
+HREF="power_management_functions.html#low_pow"
+>low_pow</A
+> is called).</P
+></LI
+></UL
+><P
+>The default at system startup is low-power mode enabled (<TT
+CLASS="literal"
+>TPW_ENALOWPOW</TT
+>).</P
+><P
+>Each time <TT
+CLASS="literal"
+>TPW_DISLOWPOW</TT
+> is specified, the request count is incremented. Low-power mode is enabled only when <TT
+CLASS="literal"
+>TPW_ENALOWPOW</TT
+> is requested for as many times as <TT
+CLASS="literal"
+>TPW_DISLOWPOW</TT
+> was requested. The maximum request count is implementation-dependent, but a count of at least 255 times must be possible.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17673"
+>Additional Notes</A
+></H3
+><P
+><A
+HREF="power_management_functions.html#off_pow"
+>off_pow</A
+> and <A
+HREF="power_management_functions.html#low_pow"
+>low_pow</A
+> are μT-Kernel/SM functions. For more details, see <A
+HREF="power_management_functions.html"
+>the Section called <I
+>Power Management Functions</I
+> in the Chapter called <I
+>μT-Kernel/SM Functions</I
+></A
+>.</P
+><P
+>μT-Kernel does not detect power supply problems or other factors for suspending the system. Actual suspension requires suspend processing in each of the peripheral devices (device drivers). The system is suspended not by calling <A
+HREF="system_management_functions.html#tk_set_pow"
+>tk_set_pow</A
+> directly but by use of the μT-Kernel/SM suspend function.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ref_ver"
+>tk_ref_ver - Reference Version Information</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17683"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN17685"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_ver</CODE
+>(T_RVER *pk_rver);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17692"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17694"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>T_RVER*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rver</CODE
+>
+              </TD
+><TD
+>Packet to Return Version Information</TD
+><TD
+>Pointer to the area to return the version information</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17707"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17709"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rver</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17724"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UH</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>maker</CODE
+>
+              </TD
+><TD
+>Maker Code</TD
+><TD
+>T-Kernel maker code</TD
+></TR
+><TR
+><TD
+>UH</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>prid</CODE
+>
+              </TD
+><TD
+>Product ID</TD
+><TD
+>T-Kernel identification number</TD
+></TR
+><TR
+><TD
+>UH</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>spver</CODE
+>
+              </TD
+><TD
+>Specification Version</TD
+><TD
+>Specification version</TD
+></TR
+><TR
+><TD
+>UH</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>prver</CODE
+>
+              </TD
+><TD
+>Product Version</TD
+><TD
+>T-Kernel version</TD
+></TR
+><TR
+><TD
+>UH</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>prno[4]</CODE
+>
+              </TD
+><TD
+>Product Number</TD
+><TD
+>T-Kernel products management information</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17761"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17763"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (invalid <CODE
+CLASS="varname"
+>pk_rver</CODE
+>)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17777"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17779"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17794"
+>Related Service Profile Items</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17797"
+>Description</A
+></H3
+><P
+>Gets information about the T-Kernel version in use, returning that information in the packet specified in <CODE
+CLASS="varname"
+>pk_rver</CODE
+>. The following information can be obtained.</P
+><P
+><CODE
+CLASS="varname"
+>maker</CODE
+> is the maker code assigned to the developer who has implemented the version of μT-Kernel. <CODE
+CLASS="varname"
+>maker</CODE
+> format is described in [<A
+HREF="system_management_functions.html#figure_a_tk_ref_ver"
+>Figure 7</A
+>].</P
+><DIV
+CLASS="figure"
+><A
+NAME="figure_a_tk_ref_ver"
+></A
+><P
+><B
+>Figure 7. <CODE
+CLASS="varname"
+>maker</CODE
+> Format</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_16_as.png"></P
+></DIV
+></DIV
+><P
+><CODE
+CLASS="varname"
+>prid</CODE
+> is a number indicating the T-Kernel type. The <CODE
+CLASS="varname"
+>prid</CODE
+> field has the format shown in <A
+HREF="system_management_functions.html#figure_b_tk_ref_ver"
+>Figure 8</A
+>.</P
+><P
+>Assignment of values to <CODE
+CLASS="varname"
+>prid</CODE
+> is left to the vendor who has implemented this version of μT-Kernel. Note, however, that this is the only number distinguishing product types, and that vendors should give careful thought to how they assign these numbers, doing so in a systematic way. In this way, the combination of <CODE
+CLASS="varname"
+>maker</CODE
+> and <CODE
+CLASS="varname"
+>prid</CODE
+> becomes a unique identifier of the kernel version.</P
+><P
+>The reference source code of μT-Kernel is provided from TRON Forum, and its <CODE
+CLASS="varname"
+>maker</CODE
+> and <CODE
+CLASS="varname"
+>prid</CODE
+> are as follows.
+<PRE
+CLASS="synopsis"
+>&#13;maker   = 0x0000
+prid    = 0x0000
+</PRE
+>
+</P
+><DIV
+CLASS="figure"
+><A
+NAME="figure_b_tk_ref_ver"
+></A
+><P
+><B
+>Figure 8. <CODE
+CLASS="varname"
+>prid</CODE
+> Format</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_16_bs.png"></P
+></DIV
+></DIV
+><P
+>The upper 4 bits of <CODE
+CLASS="varname"
+>spver</CODE
+> give the TRON specification series. The lower 12 bits indicate the T-Kernel specification version implemented. The <CODE
+CLASS="varname"
+>spver</CODE
+> field has the format shown in <A
+HREF="system_management_functions.html#figure_c_tk_ref_ver"
+>Figure 9</A
+>.</P
+><P
+>If, for example, a product conforms to the μT-Kernel specification Ver 3.01.xx, <CODE
+CLASS="varname"
+>spver</CODE
+> is as follows.</P
+><PRE
+CLASS="synopsis"
+>&#13;MAGIC   = 0x6           (μT-Kernel)
+SpecVer = 0x301         (Ver 3.01)
+spver   = 0x6301
+</PRE
+><P
+>If a product implements the draft version of μT-Kernel specification, that is,Ver 3.B0.xx draft specification, <CODE
+CLASS="varname"
+>spver</CODE
+> is as follows.</P
+><PRE
+CLASS="synopsis"
+>&#13;MAGIC   = 0x6           (μT-Kernel)
+SpecVer = 0x3B0         (Ver 3.B0)
+spver   = 0x63B0
+</PRE
+><DIV
+CLASS="figure"
+><A
+NAME="figure_c_tk_ref_ver"
+></A
+><P
+><B
+>Figure 9. <CODE
+CLASS="varname"
+>spver</CODE
+> Format</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_16_cs.png"></P
+></DIV
+></DIV
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+><TT
+CLASS="literal"
+>MAGIC</TT
+>:</DT
+><DD
+><P
+>Type of OS specification</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17860"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>0x0</TD
+><TD
+>TRON common (TAD, etc.)</TD
+></TR
+><TR
+><TD
+>0x1</TD
+><TD
+>reserved</TD
+></TR
+><TR
+><TD
+>0x2</TD
+><TD
+>reserved</TD
+></TR
+><TR
+><TD
+>0x3</TD
+><TD
+>reserved</TD
+></TR
+><TR
+><TD
+>0x4</TD
+><TD
+>reserved</TD
+></TR
+><TR
+><TD
+>0x5</TD
+><TD
+>reserved</TD
+></TR
+><TR
+><TD
+>0x6</TD
+><TD
+>μT-Kernel</TD
+></TR
+><TR
+><TD
+>0x7</TD
+><TD
+>T-Kernel</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DD
+><DT
+><TT
+CLASS="literal"
+>SpecVer</TT
+>:</DT
+><DD
+><P
+>The version of the specification that the kernel complies with. This is given as a three-digit packed-format BCD code. In the case of a draft version, the letter A, B, or C may appear in the second digit. In this case the corresponding hexadecimal form of A, B, or C is inserted.</P
+></DD
+></DL
+></DIV
+><P
+><CODE
+CLASS="varname"
+>prver</CODE
+> is the version number of the T-Kernel implementation. The specific values assigned to <CODE
+CLASS="varname"
+>prver</CODE
+> are left to the T-Kernel implementing vendor to decide.</P
+><P
+><CODE
+CLASS="varname"
+>prno</CODE
+> is a return parameter for use in indicating T-Kernel product management information, product number or the like. The specific meaning of values set in <CODE
+CLASS="varname"
+>prno</CODE
+> is left to the T-Kernel implementing vendor to decide.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17900"
+>Additional Notes</A
+></H3
+><P
+>The format of the packet and structure members for getting version information is mostly uniform across each version of T-Kernel or μT-Kernel specification.</P
+><P
+>The value obtained by <A
+HREF="system_management_functions.html#tk_ref_ver"
+>tk_ref_ver</A
+> in <TT
+CLASS="literal"
+>SpecVer</TT
+> is the first three digits of the specification version number. The numbers after that indicate minor revisions such as those issued to correct misprints and the like, and are not obtained by <A
+HREF="system_management_functions.html#tk_ref_ver"
+>tk_ref_ver</A
+>. For the purpose of matching to the specification contents, the first three numbers of the specification version are sufficient.</P
+><P
+>A kernel implementing a draft version may have A, B, or C as the second number of <TT
+CLASS="literal"
+>SpecVer</TT
+>. It must be noted that in such cases the specification order of release may not correspond exactly to higher and lower <TT
+CLASS="literal"
+>SpecVer</TT
+> values. For example, specifications may be released in the following order: Ver 2.A1 → Ver 2.A2 → Ver 2.B1 → Ver 2.C1 → Ver 2.00 → Ver 2.01... In this example, when going from Ver 2.Cx to Ver 2.00, <TT
+CLASS="literal"
+>SpecVer</TT
+> goes from a higher to a lower value.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="interrupt_management_functions_os.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="subsystem_management_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Interrupt Management Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Subsystem Management Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

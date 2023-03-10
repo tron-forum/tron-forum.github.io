@@ -1,0 +1,1869 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Trace Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/DS Functions"
+HREF="utk_ds_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="μT-Kernel/DS Functions"
+HREF="utk_ds_functions.html"><LINK
+REL="NEXT"
+TITLE="Appendix"
+HREF="appendixes.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="utk_ds_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/DS Functions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="appendixes.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="trace_functions"
+>Trace Functions</A
+></H1
+><P
+>Trace functions are functions for enabling a debugger to trace program execution. Execution trace is performed by setting hook routines.</P
+><P
+></P
+><UL
+><LI
+><P
+>Return from a hook routine must be made after states have returned to where they were when the hook routine was called. Restoring of registers, however, can be done in accordance with the C language function saving rules.</P
+></LI
+><LI
+><P
+>In a hook routine, limitations on states must not be loosened to make them less restrictive than when the routine was called. For example, if the hook routine was called during interrupts disabled state, interrupts must not be enabled.</P
+></LI
+><LI
+><P
+>A hook routine was called at protection level 0.</P
+></LI
+><LI
+><P
+>A hook routine inherits the stack at the time of the hook. Using too much stack may therefore cause a stack overflow. The extent to which the stack can be used is not definite, since it differs with the situation at the time of the hook. Switching to a separate stack in the hook routine is a safer option.</P
+></LI
+></UL
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="td_hok_svc"
+>td_hok_svc - Define System Call/Extended SVC Hook Routine</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33551"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN33553"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/dbgspt.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = td_hok_svc</CODE
+>(CONST TD_HSVC *hsvc);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33560"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33562"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST TD_HSVC*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>hsvc</CODE
+>
+              </TD
+><TD
+>SVC Hook Routine</TD
+><TD
+>Hook routine definition information</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>hsvc</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33577"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>enter</CODE
+>
+              </TD
+><TD
+>Hook Routine before Calling</TD
+><TD
+>Hook routine before calling</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>leave</CODE
+>
+              </TD
+><TD
+>Hook Routine after Calling</TD
+><TD
+>Hook routine after calling</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33596"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33598"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33611"
+>Error Codes</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33614"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33616"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33631"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33634"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+              </TD
+><TD
+>Support of μT-Kernel/DS</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33643"
+>Description</A
+></H3
+><P
+>Sets hook routines before and after the issuing of a system call or extended SVC. Setting <TT
+CLASS="literal"
+>NULL</TT
+> in <CODE
+CLASS="varname"
+>hsvc</CODE
+> cancels a hook routine.</P
+><P
+>The target of trace functions are the system calls of μT-Kernel/OS (tk_〜) and extended SVCs. Note, however, generally speaking <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> is not the target of trace function. This is implementation-dependent.</P
+><P
+>System calls of μT-Kernel/DS (td_〜) are not the target of trace functions.</P
+><P
+>A hook routine runs as a quasi-task portion of the task that called a system call or extended SVC for which a hook routine is set. Therefore, for example, the invoking task in a hook routine is the same as the task that invoked the system call or extended SVC.</P
+><P
+>Since task dispatching and interrupts can occur inside system call processing, <CODE
+CLASS="function"
+>enter()</CODE
+> and <CODE
+CLASS="function"
+>leave()</CODE
+> are not necessarily called in succession as a pair in every case. If a system call is one that does not return, <CODE
+CLASS="function"
+>leave()</CODE
+> will not be called.</P
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN33656"
+></A
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void *enter</CODE
+>(FN fncd, TD_CALINF *calinf, 
+            ...
+          );</CODE
+></P
+><P
+></P
+></DIV
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33666"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FN</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>fncd</CODE
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>Function Codes<P
+>&#60; 0 System call</P
+>
+                <P
+>≧ 0 Extended SVC</P
+></TD
+></TR
+><TR
+><TD
+>TD_CALINF*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>calinf</CODE
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>Caller information</TD
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>...</CODE
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>Parameters (variable number)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33693"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+>Return</TD
+><TD
+>&nbsp;</TD
+><TD
+>Any value passed to <CODE
+CLASS="function"
+>leave()</CODE
+></TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><PRE
+CLASS="programlisting"
+>&#13;typedef struct td_calinf {
+      Information to determine the caller for the system call or extended SVC;
+      it is preferable to include the information for the stack back-trace.
+      The contents are implementation-dependent,
+      but generally consist of register values such as stack pointer and program counter.
+} TD_CALINF;
+</PRE
+><P
+><CODE
+CLASS="varname"
+>enter</CODE
+> is called right before a system call or extended SVC.</P
+><P
+>The value passed in the return code is passed transparently to the corresponding <CODE
+CLASS="function"
+>leave()</CODE
+>. This makes it possible to pair <CODE
+CLASS="function"
+>enter()</CODE
+> and <CODE
+CLASS="function"
+>leave()</CODE
+> calls or to pass any other information.</P
+><PRE
+CLASS="programlisting"
+>&#13;exinf = enter(fncd, &#38;calinf, ... )
+ret = system call or extended SVC execution
+leave(fncd , ret, exinf)
+</PRE
+><P
+></P
+><UL
+><LI
+><P
+>For system call</P
+><P
+>The parameters are the same as the system call parameters.</P
+><DIV
+CLASS="example"
+><A
+NAME="AEN33717"
+></A
+><P
+><B
+>Example 1. tk_wai_sem(ID semid, INT cnt, TMO tmout)</B
+></P
+><PRE
+CLASS="programlisting"
+>&#13;enter(TFN_WAI_SEM, &#38;calinf, semid, cnt, tmout)
+</PRE
+></DIV
+></LI
+><LI
+><P
+>For extended SVC</P
+><P
+>The parameters are as in the packet passed to the extended SVC handler.</P
+><P
+><CODE
+CLASS="varname"
+>fncd</CODE
+> is likewise the same as that passed to the extended SVC handler.</P
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN33725"
+></A
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>&#13;                enter
+              </CODE
+>(FN fncd, TD_CALINF *calinf, void *pk_para);</CODE
+></P
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void leave</CODE
+>(FN fncd, INT ret, void *exinf);</CODE
+></P
+><P
+></P
+></DIV
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33744"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FN</TD
+><TD
+>&#13;                    <CODE
+CLASS="varname"
+>fncd</CODE
+>
+                  </TD
+><TD
+>&nbsp;</TD
+><TD
+>Function Codes</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                    <CODE
+CLASS="varname"
+>ret</CODE
+>
+                  </TD
+><TD
+>&nbsp;</TD
+><TD
+>Return code of the system call or extended SVC</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                    <CODE
+CLASS="varname"
+>exinf</CODE
+>
+                  </TD
+><TD
+>&nbsp;</TD
+><TD
+>Any value returned by <CODE
+CLASS="function"
+>enter()</CODE
+></TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></LI
+></UL
+><P
+><CODE
+CLASS="varname"
+>enter</CODE
+> is called right after returning from a system call or extended SVC.</P
+><P
+>When a hook routine is set after a system call or extended SVC is called (while the system call or extended SVC is executing), in some cases <CODE
+CLASS="function"
+>leave()</CODE
+> only may be called without calling <CODE
+CLASS="function"
+>enter()</CODE
+> . In such a case <TT
+CLASS="literal"
+>NULL</TT
+> is passed in <CODE
+CLASS="varname"
+>exinf</CODE
+>.</P
+><P
+>If, on the other hand, a hook routine is canceled after a system call or extended SVC is called, there may be cases when <CODE
+CLASS="function"
+>enter()</CODE
+> is called but not <CODE
+CLASS="function"
+>leave()</CODE
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="td_hok_dsp"
+>td_hok_dsp - Define Task Dispatch Hook Routine</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33782"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN33784"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/dbgspt.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = td_hok_dsp</CODE
+>(CONST TD_HDSP *hdsp);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33791"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33793"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST TD_HDSP*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>hdsp</CODE
+>
+              </TD
+><TD
+>Dispatcher Hook Routine</TD
+><TD
+>Hook routine definition information</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>hdsp</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33808"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exec</CODE
+>
+              </TD
+><TD
+>Hook Routine when Execution Starts</TD
+><TD
+>Hook routine when execution starts</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>stop</CODE
+>
+              </TD
+><TD
+>Hook Routine when Execution Stops</TD
+><TD
+>Hook routine when execution stops</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33827"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33829"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33842"
+>Error Codes</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33845"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33847"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33862"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33865"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+              </TD
+><TD
+>Support of μT-Kernel/DS</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33874"
+>Description</A
+></H3
+><P
+>Sets hook routines in the task dispatcher. Setting <TT
+CLASS="literal"
+>NULL</TT
+> in <CODE
+CLASS="varname"
+>hdsp</CODE
+> cancels a hook routine.</P
+><P
+>A hook routine is called while dispatching is disabled. A hook routine shall not invoke system calls of μT-Kernel/OS (tk_〜) and extended SVCs. A hook routine can invoke system calls of μT-Kernel/DS (td_〜).</P
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN33880"
+></A
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void exec</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33886"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>Task ID of the started or resumed task</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="function"
+>exec()</CODE
+> is called when the designated task starts execution or resumes. At the time <CODE
+CLASS="function"
+>exec()</CODE
+> is called, the task designated in <CODE
+CLASS="varname"
+>tskid</CODE
+> is already in RUNNING state. However, execution of the <CODE
+CLASS="varname"
+>tskid</CODE
+> task program code occurs after the return from <CODE
+CLASS="function"
+>exec()</CODE
+>.</P
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN33905"
+></A
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void stop</CODE
+>(ID tskid, UINT tskstat);</CODE
+></P
+><P
+></P
+></DIV
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33913"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>Task ID of the executed or stopped task</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskstat</CODE
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>State of the task designated in <CODE
+CLASS="varname"
+>tskid</CODE
+></TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="function"
+>stop()</CODE
+> is called when the designated task executes or stops. <CODE
+CLASS="varname"
+>tskstat</CODE
+> indicates the task state after stopping, as one of the following states:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33936"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_RDY</TT
+>
+              </TD
+><TD
+>READY state</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_WAI</TT
+>
+              </TD
+><TD
+>WAITING state</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_SUS</TT
+>
+              </TD
+><TD
+>SUSPENDED state</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_WAS</TT
+>
+              </TD
+><TD
+>WAITING-SUSPENDED state</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_DMT</TT
+>
+              </TD
+><TD
+>DORMANT state</TD
+></TR
+><TR
+><TD
+>0</TD
+><TD
+>NON-EXISTENT state</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>At the time <CODE
+CLASS="function"
+>stop()</CODE
+> is called, the task designated in <CODE
+CLASS="varname"
+>tskid</CODE
+> has already entered the state indicated in <CODE
+CLASS="varname"
+>tskstat</CODE
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="td_hok_int"
+>td_hok_int - Define Interrupt Handler Hook Routine</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33970"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN33972"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/dbgspt.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = td_hok_int</CODE
+>(CONST TD_HINT *hint);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33979"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33981"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST TD_HINT*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>hint</CODE
+>
+              </TD
+><TD
+>Interrupt Handler Hook Routine</TD
+><TD
+>Hook routine definition information</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>hint</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33996"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>enter</CODE
+>
+              </TD
+><TD
+>Hook Routine before Calling Handler</TD
+><TD
+>Hook routine before calling handler</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>leave</CODE
+>
+              </TD
+><TD
+>Hook Routine after Calling Handler</TD
+><TD
+>Hook routine after calling handler</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34015"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN34017"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34030"
+>Error Codes</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34033"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN34035"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34050"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN34053"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+              </TD
+><TD
+>Support of μT-Kernel/DS</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34062"
+>Description</A
+></H3
+><P
+>Sets hook routines before and after an interrupt handler is called. Hook routine setting cannot be done individually for different exception or interrupt factors. One pair of hook routines is set in common for all exception and interrupt factors.</P
+><P
+>Setting <CODE
+CLASS="varname"
+>hint</CODE
+> to <TT
+CLASS="literal"
+>NULL</TT
+> cancels the hook routines.</P
+><P
+>The hook routines are called as task-independent portion (part of the interrupt handler). Accordingly, the hook routines can call only those system calls that can be invoked from a task-independent portion.</P
+><P
+>Note that hook routines can be set only for interrupt handlers defined by <A
+HREF="interrupt_management_functions_os.html#tk_def_int"
+>tk_def_int</A
+> with the <TT
+CLASS="literal"
+>TA_HLNG</TT
+> attribute. A <TT
+CLASS="literal"
+>TA_ASM</TT
+> attribute interrupt handler cannot be hooked by a hook routine. Hooking of a <TT
+CLASS="literal"
+>TA_ASM</TT
+> attribute interrupt handler is possible only by directly manipulating the exception/interrupt vector table. The actual methods are implementation-dependent.</P
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN34074"
+></A
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void *enter</CODE
+>(UINT intno);</CODE
+></P
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void *leave</CODE
+>(UINT intno);</CODE
+></P
+><P
+></P
+></DIV
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN34085"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>intno</CODE
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>Interrupt number</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>Parameters passed to <CODE
+CLASS="function"
+>enter()</CODE
+> and <CODE
+CLASS="function"
+>leave()</CODE
+> are the same as those of exception handler and interrupt handler. Depending on the implementation, other information about the interrupt may be passed in addition to <CODE
+CLASS="varname"
+>intno</CODE
+>.</P
+><P
+>A hook routine is called as follows from a high-level language support routine.</P
+><PRE
+CLASS="programlisting"
+>&#13;enter(intno);
+inthdr(intno); /* Interrupt or exception handler */
+leave(intno);
+</PRE
+><P
+><CODE
+CLASS="function"
+>enter()</CODE
+> is called in interrupts disabled state, and interrupts must not be enabled. Since <CODE
+CLASS="function"
+>leave()</CODE
+> assumes the status on return from <CODE
+CLASS="function"
+>inthdr()</CODE
+>, the interrupts disabled or enabled status is indeterminate.</P
+><P
+><CODE
+CLASS="function"
+>enter()</CODE
+> can obtain the same amount of information which the function <CODE
+CLASS="function"
+>inthdr()</CODE
+> can obtain. If the function <CODE
+CLASS="function"
+>inthdr()</CODE
+> cannot obtain a piece of information, that information cannot be acquired by <CODE
+CLASS="function"
+>enter().</CODE
+> either. The specification guarantees that <CODE
+CLASS="function"
+>enter()</CODE
+> and <CODE
+CLASS="function"
+>inthdr()</CODE
+> can access information by means of <CODE
+CLASS="varname"
+>intno</CODE
+>, but whether other information can be acquired is implementation dependent. Note that during the execution of the function <CODE
+CLASS="function"
+>leave()</CODE
+>, the states such as interrupt mask status may have changed, it may be impossible to obtain the same amount of information obtained by <CODE
+CLASS="function"
+>enter()</CODE
+> or <CODE
+CLASS="function"
+>inthdr()</CODE
+>.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="utk_ds_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="appendixes.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>μT-Kernel/DS Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_ds_functions.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Appendix</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

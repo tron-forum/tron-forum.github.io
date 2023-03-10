@@ -1,0 +1,860 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Service Profile</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Common Rules of μT-Kernel"
+HREF="common_utk.html"><LINK
+REL="PREVIOUS"
+TITLE="High-Level Language Support Routines"
+HREF="high_level_language_support_routines.html"><LINK
+REL="NEXT"
+TITLE="μT-Kernel/OS Functions"
+HREF="utk_os_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="high_level_language_support_routines.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Common Rules of μT-Kernel</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="service_profile_definitions"
+>Service Profile</A
+></H1
+><P
+>μT-Kernel 3.0 service profile items are shown below. Defining these service profile items is a requirement. The implementor of OS may add original service profile definitions.</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="service_profile_bool"
+>Service Profile Items that Represent Function Availability</A
+></H2
+><P
+>The service profile item that shows whether a particular function is effective (or enabled) or ineffective (or disabled) is described by using a macro shown below, which is defined to be either <TT
+CLASS="literal"
+>TRUE</TT
+>, or <TT
+CLASS="literal"
+>FALSE</TT
+>. (The following definitions are given as example only, and each implementation shall define these appropriately.)</P
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_devicedriver"
+>Device Driver Functions</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_TASKEVENT      TRUE   /* Support of task event */
+#define TK_SUPPORT_DISWAI         TRUE   /* Support of disabling wait */
+#define TK_SUPPORT_IOPORT         TRUE   /* Support of I/O port access */
+#define TK_SUPPORT_MICROWAIT      TRUE   /* Support of micro wait */
+</PRE
+><P
+>Setting <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEVENT</TT
+> and <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+> to <TT
+CLASS="literal"
+>TRUE</TT
+> is recommended on systems that use advanced general-purpose device drivers.</P
+><P
+>Setting <TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+> and <TT
+CLASS="literal"
+>TK_SUPPORT_MICROWAIT</TT
+> to <TT
+CLASS="literal"
+>TRUE</TT
+> is generally recommended.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_lowpower"
+>Power Management Functions</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_LOWPOWER       TRUE   /* Support of power management functions */
+</PRE
+><P
+>Setting <TT
+CLASS="literal"
+>TK_SUPPORT_LOWPOWER</TT
+> to <TT
+CLASS="literal"
+>TRUE</TT
+> is recommended. However, this may as well be set to <TT
+CLASS="literal"
+>FALSE</TT
+> on systems with little need for power-saving or restrictions due to used hardware.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_memorymanagement"
+>Static/dynamic Memory Management Functions</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_USERBUF        FALSE  /* Support of user-specified buffer
+                                            (TA_USERBUF) */
+#define TK_SUPPORT_AUTOBUF        TRUE   /* Support of automatic buffer allocation
+                                            (No TA_USERBUF specification) */
+#define TK_SUPPORT_MEMLIB         TRUE   /* Support of memory allocation library */
+</PRE
+><P
+>Setting <TT
+CLASS="literal"
+>TK_SUPPORT_USERBUF</TT
+> to <TT
+CLASS="literal"
+>FALSE</TT
+> is generally recommended.</P
+><P
+>Setting <TT
+CLASS="literal"
+>TK_SUPPORT_AUTOBUF</TT
+> to <TT
+CLASS="literal"
+>TRUE</TT
+> is generally recommended.</P
+><P
+>However, it is acceptable in a system where memory management is staticfally done to set <TT
+CLASS="literal"
+>TK_SUPPORT_USERBUF</TT
+> to <TT
+CLASS="literal"
+>TRUE</TT
+>, and <TT
+CLASS="literal"
+>TK_SUPPORT_AUTOBUF</TT
+> to <TT
+CLASS="literal"
+>FALSE</TT
+>.</P
+><P
+>You cannot set both <TT
+CLASS="literal"
+>TK_SUPPORT_USERBUF</TT
+> and <TT
+CLASS="literal"
+>TK_SUPPORT_AUTOBUF</TT
+> to <TT
+CLASS="literal"
+>FALSE</TT
+>.</P
+><P
+>Setting <TT
+CLASS="literal"
+>TK_SUPPORT_MEMLIB</TT
+> to <TT
+CLASS="literal"
+>TRUE</TT
+> is generally recommended.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_taskexception"
+>Task Exception Handling Functions</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_TASKEXCEPTION  TRUE   /* Support of task exception handling
+                                            functions */
+</PRE
+><P
+>Setting <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+> to <TT
+CLASS="literal"
+>TRUE</TT
+> is recommended on a relatively large system that consist of many software modules and that requires flexible handling of abnormal conditions.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_subsystem"
+>Subsystem Management Functions</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_SUBSYSTEM      TRUE   /* Support of subsystem management
+                                            functions */
+#define TK_SUPPORT_SSYEVENT       TRUE   /* Support of event processing of subsystems */
+</PRE
+><P
+>Setting <TT
+CLASS="literal"
+>TK_SUPPORT_SUBSYSTEM</TT
+> and <TT
+CLASS="literal"
+>TK_SUPPORT_SSYEVENT</TT
+> to <TT
+CLASS="literal"
+>TRUE</TT
+> is recommended on a relatively large system which use middleware.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_sysconfig"
+>System Configuration Information Acquisition Functions</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_SYSCONF        FALSE  /* Support of system configuration
+                                            information management functions */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TK_SUPPORT_SYSCONF</TT
+> need to be set to <TT
+CLASS="literal"
+>FALSE</TT
+> on a system where system configuration information such as the maximum counts of objects (e.g. tasks), is fixed statically at OS build time by hard-coding. On the other hand, if the system configuration information is specified flexibly (e.g. at runtime), <TT
+CLASS="literal"
+>TK_SUPPORT_SYSCONF</TT
+> need to be set to <TT
+CLASS="literal"
+>TRUE</TT
+>.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_double_half"
+>Supporting 64-bit and 16-bit CPUs</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_HAS_DOUBLEWORD         FALSE  /* Support of 64-bit data types
+                                            (D, UD, VD) */
+#define TK_SUPPORT_USEC           FALSE  /* Support of microsecond */
+#define TK_SUPPORT_LARGEDEV       FALSE  /* Support of large mass-storage device
+                                            (64-bit) */
+#define TK_SUPPORT_SERCD          TRUE   /* Support of sub error code */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TK_HAS_DOUBLEWORD</TT
+>, <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>, and <TT
+CLASS="literal"
+>TK_SUPPORT_LARGEDEV</TT
+> need to be set to either <TT
+CLASS="literal"
+>TRUE</TT
+> or <TT
+CLASS="literal"
+>FALSE</TT
+>, according to the target hardware characteristics, and the usage or purpose of the target system.</P
+><P
+><TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+> and <TT
+CLASS="literal"
+>TK_SUPPORT_LARGEDEV</TT
+> depend on <TT
+CLASS="literal"
+>TK_HAS_DOUBLEWORD</TT
+>. That is, when <TT
+CLASS="literal"
+>TK_HAS_DOUBLEWORD</TT
+> is set to <TT
+CLASS="literal"
+>FALSE</TT
+>, these two profile items are also set to <TT
+CLASS="literal"
+>FALSE</TT
+>.</P
+><P
+>Setting <TT
+CLASS="literal"
+>TK_SUPPORT_SERCD</TT
+> to <TT
+CLASS="literal"
+>TRUE</TT
+> is recommended on a system where INT and ER are 32 bit entities. Setting <TT
+CLASS="literal"
+>TK_SUPPORT_SERCD</TT
+> to <TT
+CLASS="literal"
+>FALSE</TT
+> is recommended on a system where INT and ER are 16 bit entities.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_hardware"
+>Functions that Depend on CPU, Hardware, System, and Compiler</A
+></H3
+><P
+>Each of the following profiles needs to be set to <TT
+CLASS="literal"
+>TRUE</TT
+> or <TT
+CLASS="literal"
+>FALSE</TT
+> according to the target hardware and the implementation of the OS.</P
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="service_profile_interrupt"
+>Interrupt Management Functions</A
+></H4
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_INTCTRL        TRUE   /* Support of interrupt controller
+                                            management */
+#define TK_HAS_ENAINTLEVEL        TRUE   /* Can specify interrupt priority
+                                            level */
+#define TK_SUPPORT_CPUINTLEVEL    FALSE  /* Support of CPU interrupt mask level */
+#define TK_SUPPORT_CTRLINTLEVEL   TRUE   /* Support of interrupt controller
+                                            mask level */
+#define TK_SUPPORT_INTMODE        TRUE   /* Support of setting interrupt mode */
+</PRE
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="service_profile_cache"
+>Memory Cache Control Functions</A
+></H4
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_CACHECTRL      TRUE   /* Support of memory cache control
+                                            functions */
+#define TK_SUPPORT_SETCACHEMODE	  TRUE   /* Support of set cache mode function */
+#define TK_SUPPORT_WBCACHE        FALSE  /* Support of write-back cache */
+#define TK_SUPPORT_WTCACHE        TRUE   /* Support of write-through cache */
+</PRE
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="service_profile_coproc"
+>FPU(COP) Support Functions</A
+></H4
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_FPU            TRUE   /* Support of FPU */
+#define TK_SUPPORT_COP0           TRUE   /* Support of co-processor number 0 */
+#define TK_SUPPORT_COP1           FALSE  /* Support of co-processor number 1 */
+#define TK_SUPPORT_COP2           FALSE  /* Support of co-processor number 2 */
+#define TK_SUPPORT_COP3           FALSE  /* Support of co-processor number 3 */
+</PRE
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="service_profile_other"
+>Miscellaneous Functions</A
+></H4
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_ASM            FALSE  /* Support of assembly language function
+                                            entry/exit */
+#define TK_SUPPORT_REGOPS         FALSE  /* Support for task-register manipulation
+                                            functions */
+#define TK_ALLOW_MISALIGN         FALSE  /* Memory misalign access is permitted */
+#define TK_BIGENDIAN              FALSE  /* Is big endian (Must be defined) */
+#define TK_TRAP_SVC               TRUE   /* Use CPU Trap instruction for system                                             call entry */
+#define TK_HAS_SYSSTACK           TRUE   /* Task has a separate system stack */
+#define TK_SUPPORT_PTIMER         TRUE   /* Support of physical timer function */
+#define TK_SUPPORT_UTC            TRUE   /* Support of UNIX time */
+#define TK_SUPPORT_TRONTIME       FALSE  /* Support of TRON time */
+</PRE
+><P
+>At least one of <TT
+CLASS="literal"
+>TK_SUPPORT_UTC</TT
+> and <TT
+CLASS="literal"
+>TK_SUPPORT_TRONTIME</TT
+> must be set to <TT
+CLASS="literal"
+>TRUE</TT
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_debugger"
+>Debugger Support Functions</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_DSNAME         FALSE  /* Support of DS object name */
+#define TK_SUPPORT_DBGSPT         FALSE  /* Support of μT-Kernel/DS */
+</PRE
+><P
+>Depending on the user's need, <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+> and <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+> may be set to either <TT
+CLASS="literal"
+>TRUE</TT
+> or <TT
+CLASS="literal"
+>FALSE</TT
+>.</P
+><P
+><TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+> specifies whether the APIs of μT-Kernel/DS, other than <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>, can be used. Even if <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+> is set to <TT
+CLASS="literal"
+>FALSE</TT
+>, <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> can be used if <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+> is set to <TT
+CLASS="literal"
+>TRUE</TT
+>.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="check_method_of_service_profile"
+>Check Method of Service Profile</A
+></H3
+><P
+>Although the implementations of μT-Kernel 3.0 must define the profile items mentioned previously, the use of profile where some definitions are missing should be practiced since other OSs does not provide profile at all, and there bound to be implementation's failures to define all the profile items. For example, if you want to distinguish the effective/ineffective/undefined status, you can perform the following check:</P
+><PRE
+CLASS="programlisting"
+>&#13;#if defined(TK_SUPPORT_xxx)
+  #if TK_SUPPORT_xxx
+    /* when a profile item is set to be effective. */
+  #else
+    /* when a profile item is set to be ineffective */
+  #endif
+#else
+  /* when a profile item is undefined. */
+#endif
+</PRE
+><P
+>Note that if profile item is directly used for the parameter of "#if" macro as follows, you cannot distinguish whether the profile item is ineffective or undefined.</P
+><PRE
+CLASS="programlisting"
+>&#13;#if TK_SUPPORT_xxx
+  /* when a profile item is set to be effective. */
+#else
+  /* when a profile item is set to be ineffective or undefined. */
+#endif
+</PRE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="service_profile_value"
+>Service Profile Items that Represent Values</A
+></H2
+><P
+>A service profile item that represents a limit value or version number will be specified as a MACRO that holds the value. (The following definitions are given as example only. The real values of profile items are implementation-dependent.)</P
+><PRE
+CLASS="programlisting"
+>&#13;#define  TK_SPECVER_MAGIC            6      /* Magic number of μT-Kernel */
+#define  TK_SPECVER_MAJOR            3      /* Major Version number of μT-Kernel */
+#define  TK_SPECVER_MINOR            0      /* Minor Version number of μT-Kernel */
+#define  TK_SPECVER                  ((TK_SPECVER_MAJOR &#60;&#60; 8) | TK_SPECVER_MINOR)
+
+                                            /* Version number of μT-Kernel */
+#define  TK_MAX_TSKPRI               32     /* Maximum task priority (&#62;= 16) */
+#define  TK_WAKEUP_MAXCNT            65535  /* Maximum queuing count of the task wakeup
+                                               requests (&#62;= 1) */
+#define  TK_SEMAPHORE_MAXCNT         65535  /* Upper limit of maximum semaphore resource
+                                               count (maxsem) (&#62;= 32767) */
+#define  TK_SUSPEND_MAXCNT           65535  /* Maximum nest count of the forced wait
+                                               of tasks (&#62;= 1) */
+#define  TK_MEM_RNG0                 0      /* Real memory protection level of TA_RNG0
+                                               (0〜3) */
+#define  TK_MEM_RNG1                 0      /* Real memory protection level of TA_RNG1
+                                               (0〜3) */
+#define  TK_MEM_RNG2                 0      /* Real memory protection level of TA_RNG2
+                                               (0〜3) */
+#define  TK_MEM_RNG3                 3      /* Real memory protection level of TA_RNG3
+                                               (0〜3) */
+#define  TK_MAX_PTIMER               2      /* Maximum number of physical timers (&#62;= 0)
+                                               (Values from 1 to TK_MAX_PTIMER can be used
+                                               as physical timer number) */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TK_MEM_RNGn</TT
+> defines the real memory protection level of memory specified by <TT
+CLASS="literal"
+>TA_RNGn</TT
+>, and if <FONT
+COLOR="RED"
+>TK_MEM_RNGn == TK_MEM_RNGm</FONT
+>, then as far as memory access protection level goes, <TT
+CLASS="literal"
+>TA_RNGn</TT
+> and <TT
+CLASS="literal"
+>TA_RNGm</TT
+> are equivalent. In other words, it is guaranteed that a task with protection level m can access memory with protection level n without generating access privilege violation exception.</P
+><P
+>It is recommended that the developer is prepared for the case of missing definitions for service profile items that are supposed to have a value by means of coding such as <FONT
+COLOR="RED"
+>defined(...)</FONT
+>.</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="service_profile_example"
+>Examples of Service Profile Items</A
+></H2
+><P
+>Following are concrete examples of service profile items.</P
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_small_system"
+>Service Profile Items for a Very Small-scale System using 16-bit CPU</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_TASKEVENT      FALSE
+#define TK_SUPPORT_DISWAI         FALSE
+#define TK_SUPPORT_IOPORT         TRUE
+#define TK_SUPPORT_MICROWAIT      TRUE
+
+#define TK_SUPPORT_LOWPOWER       TRUE
+
+#define TK_SUPPORT_USERBUF        TRUE
+#define TK_SUPPORT_AUTOBUF        FALSE
+#define TK_SUPPORT_MEMLIB         FALSE
+
+#define TK_SUPPORT_TASKEXCEPTION  FALSE
+
+#define TK_SUPPORT_SUBSYSTEM      FALSE
+#define TK_SUPPORT_SSYEVENT       FALSE
+
+#define TK_SUPPORT_SYSCONF        FALSE
+
+#define TK_HAS_DOUBLEWORD         FALSE
+#define TK_SUPPORT_USEC           FALSE
+#define TK_SUPPORT_LARGEDEV       FALSE
+#define TK_SUPPORT_SERCD          FALSE
+
+#define TK_SUPPORT_INTCTRL        FALSE
+#define TK_HAS_ENAINTLEVEL        FALSE
+#define TK_SUPPORT_CPUINTLEVEL    FALSE
+#define TK_SUPPORT_CTRLINTLEVEL   FALSE
+#define TK_SUPPORT_INTMODE        TRUE
+
+#define TK_SUPPORT_CACHECTRL      FALSE
+#define TK_SUPPORT_SETCACHEMODE   FALSE
+#define TK_SUPPORT_WBCACHE        FALSE
+#define TK_SUPPORT_WTCACHE        FALSE
+
+#define TK_SUPPORT_FPU            FALSE
+#define TK_SUPPORT_COP0           FALSE
+#define TK_SUPPORT_COP1           FALSE
+#define TK_SUPPORT_COP2           FALSE
+#define TK_SUPPORT_COP3           FALSE
+
+#define TK_SUPPORT_ASM            TRUE
+#define TK_SUPPORT_REGOPS         FALSE
+#define TK_ALLOW_MISALIGN         FALSE
+#define TK_BIGENDIAN              FALSE
+#define TK_TRAP_SVC               FALSE
+#define TK_HAS_SYSSTACK           FALSE
+#define TK_SUPPORT_PTIMER         FALSE
+#define TK_SUPPORT_UTC            TRUE
+#define TK_SUPPORT_TRONTIME       FALSE
+
+#define TK_SUPPORT_DSNAME         FALSE
+#define TK_SUPPORT_DBGSPT         FALSE
+
+#define TK_SPECVER_MAGIC          6
+#define TK_SPECVER_MAJOR          3
+#define TK_SPECVER_MINOR          0
+#define TK_SPECVER                ((TK_SPECVER_MAJOR &#60;&#60; 8) | TK_SPECVER_MINOR)
+
+#define TK_MAX_TSKPRI             16
+#define TK_WAKEUP_MAXCNT          4095
+#define TK_SEMAPHORE_MAXCNT       4095
+#define TK_SUSPEND_MAXCNT         4095
+#define TK_MEM_RNG0               0
+#define TK_MEM_RNG1               0
+#define TK_MEM_RNG2               0
+#define TK_MEM_RNG3               0
+#define TK_MAX_PTIMER             0
+</PRE
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="service_profile_large_system"
+>Service Profile Items for a Relatively Large-scale System</A
+></H3
+><PRE
+CLASS="programlisting"
+>&#13;#define TK_SUPPORT_TASKEVENT      TRUE
+#define TK_SUPPORT_DISWAI         TRUE
+#define TK_SUPPORT_IOPORT         TRUE
+#define TK_SUPPORT_MICROWAIT      TRUE
+
+#define TK_SUPPORT_LOWPOWER       TRUE
+
+#define TK_SUPPORT_USERBUF        FALSE
+#define TK_SUPPORT_AUTOBUF        TRUE
+#define TK_SUPPORT_MEMLIB         TRUE
+
+#define TK_SUPPORT_TASKEXCEPTION  TRUE
+
+#define TK_SUPPORT_SUBSYSTEM      TRUE
+#define TK_SUPPORT_SSYEVENT       TRUE
+
+#define TK_SUPPORT_SYSCONF        TRUE
+
+#define TK_HAS_DOUBLEWORD         TRUE
+#define TK_SUPPORT_USEC           TRUE
+#define TK_SUPPORT_LARGEDEV       TRUE
+#define TK_SUPPORT_SERCD          TRUE
+
+#define TK_SUPPORT_INTCTRL        TRUE
+#define TK_HAS_ENAINTLEVEL        TRUE
+#define TK_SUPPORT_CPUINTLEVEL    FALSE
+#define TK_SUPPORT_CTRLINTLEVEL   TRUE
+#define TK_SUPPORT_INTMODE        TRUE
+
+#define TK_SUPPORT_CACHECTRL      TRUE
+#define TK_SUPPORT_SETCACHEMODE   TRUE
+#define TK_SUPPORT_WBCACHE        TRUE
+#define TK_SUPPORT_WTCACHE        TRUE
+
+#define TK_SUPPORT_FPU            TRUE
+#define TK_SUPPORT_COP0           TRUE
+#define TK_SUPPORT_COP1           FALSE
+#define TK_SUPPORT_COP2           FALSE
+#define TK_SUPPORT_COP3           FALSE
+
+#define TK_SUPPORT_ASM            TRUE
+#define TK_SUPPORT_REGOPS         TRUE
+#define TK_ALLOW_MISALIGN         FALSE
+#define TK_BIGENDIAN              FALSE
+#define TK_TRAP_SVC               TRUE
+#define TK_HAS_SYSSTACK           TRUE
+#define TK_SUPPORT_PTIMER         TRUE
+#define TK_SUPPORT_UTC            TRUE
+#define TK_SUPPORT_TRONTIME       FALSE
+
+#define TK_SUPPORT_DSNAME         TRUE
+#define TK_SUPPORT_DBGSPT         TRUE
+
+#define TK_SPECVER_MAGIC          6
+#define TK_SPECVER_MAJOR          3
+#define TK_SPECVER_MINOR          0
+#define TK_SPECVER                ((TK_SPECVER_MAJOR &#60;&#60; 8) | TK_SPECVER_MINOR)
+
+#define TK_MAX_TSKPRI             140
+#define TK_WAKEUP_MAXCNT          65535
+#define TK_SEMAPHORE_MAXCNT       65535
+#define TK_SUSPEND_MAXCNT         65535
+#define TK_MEM_RNG0               0
+#define TK_MEM_RNG1               0
+#define TK_MEM_RNG2               0
+#define TK_MEM_RNG3               3
+#define TK_MAX_PTIMER             10
+</PRE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="high_level_language_support_routines.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>High-Level Language Support Routines</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="common_utk.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>μT-Kernel/OS Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

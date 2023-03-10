@@ -1,0 +1,208 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>High-Level Language Support Routines</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Common Rules of μT-Kernel"
+HREF="common_utk.html"><LINK
+REL="PREVIOUS"
+TITLE="System Calls"
+HREF="system_calls.html"><LINK
+REL="NEXT"
+TITLE="Service Profile"
+HREF="service_profile_definitions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="system_calls.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Common Rules of μT-Kernel</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="service_profile_definitions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="high_level_language_support_routines"
+>High-Level Language Support Routines</A
+></H1
+><P
+>High-level language support routine capability is provided so that even if a task or handler is written in high-level language, the kernel-related processing can be kept separate from the language environment-related processing. Whether or not a high-level language support routine is used is specified in <TT
+CLASS="literal"
+>TA_HLNG</TT
+>, one of the object attributes and handler attributes.</P
+><P
+>When <TT
+CLASS="literal"
+>TA_HLNG</TT
+> is not specified, a task or handler is started directly from the start address passed in a parameter to <A
+HREF="utk_os_functions.html#tk_cre_tsk"
+>tk_cre_tsk</A
+> or <A
+HREF="interrupt_management_functions_os.html#tk_def_int"
+>tk_def_int</A
+>, etc.; whereas when <TT
+CLASS="literal"
+>TA_HLNG</TT
+> is specified, first the high-level language startup processing routine (high-level language support routine) is started, then from this routine an indirect jump is made to the task start address or handler address passed in a parameter to <A
+HREF="utk_os_functions.html#tk_cre_tsk"
+>tk_cre_tsk</A
+> or <A
+HREF="interrupt_management_functions_os.html#tk_def_int"
+>tk_def_int</A
+>. Viewed from the kernel, the task start address or handler address is a parameter given to the high-level language support routine. Separating the kernel processing from the language environment processing in this way facilitates support for different language environments.</P
+><P
+>Use of high-level language support routines has the further advantage that when a handler is written as a C language function, a system call for return from a handler can be executed automatically, simply by performing a function return (explicit <CODE
+CLASS="varname"
+>return</CODE
+> or "}").</P
+><P
+>In a system that utilizes CPU's operating modes, however, whereas it is relatively easy to realize a high-level language support routine in the case of an interrupt handler or the like that runs at the same protection level as the kernel, it is more difficult in the case of a task or task exception handler running at a different protection level from the kernel's. For this reason, when a high-level language support routine is used for a task, there is no guarantee that the task will exit by a return from the function. Returning a task function using <CODE
+CLASS="varname"
+>return</CODE
+> or "}" leads to an undefined behavior. At the end of a task, Exit Task (<A
+HREF="utk_os_functions.html#tk_ext_tsk"
+>tk_ext_tsk</A
+>) or Exit and Delete Task (<A
+HREF="utk_os_functions.html#tk_exd_tsk"
+>tk_exd_tsk</A
+>) must always be issued.</P
+><P
+>In the case of a task exception handler, the high-level language support routine is supplied as source code and is to be embedded in the user program.</P
+><P
+>The internal working of a high-level language support routine is as illustrated in <A
+HREF="high_level_language_support_routines.html#figure_high_level_language_support_routines"
+>Figure 1</A
+>.</P
+><DIV
+CLASS="figure"
+><A
+NAME="figure_high_level_language_support_routines"
+></A
+><P
+><B
+>Figure 1. Behavior of High-Level Language Support Routine</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_07s.png"></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="system_calls.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="service_profile_definitions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>System Calls</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="common_utk.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Service Profile</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

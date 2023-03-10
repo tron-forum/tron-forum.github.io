@@ -1,0 +1,655 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Power Management Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/SM Functions"
+HREF="utk_sm_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="I/O Port Access Support Functions"
+HREF="io_port_management_functions.html"><LINK
+REL="NEXT"
+TITLE="System Configuration Information Management Functions"
+HREF="system_configuration_information_management_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="io_port_management_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/SM Functions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="system_configuration_information_management_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="power_management_functions"
+>Power Management Functions</A
+></H1
+><P
+>Power management functions are used to realize system power saving. Power management functions are called as a callback type function from within μT-Kernel/OS.</P
+><P
+>Though <A
+HREF="power_management_functions.html#low_pow"
+>low_pow</A
+> and <A
+HREF="power_management_functions.html#off_pow"
+>off_pow</A
+> exist as part of APIs that are defined in the power management function, they are INTERNAL reference specification and should be used only internally inside the μT-Kernel. Since device drivers, middleware, and applications do not call these APIs directly, it is allowed to modify the functions or their APIs in the original specification to realize more advanced power management function. If, however, the new functions implemented have only the equivalent or similar performance as the APIs being defined as the INTERNAL reference specification here, it is preferable to follow this INTERNAL reference specification in order to enhance the program reusability.</P
+><P
+>Calling method of APIs for these functions is also implementation-dependent. Simple system calls are possible, as is the use of a trap. These functions may be provided in programs other than the μT-Kernel. Use of an extended SVC or other means that makes use of μT-Kernel function is not possible, however.</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="low_pow"
+>low_pow - Move System to Low-power Mode</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25314"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN25316"
+></A
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void low_pow</CODE
+>(void);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25321"
+>Parameter</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25324"
+>Return Parameter</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25327"
+>Error Codes</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25330"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25332"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>NO</TD
+><TD
+ALIGN="center"
+>NO</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25347"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25350"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_LOWPOWER</TT
+>
+              </TD
+><TD
+>Support of power management functions</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25359"
+>Description</A
+></H3
+><P
+>It is called within the μT-Kernel task dispatcher, and performs processing that will put CPU hardware into low-power consumption mode.</P
+><P
+>After moving CPU to the low-power mode, <A
+HREF="power_management_functions.html#low_pow"
+>low_pow</A
+> waits for an external interrupt. When an external interrupt occurs, <A
+HREF="power_management_functions.html#low_pow"
+>low_pow</A
+> moves the CPU and its associated hardware back to the normal mode (non low-power mode) and then returns to the caller of it.</P
+><P
+>The detailed processing procedure for <A
+HREF="power_management_functions.html#low_pow"
+>low_pow</A
+> is as follows:</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>Move CPU to the low-power mode. For example, lower the clock frequency.</P
+></LI
+><LI
+><P
+>Stop CPU, waiting for an external interrupt. For example, execute such a CPU instruction.</P
+></LI
+><LI
+><P
+>Resume CPU after an external interrupt (by hardware).</P
+></LI
+><LI
+><P
+>Move the CPU back to the normal mode. For example, restore the normal clock frequency.</P
+></LI
+><LI
+><P
+>Return to the caller. Caller is actually the internal dispatcher within μT-Kernel.</P
+></LI
+></OL
+><P
+>When implementing <A
+HREF="power_management_functions.html#low_pow"
+>low_pow</A
+>, the following points need to be noted:</P
+><P
+></P
+><UL
+><LI
+><P
+>This function is called in interrupts disabled state.</P
+></LI
+><LI
+><P
+>Interrupts must not be enabled.</P
+></LI
+><LI
+><P
+>Since the processing speed affects the speed of response to an interrupt, it should be as fast as possible.</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25387"
+>Additional Notes</A
+></H3
+><P
+>The task dispatcher calls <A
+HREF="power_management_functions.html#low_pow"
+>low_pow</A
+> to lower the power consumption when it has no tasks to be executed.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="off_pow"
+>off_pow - Move System to Suspend State</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25393"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN25395"
+></A
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void off_pow</CODE
+>(void);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25400"
+>Parameter</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25403"
+>Return Parameter</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25406"
+>Error Codes</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25409"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25411"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>NO</TD
+><TD
+ALIGN="center"
+>NO</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25426"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25429"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_LOWPOWER</TT
+>
+              </TD
+><TD
+>Support of power management functions</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25438"
+>Description</A
+></H3
+><P
+>This is called during the processing of <A
+HREF="system_management_functions.html#tk_set_pow"
+>tk_set_pow</A
+> with <CODE
+CLASS="varname"
+>powmode</CODE
+> = <TT
+CLASS="literal"
+>TPW_DOSUSPEND</TT
+> within μT-Kernel, and it will move the CPU hardware and its peripherals to suspend state (state where the applied power is off).</P
+><P
+>After moving the hardware to the suspend state, <A
+HREF="power_management_functions.html#off_pow"
+>off_pow</A
+> waits for a resume factor (power on, etc.). When a resume factor occurs, <A
+HREF="power_management_functions.html#off_pow"
+>off_pow</A
+> releases the suspend state and then returns to the caller of it.</P
+><P
+>The detailed processing procedure for <A
+HREF="power_management_functions.html#off_pow"
+>off_pow</A
+> is as follows:</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>Move CPU to the suspend state and wait for a resume factor. For example, stop the clock.</P
+></LI
+><LI
+><P
+>Resume CPU on the occurrence of a resume factor (by hardware).</P
+></LI
+><LI
+><P
+>Move CPU or other hardware back to the normal state, if necessary. Release the suspend state.(may be processed by hardware together with the previous step)</P
+></LI
+><LI
+><P
+>Return to the caller. Caller is actually the processing portion of <A
+HREF="system_management_functions.html#tk_set_pow"
+>tk_set_pow</A
+> in μT-Kernel.</P
+></LI
+></OL
+><P
+>When implementing <A
+HREF="power_management_functions.html#off_pow"
+>off_pow</A
+>, the following points need to be noted:</P
+><P
+></P
+><UL
+><LI
+><P
+>This function is called in interrupts disabled state.</P
+></LI
+><LI
+><P
+>Interrupts must not be enabled.</P
+></LI
+></UL
+><P
+>Note that the device drivers perform the suspending and resuming of peripherals and other devices. For more details, see the description of <A
+HREF="device_management_functions.html#tk_sus_dev"
+>tk_sus_dev</A
+>.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="io_port_management_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="system_configuration_information_management_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>I/O Port Access Support Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_sm_functions.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>System Configuration Information Management Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

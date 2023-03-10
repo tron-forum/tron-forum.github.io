@@ -1,0 +1,297 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>μT-Kernel Concepts</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="Relation with Existing RTOS Specifications"
+HREF="relation_with_existing_rtos_specifications.html"><LINK
+REL="NEXT"
+TITLE="Task States and Scheduling Rules"
+HREF="task_states_and_scheduling_rules.html"></HEAD
+><BODY
+CLASS="chapter"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="relation_with_existing_rtos_specifications.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="task_states_and_scheduling_rules.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="chapter"
+><H1
+><A
+NAME="concepts_underlying_utk"
+></A
+>μT-Kernel Concepts</H1
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="meaning_of_basic_terminology"
+>Meaning of Basic Terminology</A
+></H1
+><DIV
+CLASS="glosslist"
+><DL
+><DT
+><B
+>Real-time system and real-time operating system (RTOS)</B
+></DT
+><DD
+><P
+>A system whose response time and delay time are deterministic without uncertainty and non-reproducibility and has an internal configuration that makes the worst value predictable or makes it easy to produce an educated guess value is called a real-time system.</P
+><P
+>μT-Kernel is the real-time operating system (RTOS) that is used for building real-time systems with the preceding characteristics.</P
+></DD
+><DT
+><B
+>Task, invoking task</B
+></DT
+><DD
+><P
+>The basic logical unit of concurrent program execution is called a "task." Whereas the code in one task is executed in sequence, codes in different tasks can be executed in parallel. This concurrent processing is a conceptual phenomenon, from the standpoint of applications; in actual implementation it is accomplished by time-sharing among tasks as controlled by the kernel.</P
+><P
+>A task that invokes a system call is called the "invoking task."</P
+></DD
+><DT
+><B
+>Dispatch, dispatcher</B
+></DT
+><DD
+><P
+>The switching of tasks executed by the processor is called "dispatching" (or task dispatching). The kernel mechanism by which dispatching is realized is called a "dispatcher" (or task dispatcher).</P
+></DD
+><DT
+><B
+>Scheduling, scheduler</B
+></DT
+><DD
+><P
+>The processing to determine which task to execute next is called "scheduling" (or task scheduling). The kernel mechanism by which scheduling is realized is called a "scheduler" (or task scheduler). Generally a scheduler is implemented inside system call processing or in the dispatcher.</P
+></DD
+><DT
+><B
+>Context</B
+></DT
+><DD
+><P
+>The environment in which a program runs is generally called "context." For a context to be called identical, at the very least the processor operation mode must be the same and the stack space must be the same (part of the same contiguous area). Note that context is a conceptual entity from the standpoint of applications; even when processing must be executed in independent contexts, in actual implementation both contexts may sometimes use the same processor operation mode and the same stack space.</P
+></DD
+><DT
+><B
+>Precedence</B
+></DT
+><DD
+><P
+>The execution order of tasks, i.e., the order relation, is called precedence. This refers to the order of tasks when an execution right is given to a task among a group of tasks in the executable state to be in the execution state. If task Y has a higher precedence than task X, task Y will be executed first. If task Y, which has higher precedence than task X, becomes ready for execution while task X is executed, the execution right will be transferred to task Y, and task Y will be in execution state, i.e., RUNNING state. In this case, task X will be in the executable state, i.e., READY state, instead of execution state.<DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Additional Notes</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Precedence has a similar meaning to "priority", and they both affect the execution order of tasks. However, "priority" is an attribute of tasks specified by API parameter, etc., explicitly from applications, whereas "precedence" is a concept that is employed to define the execution order among a group of tasks. The precedence among a group of tasks is determined based on the priority of the tasks. A task with higher priority has higher precedence. On the other hand, tasks with the same priority do not have the same precedence. Among tasks having the same priority, the one that entered an executable state (i.e., RUNNING state or READY state) first has the highest precedence. It is possible, however, to use an API such as <A
+HREF="system_management_functions.html#tk_rot_rdq"
+>tk_rot_rdq</A
+> to change the precedence among tasks having the same priority.</P
+></TD
+></TR
+></TABLE
+></DIV
+></P
+></DD
+><DT
+><B
+>API and system call</B
+></DT
+><DD
+><P
+>The standard interfaces for calling functions provided by μT-Kernel from applications or middleware are collectively called API (Application Programming Interface). In addition to system calls that directly call kernel functions, APIs include functions implemented as extended SVCs, macros, and libraries.</P
+></DD
+><DT
+><B
+>Extended SVC</B
+></DT
+><DD
+><P
+>System calls that are added at the time of the initial startup of OS or added later are called extended SVC. μT-Kernel 3.0 specification stipulates @_Subsystem Management Functions_@ can be used to define/implement extended SVC. Implementation of μT-Kernel/SM API can use extended SVC(s).</P
+><P
+>A program that executes the function of an extended SVC is extended SVC handler.</P
+></DD
+><DT
+><B
+>Kernel</B
+></DT
+><DD
+><P
+>Kernel refers to the portion of μT-Kernel that is not implemented by extended SVCs, compile-time macros, or library functions. μT-Kernel/SM API can be implemented using extended SVC, compile-time macros, and/or library functions. Such APIs are part of μT-Kernel specification. However, it is not deemed to be part of the kernel. On the other hand, all the functions of μT-Kernel/OS and μT-Kernel/DS are included in the kernel.</P
+><P
+>When we refer to system state while a non-task portion is executing, we need to be aware whether the execution is within the kernel or not.</P
+></DD
+><DT
+><B
+>Implementation-defined</B
+></DT
+><DD
+><P
+>That something is implementation-defined means that something is not
+standardized in the T-Kernel specification and should be defined for
+each implementation. The specifics of the implementation should be
+described clearly in the implementation specifications. In application
+programs, the portability for the portion dependent on
+implementation-defined items is not assured.</P
+></DD
+><DT
+><B
+>Implementation-dependent</B
+></DT
+><DD
+><P
+>That something is implementation-dependent means that in the T-Kernel
+            specification, the behavior of something varies according to the
+            target systems or system operating conditions. The behavior should be
+            defined for each implementation. The specifics of the implementation
+            should be described clearly in the implementation specifications. In
+            application programs, the portion dependent on
+            implementation-dependent items needs to be modified when porting in
+            principle.</P
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="relation_with_existing_rtos_specifications.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="task_states_and_scheduling_rules.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Relation with Existing RTOS Specifications</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Task States and Scheduling Rules</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

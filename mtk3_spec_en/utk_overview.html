@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Overview of μT-Kernel 3.0</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="Index of μT-Kernel/DS APIs"
+HREF="index_of_utk_ds_api.html"><LINK
+REL="NEXT"
+TITLE="Design Policy of μT-Kernel 3.0"
+HREF="design_policy_of_utk.html"></HEAD
+><BODY
+CLASS="chapter"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="index_of_utk_ds_api.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="design_policy_of_utk.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="chapter"
+><H1
+><A
+NAME="utk_overview"
+></A
+>Overview of μT-Kernel 3.0</H1
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="position_of_utk"
+>TRON Project and μT-Kernel 3.0</A
+></H1
+><P
+>This standard defines the specification of a real-time operating system (RTOS) called "μT-Kernel 3.0." μT-Kernel 3.0 is the latest result from the TRON project (http://www.tron.org/), which was started by Dr. Ken Sakamura, then at the University of Tokyo in 1984.</P
+><P
+>The TRON Project envisioned that environments optimized to humans would be created by embedding small microprocessors, invented in the prior decade, in many objects in our surroundings and having them talk to each other. In the TRON Project, the computing paradigm to achive this goal was called a "Highly Functionally Distributed System (HFDS)" and an RTOS called ITRON was created to control such microprocessors efficiently. The specificaton of the first version of ITRON, namely ITRON1, was published in 1987. The project promoted the industry-academic cooperation and published the technical specification and other information so that anyone can make use of the technology for free under the philosophy of "Open Approach." As a result, ITRON specification OS was born and it ran on many types of processors. It became the de facto standard RTOS for embedded computer systems. Additionally, the development of "μITRON," which is an improved version of ITRON and has better adaptability, proceeded concurrently. OSs based on ITRON and μITRON specifications have been used widely in many embedded computer systems: they are used in consumer products, such as home electronic appliances and AV equipment, and industrial applications, such as machine control on factory floors, engine control of automobiles, etc.</P
+><P
+>The concept of "HFDS," which the TRON Project proposed, started to be called "ubiquitous computing" before the turn of the century and is now widely recognized as the Internet of Things (IoT). Since its inception in 1984, the TRON Project has targeted the IoT in today's parlance as the main application field of microprocessors and carried out research and development of OS and computer architecture. The latest result of such research and development of OS is μT-Kernel, a resource-efficient RTOS suitable for IoT edge nodes. It is an improvement of μITRON, and has features for IoT.</P
+><P
+>Based on the adoptions so far, it has been reported that 60 percent or more of embedded devices use the results of the TRON Project in the 2010s, 30 years after the inception of the project (https://www.tron.org/blog/2017/07/press20170406/). In 2018, IEEE (Institute of Electrical and Electronics Engineers), a global standard creating organization, published the IEEE 2050-2018 standard specification for RTOS for IoT edge nodes based on the specification of the updated version of μT-Kernel, μT-Kernel 2.0.</P
+><P
+>This document defines the standard of μT-Kernel 3.0, an updated version of μT-Kernel 2.0 by streamlining some features to adapt them specificically for controlling IoT edge devices. μT-Kernel 3.0 maintains high compatibility with IEEE 2050-2018 by adopting the API added in IEEE 2050-2018. As a result, μT-Kernel 3.0 specification is completely upper compatible with IEEE 2050-2018.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="index_of_utk_ds_api.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="design_policy_of_utk.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Index of μT-Kernel/DS APIs</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Design Policy of μT-Kernel 3.0</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

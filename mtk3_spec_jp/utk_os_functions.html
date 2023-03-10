@@ -1,0 +1,6243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>μT-Kernel/OSの機能</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="サービスプロファイル"
+HREF="service_profile_definitions.html"><LINK
+REL="NEXT"
+TITLE="タスク付属同期機能"
+HREF="task_dependent_synchronization_functions.html"></HEAD
+><BODY
+CLASS="chapter"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="service_profile_definitions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="task_dependent_synchronization_functions.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="chapter"
+><H1
+><A
+NAME="utk_os_functions"
+></A
+>μT-Kernel/OSの機能</H1
+><P
+>この章では、μT-Kernel/OS(Operating System)で提供しているシステムコールの詳細について説明を行う。</P
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="task_management_functions"
+>タスク管理機能</A
+></H1
+><P
+>タスク管理機能は、タスクの状態を直接的に操作／参照するための機能である。タスクを生成／削除する機能、タスクを起動／終了する機能、タスクの優先度を変更する機能、タスクの状態を参照する機能が含まれる。タスクはID番号で識別されるオブジェクトである。タスクのID番号をタスクIDと呼ぶ。タスク状態とスケジューリング規則については、<A
+HREF="task_states_and_scheduling_rules.html"
+><I
+>タスク状態とスケジューリング規則</I
+>項<I
+>μT-Kernelの概念</I
+>章</A
+>を参照すること。</P
+><P
+>タスクは、実行順序を制御するために、ベース優先度と現在優先度を持つ。単にタスクの優先度といった場合には、タスクの現在優先度を指す。タスクのベース優先度は、タスクの起動時にタスクの起動時優先度に初期化する。ミューテックス機能を使わない場合には、タスクの現在優先度は常にベース優先度に一致している。そのため、タスク起動直後の現在優先度は、タスクの起動時優先度になっている。ミューテックス機能を使う場合に現在優先度がどのように設定されるかについては、<A
+HREF="extended_synchronization_and_communication_functions.html#mutex"
+><I
+>ミューテックス</I
+>項</A
+>で述べる。</P
+><P
+>カーネルは、タスクの終了時に、ミューテックスのロック解除を除いては、タスクが獲得した資源(セマフォ資源、メモリブロックなど)を解放する処理を行わない。タスク終了時に資源を解放するのは、アプリケーションの責任である。</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_cre_tsk"
+>tk_cre_tsk - タスク生成</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN1993"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN1995"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID tskid = tk_cre_tsk</CODE
+>(CONST T_CTSK *pk_ctsk);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2002"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2004"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST T_CTSK*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_ctsk</CODE
+>
+              </TD
+><TD
+>Packet to Create Task</TD
+><TD
+>タスク生成情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_ctsk</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2019"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>拡張情報</TD
+></TR
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskatr</CODE
+>
+              </TD
+><TD
+>Task Attribute</TD
+><TD
+>タスク属性</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>task</CODE
+>
+              </TD
+><TD
+>Task Start Address</TD
+><TD
+>タスク起動アドレス</TD
+></TR
+><TR
+><TD
+>PRI</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>itskpri</CODE
+>
+              </TD
+><TD
+>Initial Task Priority</TD
+><TD
+>タスク起動時優先度</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>stksz</CODE
+>
+              </TD
+><TD
+>Stack Size</TD
+><TD
+>スタックサイズ(バイト数)</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>sstksz</CODE
+>
+              </TD
+><TD
+>System Stack Size</TD
+><TD
+>システムスタックサイズ(バイト数)</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>stkptr</CODE
+>
+              </TD
+><TD
+>User Stack Pointer</TD
+><TD
+>ユーザスタックポインタ</TD
+></TR
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dsname[8]</CODE
+>
+              </TD
+><TD
+>DS Object name</TD
+><TD
+>DSオブジェクト名称</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>bufptr</CODE
+>
+              </TD
+><TD
+>Buffer Pointer</TD
+><TD
+>ユーザバッファポインタ</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2082"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2084"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>タスクID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2101"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2103"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>メモリ不足(管理ブロックやスタック用の領域が確保できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>タスクの数がシステムの制限を超えた</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>予約属性(<CODE
+CLASS="varname"
+>tskatr</CODE
+> が不正あるいは利用できない)、指定のコプロセッサは存在しない</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOSPT</SPAN
+>
+              </TD
+><TD
+>未サポート機能(<TT
+CLASS="literal"
+>TA_ASM</TT
+>, <TT
+CLASS="literal"
+>TA_USERSTACK</TT
+>, <TT
+CLASS="literal"
+>TA_TASKSPACE</TT
+>, <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> に関する指定が未サポートの場合)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOCOP</SPAN
+>
+              </TD
+><TD
+>指定のコプロセッサが使用できない(動作中のハードウェアには搭載されていない、または動作異常が検出された)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2137"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2139"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2154"
+>関連するサービスプロファイル</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2156"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_ASM</TT
+>
+              </TD
+><TD
+><TT
+CLASS="literal"
+>TA_ASM</TT
+>のタスク属性指定が可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USERBUF</TT
+>
+              </TD
+><TD
+><TT
+CLASS="literal"
+>TA_USERBUF</TT
+>のタスク属性指定が可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_AUTOBUF</TT
+>
+              </TD
+><TD
+>自動バッファ割当て(<TT
+CLASS="literal"
+>TA_USERBUF</TT
+>のタスク属性指定なし)が可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_FPU</TT
+>
+              </TD
+><TD
+><TT
+CLASS="literal"
+>TA_FPU</TT
+>のタスク属性指定が可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_COPn</TT
+>
+              </TD
+><TD
+><TT
+CLASS="literal"
+>TA_COPn</TT
+>のタスク属性指定が可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_HAS_SYSSTACK</TT
+>
+              </TD
+><TD
+>タスクがユーザスタックとは独立したシステムスタックを持ち、ユーザスタック・システムスタックに対する個別の指定(<TT
+CLASS="literal"
+>TA_USERSTACK</TT
+>, <TT
+CLASS="literal"
+>TA_SSTKSZ</TT
+>)が可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+              </TD
+><TD
+><TT
+CLASS="literal"
+>TA_DSNAME</TT
+>のタスク属性指定が可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+>
+              </TD
+><TD
+>指定可能な最大タスク優先度の値 (&#62;= 16)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2201"
+>解説</A
+></H3
+><P
+>タスクを生成しタスクID番号を割り当てる。具体的には、生成するタスクに対してTCB(Task Control Block)を割り付け、<CODE
+CLASS="varname"
+>itskpri</CODE
+>, <CODE
+CLASS="varname"
+>task</CODE
+>, <CODE
+CLASS="varname"
+>stksz</CODE
+> などの情報をもとにその初期設定を行う。</P
+><P
+>対象タスクは生成後、休止状態(DORMANT)となる。</P
+><P
+><CODE
+CLASS="varname"
+>itskpri</CODE
+> によって、タスクが起動する時の優先度の初期値を指定する。タスク優先度には1以上の値を指定することができ、数の小さい方が高い優先度となる。指定可能な最大のタスク優先度は <TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+> で規定される。</P
+><P
+><CODE
+CLASS="varname"
+>exinf</CODE
+> は、対象タスクに関する情報を入れておくためにユーザが自由に利用できる。ここで設定した情報は、タスクに起動パラメータとして渡される他、<A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+> で取り出すことができる。なお、ユーザの情報を入れるためにもっと大きな領域がほしい場合や、途中で内容を変更したい場合には、自分でそのためのメモリを確保し、そのメモリパケットのアドレスを <CODE
+CLASS="varname"
+>exinf</CODE
+> に入れる。カーネルでは <CODE
+CLASS="varname"
+>exinf</CODE
+> の内容について関知しない。</P
+><P
+><CODE
+CLASS="varname"
+>tskatr</CODE
+> は、下位側がシステム属性を表し、上位側が実装独自属性を表す。<CODE
+CLASS="varname"
+>tskatr</CODE
+> のシステム属性の部分では、次のような指定を行う。</P
+><PRE
+CLASS="synopsis"
+>&#13;tskatr := (TA_ASM || TA_HLNG)
+   | [TA_SSTKSZ] | [TA_USERSTACK] | [TA_USERBUF] | [TA_DSNAME]
+   | (TA_RNG0 || TA_RNG1 || TA_RNG2 || TA_RNG3)
+   | [TA_COP0] | [TA_COP1] | [TA_COP2] | [TA_COP3] | [TA_FPU]
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2220"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_ASM</TT
+>
+              </TD
+><TD
+>対象タスクがアセンブリ言語で書かれている</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_HLNG</TT
+>
+              </TD
+><TD
+>対象タスクが高級言語で書かれている</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_SSTKSZ</TT
+>
+              </TD
+><TD
+>システムスタックサイズを指定する</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_USERSTACK</TT
+>
+              </TD
+><TD
+>ユーザスタックポインタを指定する</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_USERBUF</TT
+>
+              </TD
+><TD
+>スタック領域としてユーザが指定した領域を使用する</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_DSNAME</TT
+>
+              </TD
+><TD
+>DSオブジェクト名称を指定する</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_RNGn</TT
+>
+              </TD
+><TD
+>対象タスクは保護レベルnで実行する</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_COPn</TT
+>
+              </TD
+><TD
+>対象タスクが第n番目のコプロセッサを使用する(浮動小数点演算用コプロセッサやDSPを含む)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_FPU</TT
+>
+              </TD
+><TD
+>対象タスクが浮動小数点演算用コプロセッサを使用する(<TT
+CLASS="literal"
+>TA_COPn</TT
+> による指定の内、特に浮動小数点演算を使用するための、CPUに依存しない汎用的な指定である)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>実装独自属性の機能は、例えば、被デバッグ対象のタスクであることを指定したりするために利用できる。また、システム属性の残りの部分は、将来マルチプロセッサ属性の指定などを行うために利用できる。</P
+><PRE
+CLASS="programlisting"
+>&#13;#define TA_ASM          0x00000000      /* アセンブリ言語によるプログラム */
+#define TA_HLNG         0x00000001      /* 高級言語によるプログラム */
+#define TA_SSTKSZ       0x00000002      /* システムスタックサイズを指定 */
+#define TA_USERSTACK    0x00000004      /* ユーザスタックポインタを指定 */
+#define TA_USERBUF      0x00000020      /* ユーザバッファポインタを指定 */
+#define TA_DSNAME       0x00000040      /* DSオブジェクト名称を指定 */
+#define TA_RNG0         0x00000000      /* 保護レベル0 で実行 */
+#define TA_RNG1         0x00000100      /* 保護レベル1 で実行 */
+#define TA_RNG2         0x00000200      /* 保護レベル2 で実行 */
+#define TA_RNG3         0x00000300      /* 保護レベル3 で実行 */
+#define TA_COP0         0x00001000      /* ID=0 のコプロセッサを使用 */
+#define TA_COP1         0x00002000      /* ID=1 のコプロセッサを使用 */
+#define TA_COP2         0x00004000      /* ID=2 のコプロセッサを使用 */
+#define TA_COP3         0x00008000      /* ID=3 のコプロセッサを使用 */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TA_HLNG</TT
+> の指定を行った場合には、タスク起動時に直接 <CODE
+CLASS="varname"
+>task</CODE
+> のアドレスにジャンプするのではなく、高級言語の環境設定プログラム(高級言語対応ルーチン)を通してから <CODE
+CLASS="varname"
+>task</CODE
+> のアドレスにジャンプする。<TT
+CLASS="literal"
+>TA_HLNG</TT
+> 属性の場合のタスクは次の形式となる。</P
+><PRE
+CLASS="programlisting"
+>&#13;void task( INT stacd, void *exinf )
+{
+        /*
+                処理
+        */
+
+        tk_ext_tsk(); または tk_exd_tsk(); /* タスクの終了 */
+}
+</PRE
+><P
+>タスクの起動パラメータとして、<A
+HREF="utk_os_functions.html#tk_sta_tsk"
+>tk_sta_tsk</A
+> で指定するタスク起動コード <CODE
+CLASS="varname"
+>stacd</CODE
+>、および <A
+HREF="utk_os_functions.html#tk_cre_tsk"
+>tk_cre_tsk</A
+> で指定する拡張情報 <CODE
+CLASS="varname"
+>exinf</CODE
+> を渡す。</P
+><P
+>関数からの単純なリターン(return)でタスクを終了することはできない(してはいけない)。その場合の動作は不定(実装依存)である。</P
+><P
+><TT
+CLASS="literal"
+>TA_ASM</TT
+> 属性の場合のタスクの形式は実装依存とする。ただし、起動パラメータとして <CODE
+CLASS="varname"
+>stacd</CODE
+>, <CODE
+CLASS="varname"
+>exinf</CODE
+> を渡さなければならない。</P
+><P
+>タスクは、<TT
+CLASS="literal"
+>TA_RNGn</TT
+> で指定された保護レベルで動作する。システムコールや拡張SVCを呼び出すことで保護レベル0に移行し、システムコールや拡張SVCから戻ると元の保護レベルに復帰する。</P
+><P
+>各タスクはシステムスタックとユーザスタックの２本のスタックを持つ。ユーザスタックは <TT
+CLASS="literal"
+>TA_RNGn</TT
+> で指定した保護レベルで使用される。システムスタックは保護レベル0で使用される。システムコールや拡張SVCを呼び出すことにより保護レベルが遷移したときに使用するスタックが切り替えられる。</P
+><P
+>なお、<TT
+CLASS="literal"
+>TA_RNG0</TT
+> を指定したタスクでは、保護レベルの遷移が起きないためスタックの切替も起きない。<TT
+CLASS="literal"
+>TA_RNG0</TT
+> の場合は、ユーザスタックサイズとシステムスタックサイズの合計を１本のスタックとし、ユーザスタック兼システムスタックとして使用する。</P
+><P
+><TT
+CLASS="literal"
+>TA_SSTKSZ</TT
+> を指定した場合に <CODE
+CLASS="varname"
+>sstksz</CODE
+> が有効になる。<TT
+CLASS="literal"
+>TA_SSTKSZ</TT
+> を指定しなかった場合は、<CODE
+CLASS="varname"
+>sstksz</CODE
+> は無視されデフォルトサイズが適用される。</P
+><P
+><TT
+CLASS="literal"
+>TA_USERSTACK</TT
+> を指定した場合に <CODE
+CLASS="varname"
+>stkptr</CODE
+> が有効になる。この場合、ユーザスタックはカーネルで用意しない。ユーザスタックは呼出側で用意する。<CODE
+CLASS="varname"
+>stksz</CODE
+> には0を設定しなければならない。<TT
+CLASS="literal"
+>TA_USERSTACK</TT
+> を指定しなかった場合は、<CODE
+CLASS="varname"
+>stkptr</CODE
+> は無視される。ただし、<TT
+CLASS="literal"
+>TA_RNG0</TT
+> の場合は、<TT
+CLASS="literal"
+>TA_USERSTACK</TT
+> を指定することはできない。<TT
+CLASS="literal"
+>TA_RNG0</TT
+> と <TT
+CLASS="literal"
+>TA_USERSTACK</TT
+> を同時に指定した場合は <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> が発生する。</P
+><P
+>ユーザスタックとシステムスタックを区別せずタスクごとにスタックを1本持った実装向けに <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> の指定が提供される。この属性を指定した場合に <CODE
+CLASS="varname"
+>bufptr</CODE
+> が有効となり、<CODE
+CLASS="varname"
+>bufptr</CODE
+> を先頭とする <CODE
+CLASS="varname"
+>stksz</CODE
+> バイトのメモリ領域をユーザスタック兼システムスタック領域として使用する。この場合、これらのスタックはカーネルで用意しない。</P
+><P
+><TT
+CLASS="literal"
+>TA_DSNAME</TT
+> を指定した場合に <CODE
+CLASS="varname"
+>dsname</CODE
+> が有効となり、DSオブジェクト名称として設定される。DSオブジェクト名称はデバッガがオブジェクトを識別するために使用され、T-Kernel/DSのシステムコール <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> と <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> からのみ操作可能である。詳細は <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> 、<A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> を参照のこと。<TT
+CLASS="literal"
+>TA_DSNAME</TT
+> を指定しなかった場合は、<CODE
+CLASS="varname"
+>dsname</CODE
+> が無視され、<A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> や <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> が、<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> エラーとなる。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2320"
+>補足事項</A
+></H3
+><P
+>タスクは、<TT
+CLASS="literal"
+>TA_RNGn</TT
+> で指定した保護レベルと保護レベル0のいずれかでのみ動作する。例えば、<TT
+CLASS="literal"
+>TA_RNG3</TT
+> を指定したタスクが保護レベル1および2で動作することはない。</P
+><P
+>割込みスタックが分離されていないシステムでは、割込みハンドラもシステムスタックを使用する。割込みハンドラは保護レベル0で動作する。</P
+><P
+>システムスタックのデフォルトサイズは、システムコールの実行により消費するサイズおよび割込みスタックが分離されていないシステムでは割込みハンドラにより消費されるサイズを考慮して決定する。</P
+><P
+><TT
+CLASS="literal"
+>TA_COPn</TT
+> の定義は、CPUなどのハードウェアに依存して決められるため移植性はない。</P
+><P
+><TT
+CLASS="literal"
+>TA_FPU</TT
+> は、<TT
+CLASS="literal"
+>TA_COPn</TT
+> の定義の内、浮動小数点演算の使用に関してのみ移植性のある指定方法として用意される。例えば、浮動小数点コプロセッサが <TT
+CLASS="literal"
+>TA_COP0</TT
+> の場合は、<TT
+CLASS="literal"
+>TA_FPU</TT
+>＝<TT
+CLASS="literal"
+>TA_COP0</TT
+> となる。浮動小数点演算を行うのに特にコプロセッサの使用を指定する必要がない場合は、<TT
+CLASS="literal"
+>TA_FPU</TT
+>＝0となる。</P
+><P
+>CPUの実行保護モードのないシステムにおいても、移植性確保のために <TT
+CLASS="literal"
+>TA_RNGn</TT
+> などすべての属性を受け付けなければならない。例えば、<TT
+CLASS="literal"
+>TA_RNGn</TT
+> の指定はすべて <TT
+CLASS="literal"
+>TA_RNG0</TT
+> 相当として処理してもよいが、エラーとはしない。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2340"
+>移植ガイドライン</A
+></H3
+><P
+>T-Kernel 2.0には<TT
+CLASS="literal"
+>TA_USERBUF</TT
+>と<CODE
+CLASS="varname"
+>bufptr</CODE
+>が存在しない。そのため、この機能を使っている場合はT-Kernel 2.0への移植の際に修正が必要となるが、正しく<CODE
+CLASS="varname"
+>stksz</CODE
+>を設定してあれば、<TT
+CLASS="literal"
+>TA_USERBUF</TT
+>と<CODE
+CLASS="varname"
+>bufptr</CODE
+>を削除するだけで移植できる。</P
+><P
+>μT-Kernelの最大のタスク優先度は<TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+>で示される。この値は可変だが、16以上であることが保証されているため、利用するタスク優先度の範囲を1〜16に限定することで移植の際のタスク優先度の修正が不要となる。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_del_tsk"
+>tk_del_tsk - タスク削除</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2352"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN2354"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_del_tsk</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2361"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2363"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>タスクID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2376"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2378"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2391"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2393"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>オブジェクトの状態が不正(対象タスクが休止状態(DORMANT)でない)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2416"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2418"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2433"
+>関連するサービスプロファイル</A
+></H3
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2436"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> で示されたタスクを削除する。</P
+><P
+>具体的には、<CODE
+CLASS="varname"
+>tskid</CODE
+> で指定されたタスクを休止状態(DORMANT)から未登録状態(NON-EXISTENT)(システムに存在しない状態)へと移行させ、それに伴ってTCBおよびスタック領域を解放する。また、タスクID番号も解放される。休止状態(DORMANT)でないタスクに対してこのシステムコールを実行すると、<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> のエラーとなる。</P
+><P
+>このシステムコールで自タスクの指定はできない。自タスクを指定した場合には、自タスクが休止状態(DORMANT)ではないため、<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> のエラーとなる。自タスクを削除するには、本システムコールではなく、<A
+HREF="utk_os_functions.html#tk_exd_tsk"
+>tk_exd_tsk</A
+> システムコールを発行する。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_sta_tsk"
+>tk_sta_tsk - タスク起動</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2448"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN2450"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_sta_tsk</CODE
+>(ID tskid, INT stacd);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2459"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2461"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>タスクID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>stacd</CODE
+>
+              </TD
+><TD
+>Task Start Code</TD
+><TD
+>タスク起動コード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2480"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2482"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2495"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2497"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>オブジェクトの状態が不正(対象タスクが休止状態(DORMANT)でない)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2520"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2522"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2537"
+>関連するサービスプロファイル</A
+></H3
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2540"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> で示されたタスクを起動する。具体的には、休止状態(DORMANT)から実行可能状態(READY)へと移す。</P
+><P
+><CODE
+CLASS="varname"
+>stacd</CODE
+> により、タスクの起動時にタスクに渡すパラメータを設定することができる。このパラメータは、対象タスクから参照することができ、簡単なメッセージ通信の目的で利用できる。</P
+><P
+>タスク起動時のタスク優先度は、対象タスクが生成された時に指定されたタスク起動時優先度(<CODE
+CLASS="varname"
+>itskpri</CODE
+>)となる。</P
+><P
+>このシステムコールによる起動要求のキューイングは行わない。すなわち、対象タスクが休止状態(DORMANT)でないのにこのシステムコールが発行された場合、このシステムコールは無視され、発行タスクに <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> のエラーが返る。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2550"
+>移植ガイドライン</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>stacd</CODE
+> がINT型であり、処理系によって指定できる値の範囲が異なる可能性があるため注意が必要である。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ext_tsk"
+>tk_ext_tsk - 自タスク終了</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2556"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN2558"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void tk_ext_tsk</CODE
+>(void);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2564"
+>パラメータ</A
+></H3
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2567"
+>リターンパラメータ</A
+></H3
+><P
+>※ システムコールを発行したコンテキストには戻らない</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2570"
+>エラーコード</A
+></H3
+><P
+>※ 次のようなエラーを検出する可能性があるが、エラーを検出した場合でも、システムコールを発行したコンテキストには戻らない。したがって、システムコールのリターンパラメータとして直接エラーコードを返すことはできない。万一エラーを検出した場合の動作は、実装依存となる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2573"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2582"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2584"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2599"
+>関連するサービスプロファイル</A
+></H3
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2602"
+>解説</A
+></H3
+><P
+>自タスクを正常終了させ、休止状態(DORMANT)へと移行させる。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2605"
+>補足事項</A
+></H3
+><P
+><A
+HREF="utk_os_functions.html#tk_ext_tsk"
+>tk_ext_tsk</A
+> によるタスクの終了時に、終了するタスクがそれ以前に獲得した資源(メモリブロック、セマフォなど) を自動的に解放するということはない。タスク終了前に資源を解放しておくのは、ユーザの責任である。</P
+><P
+><A
+HREF="utk_os_functions.html#tk_ext_tsk"
+>tk_ext_tsk</A
+> は発行元のコンテキストに戻らないシステムコールである。したがって、何らかのエラーを検出した場合にエラーコードを返しても、これらのシステムコールを呼んだ側ではエラーのチェックを行っていないのが普通であり、プログラムが暴走する可能性がある。そこで、これらのシステムコールでは、エラーを検出した場合にも、システムコール発行元へは戻らないものとする。</P
+><P
+>タスクが休止状態(DORMANT)に戻る時は、タスク優先度などTCBに含まれている情報もリセットされるというのが原則である。たとえば、<A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+> によりタスク優先度を変更されているタスクが、<A
+HREF="utk_os_functions.html#tk_ext_tsk"
+>tk_ext_tsk</A
+> により終了した時、タスク優先度は <A
+HREF="utk_os_functions.html#tk_cre_tsk"
+>tk_cre_tsk</A
+> で指定したタスク起動時優先度(<CODE
+CLASS="varname"
+>itskpri</CODE
+>)に戻る。<A
+HREF="utk_os_functions.html#tk_ext_tsk"
+>tk_ext_tsk</A
+> 実行時のタスク優先度になるわけではない。</P
+><P
+>元のコンテキストに戻らないシステムコールは、すべてtk_ret_???またはtk_ext_???(tk_exd_???)の名称となっている。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_exd_tsk"
+>tk_exd_tsk - 自タスクの終了と削除</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2620"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN2622"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void tk_exd_tsk</CODE
+>(void);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2628"
+>パラメータ</A
+></H3
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2631"
+>リターンパラメータ</A
+></H3
+><P
+>※ システムコールを発行したコンテキストには戻らない</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2634"
+>エラーコード</A
+></H3
+><P
+>※ 次のようなエラーを検出する可能性があるが、エラーを検出した場合でも、システムコールを発行したコンテキストには戻らない。したがって、システムコールのリターンパラメータとして直接エラーコードを返すことはできない。万一エラーを検出した場合の動作は、実装依存となる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2637"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2646"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2648"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2663"
+>関連するサービスプロファイル</A
+></H3
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2666"
+>解説</A
+></H3
+><P
+>自タスクを正常終了させ、さらに自タスクを削除する。すなわち、自タスクを未登録状態(NON-EXISTENT)(システムに存在しない状態)へと移行させる。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2669"
+>補足事項</A
+></H3
+><P
+><A
+HREF="utk_os_functions.html#tk_exd_tsk"
+>tk_exd_tsk</A
+> によるタスクの終了時に、終了するタスクがそれ以前に獲得した資源(メモリブロック、セマフォなど) を自動的に解放するということはない。タスク終了前に資源を解放しておくのは、ユーザの責任である。</P
+><P
+><A
+HREF="utk_os_functions.html#tk_exd_tsk"
+>tk_exd_tsk</A
+> は発行元のコンテキストに戻らないシステムコールである。したがって、何らかのエラーを検出した場合にエラーコードを返しても、これらのシステムコールを呼んだ側ではエラーのチェックを行っていないのが普通であり、プログラムが暴走する可能性がある。そこで、これらのシステムコールでは、エラーを検出した場合にも、システムコール発行元へは戻らないものとする。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ter_tsk"
+>tk_ter_tsk - 他タスク強制終了</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2677"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN2679"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ter_tsk</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2686"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2688"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>タスクID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2701"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2703"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2716"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2718"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>オブジェクトの状態が不正(対象タスクが休止状態(DORMANT)または自タスク)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2741"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2743"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2758"
+>関連するサービスプロファイル</A
+></H3
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2761"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> で示されたタスクを強制的に終了させる。すなわち、<CODE
+CLASS="varname"
+>tskid</CODE
+> で示された対象タスクを休止状態(DORMANT)に移行させる。</P
+><P
+>対象タスクが待ち状態(強制待ち状態(SUSPENDED)を含む)にあった場合でも、対象タスクは待ち解除となって終了する。また、対象タスクが何らかの待ち行列(セマフォ待ちなど)につながれていた場合には、<A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+> の実行によってその待ち行列から削除される。</P
+><P
+>本システムコールでは、自タスクの指定はできない。自タスクを指定した場合には、<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> のエラーとなる。</P
+><P
+><A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+> の対象タスクの状態と実行結果との関係についてまとめたものを<A
+HREF="utk_os_functions.html#table_tk_ter_tsk"
+>表1</A
+>に示す。</P
+><DIV
+CLASS="table"
+><A
+NAME="table_tk_ter_tsk"
+></A
+><P
+><B
+>表 1. tk_ter_tskの対象タスクの状態と実行結果</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="40%"><COL
+WIDTH="30%"><COL
+WIDTH="30%"><THEAD
+><TR
+><TH
+ALIGN="left"
+>対象タスク状態</TH
+><TH
+ALIGN="left"
+><A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+> の <CODE
+CLASS="varname"
+>ercd</CODE
+></TH
+><TH
+ALIGN="left"
+>処理</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>実行できる状態(RUNNING,READY) (自タスク以外)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>強制終了処理</TD
+></TR
+><TR
+><TD
+>実行状態(RUNNING)(自タスク)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>何もしない</TD
+></TR
+><TR
+><TD
+>待ち状態(WAITING)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>強制終了処理</TD
+></TR
+><TR
+><TD
+>強制待ち状態(SUSPENDED)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>強制終了処理</TD
+></TR
+><TR
+><TD
+>二重待ち状態(WAITING-SUSPENDED)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>強制終了処理</TD
+></TR
+><TR
+><TD
+>休止状態(DORMANT)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>何もしない</TD
+></TR
+><TR
+><TD
+>未登録状態(NON-EXISTENT)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>何もしない</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2822"
+>補足事項</A
+></H3
+><P
+><A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+> によるタスクの終了時に、終了するタスクがそれ以前に獲得した資源(メモリブロック、セマフォなど)を自動的に解放するということはない。タスク終了前に資源を解放しておくのは、ユーザの責任である。</P
+><P
+>タスクが休止状態(DORMANT)に戻る時は、タスク優先度などTCBに含まれている情報もリセットされるというのが原則である。たとえば、<A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+> によりタスク優先度を変更されているタスクが、<A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+> により終了した時、タスク優先度は <A
+HREF="utk_os_functions.html#tk_cre_tsk"
+>tk_cre_tsk</A
+> で指定したタスク起動時優先度(<CODE
+CLASS="varname"
+>itskpri</CODE
+>)に戻る。<A
+HREF="utk_os_functions.html#tk_sta_tsk"
+>tk_sta_tsk</A
+> によって再度タスクを起動した場合、<A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+> を実行して強制終了された時のタスク優先度になるわけではない。</P
+><P
+>他タスクの強制終了は、デバッガなどのOSに密接に関連したごく一部でのみ使用することを原則とする。一般のアプリケーションやミドルウェアでは、他タスクの強制終了は原則として使用してはいけない。これは次のような理由による。</P
+><P
+>強制終了は、対象タスクの実行状態に関係なく行われる。例えば、タスクがあるミドルウェアの機能を呼び出しているとき、そのタスクを強制終了するとミドルウェアの実行途中でタスクが終了してしまうことになる。そのような状況になれば、ミドルウェアの正常動作は保証できなくなる。</P
+><P
+>このように、タスクの状態(何を実行中か)が不明な状況で、そのタスクを強制終了させることはできない。したがって、一般にタスクの強制終了は使用してはならない。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_chg_pri"
+>tk_chg_pri - タスク優先度変更</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2838"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN2840"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_chg_pri</CODE
+>(ID tskid, PRI tskpri);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2849"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2851"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>タスクID</TD
+></TR
+><TR
+><TD
+>PRI</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskpri</CODE
+>
+              </TD
+><TD
+>Task Priority</TD
+><TD
+>タスク優先度</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2870"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2872"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2885"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2887"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>tskpri</CODE
+> が不正あるいは利用できない値)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+>
+              </TD
+><TD
+>不正使用(上限優先度違反)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2915"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2917"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2932"
+>関連するサービスプロファイル</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2934"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+>
+              </TD
+><TD
+>指定可能な最大タスク優先度の値 (&#62;= 16)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2943"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> で指定されるタスクのベース優先度を、<CODE
+CLASS="varname"
+>tskpri</CODE
+> で指定される値に変更する。それに伴って、タスクの現在優先度も変更する。</P
+><P
+>タスク優先度としては、1～<TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+>の値を指定することができ、数の小さい方が高い優先度となる。</P
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> に <TT
+CLASS="literal"
+>TSK_SELF</TT
+>(＝0)が指定されると、自タスクを対象タスクとする。ただし、タスク独立部から発行したシステムコールで <CODE
+CLASS="varname"
+>tskid</CODE
+>＝<TT
+CLASS="literal"
+>TSK_SELF</TT
+> を指定した場合には、<SPAN
+CLASS="errorname"
+>E_ID</SPAN
+> のエラーとなる。また、<CODE
+CLASS="varname"
+>tskpri</CODE
+> に <TT
+CLASS="literal"
+>TPRI_INI</TT
+>(＝0)が指定されると、対象タスクのベース優先度を、タスクの起動時優先度(<CODE
+CLASS="varname"
+>itskpri</CODE
+>)に変更する。</P
+><P
+>このシステムコールで変更した優先度は、タスクが終了するまで有効である。タスクが休止状態(DORMANT)に戻る時、終了前のタスクの優先度は捨てられ、タスク生成時に指定されたタスク起動時優先度(<CODE
+CLASS="varname"
+>itskpri</CODE
+>)になる。ただし、休止状態(DORMANT)中に変更した優先度は有効である。次にタスクを起動したときは、その変更された優先度で起動される。</P
+><P
+>このシステムコールを実行した結果、対象タスクの現在優先度がベース優先度に一致している場合(ミューテックス機能を使わない場合には、この条件は常に成り立つ)には、次の処理を行う。</P
+><P
+>対象タスクが実行できる状態である場合、タスクの優先順位を、変更後の優先度にしたがって変化させる。変更後の優先度と同じ優先度を持つタスクの間では、対象タスクの優先順位を最低とする。</P
+><P
+>対象タスクが何らかのタスク優先度順の待ち行列につながれている場合にも、その待ち行列の中での順序を、変更後の優先度にしたがって変化させる。変更後の優先度と同じ優先度を持つタスクの間では、対象タスクを最後につなぐ。</P
+><P
+>対象タスクが <TT
+CLASS="literal"
+>TA_CEILING</TT
+> 属性のミューテックスをロックしているか、ロックを待っている場合で、<CODE
+CLASS="varname"
+>tskpri</CODE
+> で指定されたベース優先度が、それらのミューテックスのいずれかの上限優先度よりも高い場合には、<SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+> エラーを返す。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2968"
+>補足事項</A
+></H3
+><P
+>このシステムコールを呼び出した結果、対象タスクのタスク優先度順の待ち行列の中での順序が変化した場合、対象タスクないしはその待ち行列で待っている他のタスクの待ち解除が必要になる場合がある(メッセージバッファの送信待ち行列、および可変長メモリプールの獲得待ち行列)。</P
+><P
+>対象タスクが、<TT
+CLASS="literal"
+>TA_INHERIT</TT
+> 属性のミューテックスのロック待ち状態である場合、このシステムコールでベース優先度を変更したことにより、推移的な優先度継承の処理が必要になる場合がある。</P
+><P
+>ミューテックス機能を使わない場合には、対象タスクに自タスク、変更後の優先度に自タスクのベース優先度を指定してこのシステムコールが呼び出されると、自タスクの実行順位は同じ優先度を持つタスクの中で最低となる。そのため、このシステムコールを用いて、実行権の放棄を行うことができる。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2974"
+>移植ガイドライン</A
+></H3
+><P
+>μT-Kernelの最大のタスク優先度は<TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+>で示される。この値は可変だが、16以上であることが保証されているため、利用するタスク優先度の範囲を1〜16に限定することで移植の際のタスク優先度の修正が不要となる。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_get_reg"
+>tk_get_reg - タスクレジスタの取得</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2980"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN2982"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_get_reg</CODE
+>(ID tskid, T_REGS *pk_regs, T_EIT *pk_eit, T_CREGS *pk_cregs);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN2995"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN2997"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>対象タスクのID</TD
+></TR
+><TR
+><TD
+>T_REGS*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_regs</CODE
+>
+              </TD
+><TD
+>Packet of Registers</TD
+><TD
+>汎用レジスタの値を返す領域へのポインタ</TD
+></TR
+><TR
+><TD
+>T_EIT*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_eit</CODE
+>
+              </TD
+><TD
+>Packet of EIT Registers</TD
+><TD
+>例外時に保存されるレジスタの値を返す領域へのポインタ</TD
+></TR
+><TR
+><TD
+>T_CREGS*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_cregs</CODE
+>
+              </TD
+><TD
+>Packet of Control Registers</TD
+><TD
+>制御レジスタの値を返す領域へのポインタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3028"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3030"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>T_REGS, T_EIT, T_CREGSの内容は、CPUおよび実装ごとに定義する。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3044"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3046"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>オブジェクトの状態が不正(対象タスクが自タスク)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部からの発行)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3073"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3075"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3090"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3093"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_REGOPS</TT
+>
+              </TD
+><TD
+>タスクレジスタ取得・設定機能のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3102"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクの現在のレジスタの内容を参照する。</P
+><P
+><CODE
+CLASS="varname"
+>pk_regs</CODE
+>, <CODE
+CLASS="varname"
+>pk_eit</CODE
+>, <CODE
+CLASS="varname"
+>pk_cregs</CODE
+> にそれぞれ <TT
+CLASS="literal"
+>NULL</TT
+> を指定すると、対応するレジスタは参照されない。</P
+><P
+>参照されたレジスタの値が、タスク部実行中のものであるとは限らない。</P
+><P
+>自タスクに対して本システムコールを発行することはできない。(<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>)</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3114"
+>補足事項</A
+></H3
+><P
+>参照可能なレジスタは、タスクのコンテキストに含まれるすべてのレジスタを原則とする。また、CPUに物理的に存在するレジスタ以外に、カーネルが仮想的にレジスタとして扱っているものがあればそれも含まれる。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_set_reg"
+>tk_set_reg - タスクレジスタの設定</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3119"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN3121"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_set_reg</CODE
+>(ID tskid, CONST T_REGS *pk_regs, CONST T_EIT *pk_eit, CONST T_CREGS *pk_cregs);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3134"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3136"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>対象タスクのID</TD
+></TR
+><TR
+><TD
+>CONST T_REGS*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_regs</CODE
+>
+              </TD
+><TD
+>Packet of Registers</TD
+><TD
+>汎用レジスタ</TD
+></TR
+><TR
+><TD
+>CONST T_EIT*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_eit</CODE
+>
+              </TD
+><TD
+>Packet of EIT Registers</TD
+><TD
+>例外時に保存されるレジスタ</TD
+></TR
+><TR
+><TD
+>CONST T_CREGS*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_cregs</CODE
+>
+              </TD
+><TD
+>Packet of Control Registers</TD
+><TD
+>制御レジスタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>T_REGS, T_EIT, T_CREGSの内容は、CPUおよび実装ごとに定義する。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3168"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3170"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3183"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3185"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>オブジェクトの状態が不正(対象タスクが自タスク)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部からの発行)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>設定するレジスタ値が不正(実装依存)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3216"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3218"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3233"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3236"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_REGOPS</TT
+>
+              </TD
+><TD
+>タスクレジスタ取得・設定機能のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3245"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクのレジスタを指定の内容に設定する。</P
+><P
+><CODE
+CLASS="varname"
+>pk_regs</CODE
+>, <CODE
+CLASS="varname"
+>pk_eit</CODE
+>, <CODE
+CLASS="varname"
+>pk_cregs</CODE
+> にそれぞれ <TT
+CLASS="literal"
+>NULL</TT
+> を指定すると、対応するレジスタは設定されない。</P
+><P
+>設定するレジスタの値が、タスク部実行中のものであるとは限らない。レジスタの値を設定したことによる影響には、カーネルは関知しない。</P
+><P
+>ただし、カーネルの動作上変更が許されないレジスタやレジスタ内の一部のビットが変更できないようになっている場合がある。(実装依存)</P
+><P
+>自タスクに対して本システムコールを発行することはできない。(<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>)</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_get_cpr"
+>tk_get_cpr - コプロセッサのレジスタの取得</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3260"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN3262"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_get_cpr</CODE
+>(ID tskid, INT copno, T_COPREGS *pk_copregs);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3273"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3275"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>対象タスクのID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>copno</CODE
+>
+              </TD
+><TD
+>Coprocessor Number</TD
+><TD
+>コプロセッサ番号(0～3)</TD
+></TR
+><TR
+><TD
+>T_COPREGS*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_copregs</CODE
+>
+              </TD
+><TD
+>Packet of Coprocessor Registers</TD
+><TD
+>コプロセッサのレジスタの値を返す領域へのポインタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3300"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3302"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_copregs</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3317"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>T_COP0REG</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cop0</CODE
+>
+              </TD
+><TD
+>Coprocessor Number 0 Register</TD
+><TD
+>コプロセッサ番号0のレジスタ</TD
+></TR
+><TR
+><TD
+>T_COP1REG</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cop1</CODE
+>
+              </TD
+><TD
+>Coprocessor Number 1 Register</TD
+><TD
+>コプロセッサ番号1のレジスタ</TD
+></TR
+><TR
+><TD
+>T_COP2REG</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cop2</CODE
+>
+              </TD
+><TD
+>Coprocessor Number 2 Register</TD
+><TD
+>コプロセッサ番号2のレジスタ</TD
+></TR
+><TR
+><TD
+>T_COP3REG</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cop3</CODE
+>
+              </TD
+><TD
+>Coprocessor Number 3 Register</TD
+><TD
+>コプロセッサ番号3のレジスタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>T_COPnREGの内容は、CPUおよび実装ごとに定義する。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3349"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3351"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>オブジェクトの状態が不正(対象タスクが自タスク)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部からの発行)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>copno</CODE
+> が不正または指定のコプロセッサは存在しない)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3383"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3385"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3400"
+>関連するサービスプロファイル</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3402"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_COPn</TT
+>
+              </TD
+><TD
+>番号nのコプロセッサ利用機能のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>なお、すべての<CODE
+CLASS="varname"
+>n</CODE
+>について<TT
+CLASS="literal"
+>TK_SUPPORT_COPn</TT
+>が無効である場合、本APIはサポートされない。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3414"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクの <CODE
+CLASS="varname"
+>copno</CODE
+> で指定したコプロセッサの現在のレジスタ内容を参照する。</P
+><P
+>参照されたレジスタの値が、タスク部実行中のものであるとは限らない。</P
+><P
+>自タスクに対して本システムコールを発行することはできない。(<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>)</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3422"
+>補足事項</A
+></H3
+><P
+>参照可能なレジスタは、タスクのコンテキストに含まれるすべてのレジスタを原則とする。また、CPUに物理的に存在するレジスタ以外に、カーネルが仮想的にレジスタとして扱っているものがあればそれも含まれる。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_set_cpr"
+>tk_set_cpr - コプロセッサのレジスタの設定</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3427"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN3429"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_set_cpr</CODE
+>(ID tskid, INT copno, CONST T_COPREGS *pk_copregs);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3440"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3442"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="27%"><COL
+WIDTH="13%"><COL
+WIDTH="27%"><COL
+WIDTH="33%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>対象タスクのID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>copno</CODE
+>
+              </TD
+><TD
+>Coprocessor Number</TD
+><TD
+>コプロセッサ番号(0～3)</TD
+></TR
+><TR
+><TD
+>CONST T_COPREGS*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_copregs</CODE
+>
+              </TD
+><TD
+>Packet of Coprocessor Registers</TD
+><TD
+>コプロセッサのレジスタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_copregs</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3469"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="27%"
+TITLE="c1"><COL
+WIDTH="13%"><COL
+WIDTH="27%"><COL
+WIDTH="33%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>T_COP0REG</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cop0</CODE
+>
+              </TD
+><TD
+>Coprocessor Number 0 Register</TD
+><TD
+>コプロセッサ番号0のレジスタ</TD
+></TR
+><TR
+><TD
+>T_COP1REG</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cop1</CODE
+>
+              </TD
+><TD
+>Coprocessor Number 1 Register</TD
+><TD
+>コプロセッサ番号1のレジスタ</TD
+></TR
+><TR
+><TD
+>T_COP2REG</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cop2</CODE
+>
+              </TD
+><TD
+>Coprocessor Number 2 Register</TD
+><TD
+>コプロセッサ番号2のレジスタ</TD
+></TR
+><TR
+><TD
+>T_COP3REG</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cop3</CODE
+>
+              </TD
+><TD
+>Coprocessor Number 3 Register</TD
+><TD
+>コプロセッサ番号3のレジスタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3500"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3502"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="27%"><COL
+WIDTH="13%"><COL
+WIDTH="27%"><COL
+WIDTH="33%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3515"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3517"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>オブジェクトの状態が不正(対象タスクが自タスク)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部からの発行)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>copno</CODE
+> が不正または指定のコプロセッサは存在しない)、設定するレジスタ値が不正(実装依存)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3549"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3551"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3566"
+>関連するサービスプロファイル</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3568"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_COPn</TT
+>
+              </TD
+><TD
+>番号nのコプロセッサ利用機能のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>なお、すべての<CODE
+CLASS="varname"
+>n</CODE
+>について<TT
+CLASS="literal"
+>TK_SUPPORT_COPn</TT
+>が無効である場合、本APIはサポートされない。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3580"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクの <CODE
+CLASS="varname"
+>copno</CODE
+> で指定したコプロセッサのレジスタに指定の内容を設定する。</P
+><P
+>設定するレジスタの値が、タスク部実行中のものであるとは限らない。レジスタの値を設定したことによる影響には、カーネルは関知しない。</P
+><P
+>ただし、カーネルの動作上変更が許されないレジスタやレジスタ内の一部のビットが変更できないようになっている場合がある。(実装依存)</P
+><P
+>自タスクに対して本システムコールを発行することはできない。(<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>)</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ref_tsk"
+>tk_ref_tsk - タスク状態参照</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3591"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN3593"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_tsk</CODE
+>(ID tskid, T_RTSK *pk_rtsk);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3602"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3604"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>タスクID</TD
+></TR
+><TR
+><TD
+>T_RTSK*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rtsk</CODE
+>
+              </TD
+><TD
+>Packet to Refer Task Status</TD
+><TD
+>タスク状態を返す領域へのポインタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3623"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3625"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rtsk</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3640"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>拡張情報</TD
+></TR
+><TR
+><TD
+>PRI</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskpri</CODE
+>
+              </TD
+><TD
+>Task Priority</TD
+><TD
+>現在の優先度</TD
+></TR
+><TR
+><TD
+>PRI</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskbpri</CODE
+>
+              </TD
+><TD
+>Task Base Priority</TD
+><TD
+>ベース優先度</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskstat</CODE
+>
+              </TD
+><TD
+>Task State</TD
+><TD
+>タスク状態</TD
+></TR
+><TR
+><TD
+>UW</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskwait</CODE
+>
+              </TD
+><TD
+>Task Wait Factor</TD
+><TD
+>待ち要因</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wid</CODE
+>
+              </TD
+><TD
+>Waiting Object ID</TD
+><TD
+>待ちオブジェクトID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wupcnt</CODE
+>
+              </TD
+><TD
+>Wakeup Count</TD
+><TD
+>起床要求キューイング数</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>suscnt</CODE
+>
+              </TD
+><TD
+>Suspend Count</TD
+><TD
+>強制待ち要求ネスト数</TD
+></TR
+><TR
+><TD
+>UW</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>waitmask</CODE
+>
+              </TD
+><TD
+>Wait Mask</TD
+><TD
+>待ちを禁止されている待ち要因</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>texmask</CODE
+>
+              </TD
+><TD
+>Task Exception Mask</TD
+><TD
+>許可されているタスク例外</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskevent</CODE
+>
+              </TD
+><TD
+>Task Event</TD
+><TD
+>発生しているタスクイベント</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3715"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3717"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>pk_rtsk</CODE
+> が不正)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3741"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3743"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3758"
+>関連するサービスプロファイル</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3760"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>待ち禁止状態に関する情報(<CODE
+CLASS="varname"
+>waitmask</CODE
+>)の取得が可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+              </TD
+><TD
+>タスク例外情報(<CODE
+CLASS="varname"
+>texmask</CODE
+>)の取得が可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEVENT</TT
+>
+              </TD
+><TD
+>タスクイベント発生情報(<CODE
+CLASS="varname"
+>tskevent</CODE
+>)の取得が可能</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN3780"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> で示された対象タスクの各種の状態を参照する。</P
+><P
+><CODE
+CLASS="varname"
+>tskstat</CODE
+> は次のような値をとる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN3786"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"><COL
+WIDTH="17%"><COL
+WIDTH="67%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_RUN</TT
+>
+              </TD
+><TD
+>0x0001</TD
+><TD
+>実行状態(RUNNING)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_RDY</TT
+>
+              </TD
+><TD
+>0x0002</TD
+><TD
+>実行可能状態(READY)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_WAI</TT
+>
+              </TD
+><TD
+>0x0004</TD
+><TD
+>待ち状態(WAITING)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_SUS</TT
+>
+              </TD
+><TD
+>0x0008</TD
+><TD
+>強制待ち状態(SUSPENDED)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_WAS</TT
+>
+              </TD
+><TD
+>0x000c</TD
+><TD
+>二重待ち状態(WAITING-SUSPENDED)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_DMT</TT
+>
+              </TD
+><TD
+>0x0010</TD
+><TD
+>休止状態(DORMANT)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_NODISWAI</TT
+>
+              </TD
+><TD
+>0x0080</TD
+><TD
+>待ち禁止拒否状態</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><TT
+CLASS="literal"
+>TTS_RUN</TT
+>, <TT
+CLASS="literal"
+>TTS_WAI</TT
+> などによるタスク状態の表現はビット対応になっているため、和集合の判定を行う(例えば、実行状態(RUNNING)または実行可能状態(READY)であることを判定する)場合に便利である。なお、上記の状態のうち、<TT
+CLASS="literal"
+>TTS_WAS</TT
+> は <TT
+CLASS="literal"
+>TTS_SUS</TT
+> と <TT
+CLASS="literal"
+>TTS_WAI</TT
+> が複合したものであるが、<TT
+CLASS="literal"
+>TTS_SUS</TT
+> がこれ以外の状態(<TT
+CLASS="literal"
+>TTS_RUN</TT
+>, <TT
+CLASS="literal"
+>TTS_RDY</TT
+>, <TT
+CLASS="literal"
+>TTS_DMT</TT
+>)と複合することはない。</P
+><P
+><TT
+CLASS="literal"
+>TTS_WAI</TT
+>(<TT
+CLASS="literal"
+>TTS_WAS</TT
+> 含む)の場合、<A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> による待ち禁止を拒否している状態であれば、<TT
+CLASS="literal"
+>TTS_NODISWAI</TT
+> がセットされる。<TT
+CLASS="literal"
+>TTS_WAI</TT
+> 以外と <TT
+CLASS="literal"
+>TTS_NODISWAI</TT
+> が組み合わされることはない。</P
+><P
+>割込みハンドラの中から、割り込まれたタスクを対象とした <A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+> を実行した場合は、<CODE
+CLASS="varname"
+>tskstat</CODE
+> として実行状態(RUNNING)(<TT
+CLASS="literal"
+>TTS_RUN</TT
+>)を返す。</P
+><P
+><CODE
+CLASS="varname"
+>tskstat</CODE
+> が <TT
+CLASS="literal"
+>TTS_WAI</TT
+>(<TT
+CLASS="literal"
+>TTS_WAS</TT
+> を含む)の場合、<CODE
+CLASS="varname"
+>tskwait</CODE
+>, <CODE
+CLASS="varname"
+>wid</CODE
+> は <A
+HREF="utk_os_functions.html#table_tk_ref_tsk"
+>表2</A
+>のような値をとる。</P
+><DIV
+CLASS="table"
+><A
+NAME="table_tk_ref_tsk"
+></A
+><P
+><B
+>表 2. <CODE
+CLASS="varname"
+>tskwait</CODE
+> と <CODE
+CLASS="varname"
+>wid</CODE
+> の値</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="22%"><COL
+WIDTH="22%"><COL
+WIDTH="33%"><COL
+WIDTH="22%"><THEAD
+><TR
+><TH
+ALIGN="left"
+>&#13;                <CODE
+CLASS="varname"
+>tskwait</CODE
+>
+              </TH
+><TH
+ALIGN="left"
+>値</TH
+><TH
+ALIGN="left"
+>意味</TH
+><TH
+ALIGN="left"
+>&#13;                <CODE
+CLASS="varname"
+>wid</CODE
+>
+              </TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_SLP</TT
+>
+              </TD
+><TD
+>0x00000001</TD
+><TD
+><A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> による待ち</TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_DLY</TT
+>
+              </TD
+><TD
+>0x00000002</TD
+><TD
+><A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk"
+>tk_dly_tsk</A
+> による待ち</TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_SEM</TT
+>
+              </TD
+><TD
+>0x00000004</TD
+><TD
+><A
+HREF="synchronzation_and_communication_functions.html#tk_wai_sem"
+>tk_wai_sem</A
+> による待ち</TD
+><TD
+>待ち対象の <CODE
+CLASS="varname"
+>semid</CODE
+></TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_FLG</TT
+>
+              </TD
+><TD
+>0x00000008</TD
+><TD
+><A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> による待ち</TD
+><TD
+>待ち対象の <CODE
+CLASS="varname"
+>flgid</CODE
+></TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_MBX</TT
+>
+              </TD
+><TD
+>0x00000040</TD
+><TD
+><A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+> による待ち</TD
+><TD
+>待ち対象の <CODE
+CLASS="varname"
+>mbxid</CODE
+></TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_MTX</TT
+>
+              </TD
+><TD
+>0x00000080</TD
+><TD
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_loc_mtx"
+>tk_loc_mtx</A
+> による待ち</TD
+><TD
+>待ち対象の <CODE
+CLASS="varname"
+>mtxid</CODE
+></TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_SMBF</TT
+>
+              </TD
+><TD
+>0x00000100</TD
+><TD
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+> による待ち</TD
+><TD
+>待ち対象の <CODE
+CLASS="varname"
+>mbfid</CODE
+></TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_RMBF</TT
+>
+              </TD
+><TD
+>0x00000200</TD
+><TD
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+> による待ち</TD
+><TD
+>待ち対象の <CODE
+CLASS="varname"
+>mbfid</CODE
+></TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_CAL</TT
+>
+              </TD
+><TD
+>0x00000400</TD
+><TD
+>(予約)</TD
+><TD
+>(予約)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_ACP</TT
+>
+              </TD
+><TD
+>0x00000800</TD
+><TD
+>(予約)</TD
+><TD
+>(予約)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_RDV</TT
+>
+              </TD
+><TD
+>0x00001000</TD
+><TD
+>(予約)</TD
+><TD
+>(予約)</TD
+></TR
+><TR
+><TD
+>(<TT
+CLASS="literal"
+>TTW_CAL</TT
+> | <TT
+CLASS="literal"
+>TTW_RDV</TT
+>)</TD
+><TD
+>0x00001400</TD
+><TD
+>(予約)</TD
+><TD
+>(予約)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_MPF</TT
+>
+              </TD
+><TD
+>0x00002000</TD
+><TD
+><A
+HREF="memory_pool_management_functions.html#tk_get_mpf"
+>tk_get_mpf</A
+> による待ち</TD
+><TD
+>待ち対象の <CODE
+CLASS="varname"
+>mpfid</CODE
+></TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_MPL</TT
+>
+              </TD
+><TD
+>0x00004000</TD
+><TD
+><A
+HREF="memory_pool_management_functions.html#tk_get_mpl"
+>tk_get_mpl</A
+> による待ち</TD
+><TD
+>待ち対象の <CODE
+CLASS="varname"
+>mplid</CODE
+></TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_EV1</TT
+>
+              </TD
+><TD
+>0x00010000</TD
+><TD
+>タスクイベント#1待ち</TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_EV2</TT
+>
+              </TD
+><TD
+>0x00020000</TD
+><TD
+>タスクイベント#2待ち</TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_EV3</TT
+>
+              </TD
+><TD
+>0x00040000</TD
+><TD
+>タスクイベント#3待ち</TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_EV4</TT
+>
+              </TD
+><TD
+>0x00080000</TD
+><TD
+>タスクイベント#4待ち</TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_EV5</TT
+>
+              </TD
+><TD
+>0x00100000</TD
+><TD
+>タスクイベント#5待ち</TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_EV6</TT
+>
+              </TD
+><TD
+>0x00200000</TD
+><TD
+>タスクイベント#6待ち</TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_EV7</TT
+>
+              </TD
+><TD
+>0x00400000</TD
+><TD
+>タスクイベント#7待ち</TD
+><TD
+>0</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTW_EV8</TT
+>
+              </TD
+><TD
+>0x00800000</TD
+><TD
+>タスクイベント#8待ち</TD
+><TD
+>0</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+><CODE
+CLASS="varname"
+>tskstat</CODE
+> が <TT
+CLASS="literal"
+>TTS_WAI</TT
+> (<TT
+CLASS="literal"
+>TTS_WAS</TT
+> を含む) でない場合は、<CODE
+CLASS="varname"
+>tskwait</CODE
+>, <CODE
+CLASS="varname"
+>wid</CODE
+> はともに0となる。</P
+><P
+><CODE
+CLASS="varname"
+>waitmask</CODE
+> は、<CODE
+CLASS="varname"
+>tskwait</CODE
+> と同じビット並びとなる。</P
+><P
+><CODE
+CLASS="varname"
+>texmask</CODE
+> は、許可されている各タスク例外を1&#60;&#60;タスク例外コードのビット値として、論理和(OR)した値である。</P
+><P
+><CODE
+CLASS="varname"
+>tskevent</CODE
+> は、発生している各タスクイベントを1&#60;&#60;(タスクイベント番号-1)のビット値として論理和(OR)した値である。</P
+><P
+>休止状態(DORMANT)のタスクでは <CODE
+CLASS="varname"
+>wupcnt</CODE
+>=0, <CODE
+CLASS="varname"
+>suscnt</CODE
+>=0, <CODE
+CLASS="varname"
+>tskevent</CODE
+>=0 である。</P
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+>＝<TT
+CLASS="literal"
+>TSK_SELF</TT
+>＝0によって自タスクの指定を行うことができる。ただし、タスク独立部から発行したシステムコールで <CODE
+CLASS="varname"
+>tskid</CODE
+>＝<SPAN
+CLASS="errorname"
+>TSK_SELF</SPAN
+>＝0を指定した場合には、<SPAN
+CLASS="errorname"
+>E_ID</SPAN
+> のエラーとなる。</P
+><P
+><A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+> で、対象タスクが存在しない場合には、エラー <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> となる。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4050"
+>補足事項</A
+></H3
+><P
+>このシステムコールで <CODE
+CLASS="varname"
+>tskid</CODE
+>＝<TT
+CLASS="literal"
+>TSK_SELF</TT
+> を指定した場合でも、自タスクのIDは分からない。自タスクのIDを知りたい場合には、<A
+HREF="system_management_functions.html#tk_get_tid"
+>tk_get_tid</A
+> を利用する。</P
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="service_profile_definitions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="task_dependent_synchronization_functions.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>サービスプロファイル</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>タスク付属同期機能</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

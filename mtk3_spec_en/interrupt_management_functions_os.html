@@ -1,0 +1,1057 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Interrupt Management Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/OS Functions"
+HREF="utk_os_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Time Management Functions"
+HREF="time_management_functions.html"><LINK
+REL="NEXT"
+TITLE="System Management Functions"
+HREF="system_management_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="time_management_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/OS Functions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="system_management_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="interrupt_management_functions_os"
+>Interrupt Management Functions</A
+></H1
+><P
+>Interrupt management functions are for defining and manipulating handlers for external interrupts and CPU exceptions.</P
+><P
+>An interrupt handler runs as a task-independent portion. System calls can be invoked in a task-independent portion in the same way as in a task portion, but the following restriction applies to system call issuing in a task-independent portion.<P
+></P
+><UL
+><LI
+><P
+>A system call that implicitly specifies the invoking task, or one that may put the invoking task in WAITING state cannot be issued. Error code <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+> is returned in such cases.</P
+></LI
+></UL
+></P
+><P
+>During task-independent portion execution, task switching (dispatching) does not occur. If system call processing results in a dispatch request, the dispatch is delayed until processing leaves the task-independent portion. This is called delayed dispatching.</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_def_int"
+>tk_def_int - Define Interrupt Handler</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16751"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN16753"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_def_int</CODE
+>(UINT intno, CONST T_DINT *pk_dint);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16762"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16764"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>intno</CODE
+>
+              </TD
+><TD
+>Interrupt Number</TD
+><TD
+>Interrupt number</TD
+></TR
+><TR
+><TD
+>CONST T_DINT*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_dint</CODE
+>
+              </TD
+><TD
+>Packet to Define Interrupt Handler</TD
+><TD
+>Interrupt handler definition information</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_dint</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16785"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>intatr</CODE
+>
+              </TD
+><TD
+>Interrupt Handler Attribute</TD
+><TD
+>Interrupt handler attribute</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>inthdr</CODE
+>
+              </TD
+><TD
+>Interrupt Handler Address</TD
+><TD
+>Interrupt handler address</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16806"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16808"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16821"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16823"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>Insufficient memory (memory for control block cannot be allocated)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>Reserved attribute (<CODE
+CLASS="varname"
+>intatr</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>intno</CODE
+>, <CODE
+CLASS="varname"
+>pk_dint</CODE
+>, or <CODE
+CLASS="varname"
+>inthdr</CODE
+> is invalid or cannot be used)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16848"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16850"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16865"
+>Related Service Profile Items</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16867"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_ASM</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_ASM</TT
+> for interrupt handler attribute</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16877"
+>Description</A
+></H3
+><P
+>"Interrupts" include both external interrupts from devices and interrupts due to CPU exceptions.</P
+><P
+>Defines an interrupt handler for the interrupt number <CODE
+CLASS="varname"
+>intno</CODE
+> to enable use of the interrupt handler. This system call maps the interrupt number specified by <CODE
+CLASS="varname"
+>intno</CODE
+> to the address and attributes of the interrupt handler.</P
+><P
+><CODE
+CLASS="varname"
+>intno</CODE
+> is the number used to distinguish different interrupts. Its specific meaning is defined for each implementation, but generally the interrupt number used by the interrupt mechanism of the CPU hardware (such as IRQ number) is used as it is, or any number that can be mapped to such number is used.</P
+><P
+><CODE
+CLASS="varname"
+>intatr</CODE
+> indicates system attributes in its lower bits and implementation-dependent attributes in its higher bits. The system attribute part of <CODE
+CLASS="varname"
+>intatr</CODE
+> is specified as follows.</P
+><PRE
+CLASS="synopsis"
+>&#13;intatr := (TA_ASM || TA_HLNG)
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16889"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_ASM</TT
+>
+              </TD
+><TD
+>The handler is written in assembly language</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_HLNG</TT
+>
+              </TD
+><TD
+>The handler is written in high-level language</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><PRE
+CLASS="programlisting"
+>&#13;#define TA_ASM          0x00000000      /* assembly language program */
+#define TA_HLNG         0x00000001      /* high-level language program */
+</PRE
+><P
+>As a rule, the kernel is not involved in the starting of a <TT
+CLASS="literal"
+>TA_ASM</TT
+> attribute interrupt handler. When an interrupt is raised, the interrupt handling function in the CPU hardware directly starts the interrupt handler defined by this system call (depending on the implementation, processing by program may be included). Accordingly, processing for saving and restoring registers used by the interrupt handler is necessary at the beginning and end of the interrupt handler. An interrupt handler is terminated by execution of the <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> system call or by the CPU interrupt return instruction (or an equivalent mechanism).</P
+><P
+>Support of a mechanism for return from an interrupt handler without using <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> and hence without kernel intervention is mandatory. Note that if <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> is not used, delayed dispatching does not need to be performed.</P
+><P
+>Support for return from an interrupt handler using <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> is also mandatory, and in this case delayed dispatching must be performed.</P
+><P
+>When the <TT
+CLASS="literal"
+>TA_HLNG</TT
+> attribute is specified, the interrupt handler is started via a high-level language support routine. The high-level language support routine takes care of saving and restoring register values. The interrupt handler terminates by a return from a C language function. The interrupt handler takes the following format when the <TT
+CLASS="literal"
+>TA_HLNG</TT
+> attribute is specified.</P
+><PRE
+CLASS="programlisting"
+>&#13;void inthdr( UINT intno )
+{
+        /*
+                Interrupt Handling
+        */
+
+        return; /* Exit interrupt handler */
+}
+</PRE
+><P
+>The parameter <CODE
+CLASS="varname"
+>intno</CODE
+> passed to an interrupt handler is the interrupt number identifying the interrupt that was raised, and is the same as that specified with <A
+HREF="interrupt_management_functions_os.html#tk_def_int"
+>tk_def_int</A
+>. Depending on the implementation, other information about the interrupt may be passed in addition to <CODE
+CLASS="varname"
+>intno</CODE
+>. If such information is used, it must be defined for each implementation in the second parameter or subsequent parameters passed to the interrupt handler.</P
+><P
+>If the <TT
+CLASS="literal"
+>TA_HLNG</TT
+> attribute is specified, it is assumed that the CPU interrupt flag will be set to interrupts disabled state from the time the interrupt is raised until the interrupt handler is called. In other words, as soon as an interrupt is raised, multiple interrupts are disabled, and this state remains when the interrupt handler is called. If multiple interrupts are to be allowed, the interrupt handler must include processing that handles multiple interrupts by manipulating the CPU interrupt flag.</P
+><P
+>Also in the case of the <TT
+CLASS="literal"
+>TA_HLNG</TT
+> attribute, upon entry into the interrupt handler, issuing system call must be possible. Note, however, that assuming standard provision of the functionality described above, extensions are allowed such as adding a function for entering an interrupt handler with multiple interrupts enabled.</P
+><P
+>When the <TT
+CLASS="literal"
+>TA_ASM</TT
+> attribute is specified, the state upon entry into the interrupt handler shall be defined for each implementation. Such matters as the stack and register status upon interrupt handler entry, whether system calls can be made, the method of invoking system calls, and the method of returning from the interrupt handler without kernel intervention must all be defined explicitly.</P
+><P
+>In the case of the <TT
+CLASS="literal"
+>TA_ASM</TT
+> attribute, depending on the implementation there may be cases where interrupt handler execution is not considered to be a task-independent portion. In such a case the following points need to be noted carefully.</P
+><P
+></P
+><UL
+><LI
+><P
+>If interrupts are enabled, there is a possibility that task dispatching will occur.</P
+></LI
+><LI
+><P
+>When a system call is invoked, it will be processed as having been called from a task portion or quasi-task portion.</P
+></LI
+></UL
+><P
+>If a method is provided for performing some kind of operation in an interrupt handler to detected whether it runs as task-independent portion, that method shall be announced for each implementation.</P
+><P
+>Even if a system call is invoked from an interrupt handler and this causes the task in RUNNING state up to that time to go to another state, with a different task going to RUNNING state, dispatching (task switching) does not occur while the interrupt handler is running. Completion of execution of the interrupt handler has precedence even if dispatching is necessary; only when the interrupt handler terminates does the dispatch take place. In other words, a dispatch request that is generated while an interrupt handler is running is not processed immediately, but is delayed until the interrupt handler terminates. This is called delayed dispatching.</P
+><P
+>An interrupt handler runs as a task-independent portion. As such, it is not possible to call in an interrupt handler a system call that can enter WAITING state, or one that is intended for the invoking task.</P
+><P
+>When <CODE
+CLASS="varname"
+>pk_dint</CODE
+> = <TT
+CLASS="literal"
+>NULL</TT
+> is set, a previously defined interrupt handler is canceled. When the handler definitions are canceled, the default handler defined by the system is used.</P
+><P
+>It is possible to redefine an interrupt handler for an interrupt number for which a handler is already defined. It is not necessary first to cancel the definition for that number. Defining a new handler for a <CODE
+CLASS="varname"
+>intno</CODE
+> already having an interrupt handler defined does not return error.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16940"
+>Additional Notes</A
+></H3
+><P
+>The various specifications governing the <TT
+CLASS="literal"
+>TA_ASM</TT
+> attribute are mainly concerned with realizing an interrupt hook. For example, when an exception is raised due to illegal address access, ordinarily an interrupt handler defined in a higher-level program detects this and performs the error processing; but in the case of debugging, in place of error processing by a higher-level program, the default interrupt handler defined by the system may perform the processing and starts a debugger. In this case, the interrupt handler defined by high-level program hooks the default interrupt handler defined by the system. And, according to the situation, the handler either passes the interrupt handling to a system program such as a debugger, or it just processes it for itself.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ret_int"
+>tk_ret_int - Return from Interrupt Handler</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16946"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN16948"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void tk_ret_int</CODE
+>(void);</CODE
+></P
+><P
+></P
+></DIV
+><P
+>Although this system call is defined in the form of a C language interface, it will not be called in this format if a high-level language support routine is used.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16955"
+>Parameter</A
+></H3
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16958"
+>Return Parameter</A
+></H3
+><P
+>Does not return to the context issuing the system call.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16961"
+>Error Codes</A
+></H3
+><P
+>The following kind of error may be detected, but no return is made to the context issuing the system call even if the error is detected. For this reason the error code cannot be passed directly as a system call return parameter. The behavior in case an error occurs is implementation-dependent.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16964"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from other than an interrupt handler (implementation-dependent error))</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16973"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16975"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>NO</TD
+><TD
+ALIGN="center"
+>NO</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16990"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16993"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_ASM</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_ASM</TT
+> for interrupt handler attribute</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17003"
+>Description</A
+></H3
+><P
+>Exits from an interrupt handler.</P
+><P
+>System calls invoked from an interrupt handler do not result in dispatching while the handler is running; instead, the dispatching is delayed until <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> is called ending the interrupt handler processing(delayed dispatching). Accordingly, <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> results in the processing of all dispatch requests made while the interrupt handler was running.</P
+><P
+><A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> is invoked only if the interrupt handler was defined specifying the <TT
+CLASS="literal"
+>TA_ASM</TT
+> attribute. In the case of a <TT
+CLASS="literal"
+>TA_HLNG</TT
+> attribute interrupt handler, the functionality equivalent to <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> is executed implicitly in the high-level language support routine, so <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> is not (must not be) called explicitly.</P
+><P
+>As a rule, the kernel is not involved in the starting of a <TT
+CLASS="literal"
+>TA_ASM</TT
+> attribute interrupt handler. When an interrupt is raised, the defined interrupt handler is started directly by the CPU hardware interrupt processing function. The saving and restoring of registers used by the interrupt handler must therefore be taken care of in the interrupt handler.</P
+><P
+>For the same reason, the stack and register states at the time <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> is issued must be the same as those at the time of entry into the interrupt handler. Because of this, in some cases function codes cannot be used in <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+>, in which case <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> can be implemented using a trap instruction of another vector separate from that used for other system calls.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17021"
+>Additional Notes</A
+></H3
+><P
+><A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> is a system call that does not return to the context from which it was called. Even if an error code is returned when an error of some kind is detected, normally no error checking is performed in the context from which the system call was invoked, leaving the possibility that the program will hang. For this reason these system calls do not return even if error is detected.</P
+><P
+>Using an assembly language return-from-interrupt instruction instead of <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> to exit the interrupt handler is possible if it is clear no dispatching will take place on return from the handler (the same task is guaranteed to continue executing), or if there is no need for dispatching to take place.</P
+><P
+>Depending on the CPU architecture and method of implementing the kernel, it may be possible to perform delayed dispatching even when an interrupt handler exits using an assembly language return-from-interrupt instruction. In such cases, it is permissible for the assembly language return-from-interrupt instruction to be interpreted as if it were a <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> system call.</P
+><P
+>Performing of <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+> error checking when <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> is called from a time event handler is implementation-dependent. Depending on implementation, control may return from a different type of handler immediately.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="time_management_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="system_management_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Time Management Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>System Management Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

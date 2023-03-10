@@ -1,0 +1,551 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Common Rules of μT-Kernel</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="Service Profile"
+HREF="service_profile_overview.html"><LINK
+REL="NEXT"
+TITLE="System Calls"
+HREF="system_calls.html"></HEAD
+><BODY
+CLASS="chapter"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="service_profile_overview.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="system_calls.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="chapter"
+><H1
+><A
+NAME="common_utk"
+></A
+>Common Rules of μT-Kernel</H1
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="data_types"
+>Data Types</A
+></H1
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="general_data_types"
+>General Data Types</A
+></H2
+><PRE
+CLASS="programlisting"
+>&#13;typedef signed char          B;     /* signed 8-bit integer */
+typedef signed short         H;     /* signed 16-bit integer */
+typedef signed long          W;     /* signed 32-bit integer */
+typedef signed long long     D;     /* signed 64-bit integer */
+typedef unsigned char       UB;     /* unsigned 8-bit integer */
+typedef unsigned short      UH;     /* unsigned 16-bit integer */
+typedef unsigned long       UW;     /* unsigned 32-bit integer */
+typedef unsigned long long  UD;     /* unsigned 64-bit integer */
+
+typedef char                VB;     /* 8-bit data without an intended type */
+typedef short               VH;     /* 16-bit data without an intended type */
+typedef long                VW;     /* 32-bit data without an intended type */
+typedef long long           VD;     /* 64-bit data without an intended type */
+
+typedef volatile B          _B;     /* volatile declaration */
+typedef volatile H          _H;
+typedef volatile W          _W;
+typedef volatile D          _D;
+typedef volatile UB         _UB;
+typedef volatile UH         _UH;
+typedef volatile UW         _UW;
+typedef volatile UD         _UD;
+
+typedef signed int          INT;    /* signed integer of processor bit width */
+typedef unsigned int        UINT;   /* unsigned integer of processor bit width */
+
+typedef INT                 SZ;     /* Generic SiZe */
+
+typedef INT                 ID;     /* general ID */
+typedef W                   MSEC;   /* general time (in milliseconds) */
+
+typedef void            (*FP)();    /* general function address */
+typedef INT             (*FUNCP)(); /* general function address */
+
+#define LOCAL           static      /* local symbol definition */
+#define EXPORT                      /* global symbol definition */
+#define IMPORT          extern      /* global symbol reference */
+
+/*
+ * Boolean values
+ *      TRUE = 1 is defined, but any value other than 0 is logically TRUE.
+ *      Do NOT use as in if ( bool == TRUE )
+ *      use as in if ( bool )
+ */
+typedef UINT            BOOL;
+#define TRUE            1           /* true */
+#define FALSE           0           /* false */
+
+</PRE
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+></P
+><UL
+><LI
+><P
+>VB, VH, VW, and VD differ from B, H, W, and D in that the former mean only the bit width is known, not the contents of the data type, whereas the latter clearly indicate integer type.</P
+></LI
+><LI
+><P
+>SZ type is an integer data type with implementation-defined bit width, and it shall be properly defined based on the CPU bit width and memory space size for each implementation.</P
+></LI
+><LI
+><P
+>BOOL defines <TT
+CLASS="literal"
+>TRUE</TT
+> as 1, but any value other than 0 is also true. For this reason, <TT
+CLASS="literal"
+>TRUE</TT
+> must not be used as left-hand or right-hand value of comparison operators (== and !=) for deciding whether the value is true or false. That is, conditional operations like "<FONT
+COLOR="RED"
+>if (boolean value == TRUE)</FONT
+>" should be avoided, and instead use boolean value directly as condition, like "<FONT
+COLOR="RED"
+>if (boolean value)</FONT
+>".</P
+></LI
+></UL
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Related Service Profile Items</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>The 64-bit data types, D, UD, and VD, are guaranteed to be usable when the following service profile item is set to be effective.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN1403"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_HAS_DOUBLEWORD</TT
+>
+                  </TD
+><TD
+>Support of 64-bit data types (D, UD, VD)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Additional Notes</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Parameters such as <CODE
+CLASS="varname"
+>stksz</CODE
+>, <CODE
+CLASS="varname"
+>wupcnt</CODE
+>, and message size that clearly do not take negative values are also in principle signed integer (INT or W) data type. This is in keeping with the overall TRON project rule that integers should be treated as signed numbers as much as possible. As for the timeout (TMO <CODE
+CLASS="varname"
+>tmout</CODE
+>) parameter, its being a signed integer enables the use of <TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1) having special meaning. Parameters with unsigned data type are those treated as bit patterns (object attribute, event flag, etc.)</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="other_defined_data_types"
+>Other Defined Data Types</A
+></H2
+><P
+>The following names are used for other data types that appear frequently or have special meaning, in order to make The parameter meaning clear.</P
+><PRE
+CLASS="programlisting"
+>&#13;typedef INT             FN;             /* Function Codes */
+typedef UW              ATR;            /* Object/handler attributes */
+typedef INT             ER;             /* Error Code */
+typedef INT             PRI;            /* Priority */
+typedef W               TMO;            /* Timeout specification in milliseconds */
+typedef D               TMO_U;          /* Timeout specification in microseconds with 64-bit integer */
+typedef UW              RELTIM;         /* Relative time in milliseconds */
+typedef UD              RELTIM_U;       /* Relative time in microseconds with 64-bit integer */
+
+typedef struct systim {                 /* System time in milliseconds */
+        W       hi;                     /* High 32 bits */
+        UW      lo;                     /* Low 32 bits */
+} SYSTIM;
+
+typedef D               SYSTIM_U;       /* System time in microseconds with 64-bit integer */
+
+/*
+ * Common constants
+ */
+#define NULL            0               /* Null pointer */
+#define TA_NULL         0               /* No special attributes indicated */
+#define TMO_POL         0               /* Polling */
+#define TMO_FEVR        (-1)            /* Eternal wait */
+</PRE
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+></P
+><UL
+><LI
+><P
+>A data type that combines two or more data types is represented by its main data type. For example, the value returned by <A
+HREF="utk_os_functions.html#tk_cre_tsk"
+>tk_cre_tsk</A
+> can be a task ID or error code, but since it is mainly a task ID, the data type is ID.</P
+></LI
+></UL
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Related Service Profile Items</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>TMO_U, RELTIM_U, and SYSTEM_U dealing with date and relative time in microsecond resolution are guaranteed to be usable only when the following service profile items are set to be effective.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN1431"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>Support of microsecond</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Additional Notes</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>The policy is to append "_u" (u means μ) or "_U" at the end for parameters and data types representing microsecond (μsec), or append "_d" (d means double integer) or "_D" at the end for other parameters and data types representing 64-bit integer. TMO_U, RELTIM_U, and SYSTIM_U are data type names complying to this policy.</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="service_profile_overview.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="system_calls.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Service Profile</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>System Calls</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,256 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Protection Levels</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel Concepts"
+HREF="concepts_underlying_utk.html"><LINK
+REL="PREVIOUS"
+TITLE="Objects"
+HREF="objects.html"><LINK
+REL="NEXT"
+TITLE="Service Profile"
+HREF="service_profile_overview.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="objects.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel Concepts</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="service_profile_overview.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="protection_levels"
+>Protection Levels</A
+></H1
+><P
+>In μT-Kernel, four levels from 0 to 3 (meaning privileged mode, user mode, etc.) are defined as the protection level at runtime, and also four levels from 0 to 3 are defined as the protection level of memory to be accessed. The currently running execution task can access only to the memory with the same or lower protection level. This function is useful for protecting a system such as the OS from being illegally accessed by programs.</P
+><P
+>The uses of each protection level are as follows.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN1325"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+ALIGN="left"
+>Protection Levels</TH
+><TH
+ALIGN="left"
+>Usage</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>0</TD
+><TD
+>Kernel, subsystems, device drivers, etc.</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>System application tasks</TD
+></TR
+><TR
+><TD
+>2</TD
+><TD
+>(reserved)</TD
+></TR
+><TR
+><TD
+>3</TD
+><TD
+>User application tasks</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>Some CPUs support only two protection levels privileged (supervisor mode) and user levels. In such a case protection level 0 is assigned to the privileged level and protection level 3 to the user level. In such a case if protection levels from 0 to 2 are specified in an API the behavior of the system is the same as in the case of privileged level 0 being specified. For example if <TT
+CLASS="literal"
+>TA_RNG2</TT
+> is specified in <CODE
+CLASS="varname"
+>tskatr</CODE
+> when <A
+HREF="utk_os_functions.html#tk_cre_tsk"
+>tk_cre_tsk</A
+> is invoked it is assumed that <TT
+CLASS="literal"
+>TA_RNG0</TT
+> has been specified and the task executes at the privileged level (protection level 0). Another example is specifying <TT
+CLASS="literal"
+>TA_RNG2</TT
+> in <CODE
+CLASS="varname"
+>mplatr</CODE
+> when <A
+HREF="memory_pool_management_functions.html#tk_cre_mpl"
+>tk_cre_mpl</A
+> is invoked. This is assumed to specify <TT
+CLASS="literal"
+>TA_RNG0</TT
+> and the access protection level of the created memory pool is 0. In this case the service profile defines the following macros to be 0: <TT
+CLASS="literal"
+>TK_MEM_RNG0</TT
+>, <TT
+CLASS="literal"
+>TK_MEM_RNG1</TT
+>, <TT
+CLASS="literal"
+>TK_MEM_RNG2</TT
+>.</P
+><P
+>In the case of CPUs without any distinction for privileged and user modes only protection level 0 is used. In such a case if protection levels 1 to 3 are specified in an API the behavior of the system is the same as in the case of privileged level 0 being specified. In this case the service profile defines the following macros to be 0: <TT
+CLASS="literal"
+>TK_MEM_RNG0</TT
+>, <TT
+CLASS="literal"
+>TK_MEM_RNG1</TT
+>, <TT
+CLASS="literal"
+>TK_MEM_RNG2</TT
+>, <TT
+CLASS="literal"
+>TK_MEM_RNG3</TT
+>.</P
+><P
+>When a protection privilege level of the currently running context is lower than that of the memory being accessed the violation of memory access privilege shall be detected and a CPU exception shall be generated.</P
+><P
+>Changing from one protection level to another is accomplished by invoking a system call or extended SVC or by interrupt or CPU exception.</P
+><P
+>A non-task portion (task-independent portion, quasi-task portion, etc.) runs at protection level 0. Only a task portion can run at protection levels 1 to 3. A task portion can also run at protection level 0.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="objects.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="service_profile_overview.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Objects</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="concepts_underlying_utk.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Service Profile</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

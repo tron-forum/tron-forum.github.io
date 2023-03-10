@@ -1,0 +1,933 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>μT-Kernel/OS API索引</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="APIの記述形式"
+HREF="api_notation.html"><LINK
+REL="NEXT"
+TITLE="μT-Kernel/SM API索引"
+HREF="index_of_utk_sm_api.html"></HEAD
+><BODY
+CLASS="chapter"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="api_notation.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="index_of_utk_sm_api.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="chapter"
+><H1
+><A
+NAME="index_of_utk_os_api"
+></A
+>μT-Kernel/OS API索引</H1
+><P
+>この索引は、本仕様書で説明されるμT-Kernel/OS APIのアルファベット順索引である。</P
+><P
+></P
+><UL
+><LI
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_can_wup"
+>tk_can_wup</A
+> - タスクの起床要求を無効化</P
+></LI
+><LI
+><P
+><A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+> - タスク優先度変更</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_clr_flg"
+>tk_clr_flg</A
+> - イベントフラグのクリア</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_cre_alm"
+>tk_cre_alm</A
+> - アラームハンドラの生成</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_cre_cyc"
+>tk_cre_cyc</A
+> - 周期ハンドラの生成</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_cre_cyc_u"
+>tk_cre_cyc_u</A
+> - 周期ハンドラの生成(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_cre_flg"
+>tk_cre_flg</A
+> - イベントフラグ生成</P
+></LI
+><LI
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_cre_mbf"
+>tk_cre_mbf</A
+> - メッセージバッファ生成</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_cre_mbx"
+>tk_cre_mbx</A
+> - メールボックス生成</P
+></LI
+><LI
+><P
+><A
+HREF="memory_pool_management_functions.html#tk_cre_mpf"
+>tk_cre_mpf</A
+> - 固定長メモリプール生成</P
+></LI
+><LI
+><P
+><A
+HREF="memory_pool_management_functions.html#tk_cre_mpl"
+>tk_cre_mpl</A
+> - 可変長メモリプール生成</P
+></LI
+><LI
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_cre_mtx"
+>tk_cre_mtx</A
+> - ミューテックス生成</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_cre_sem"
+>tk_cre_sem</A
+> - セマフォ生成</P
+></LI
+><LI
+><P
+><A
+HREF="utk_os_functions.html#tk_cre_tsk"
+>tk_cre_tsk</A
+> - タスク生成</P
+></LI
+><LI
+><P
+><A
+HREF="interrupt_management_functions_os.html#tk_def_int"
+>tk_def_int</A
+> - 割込みハンドラ定義</P
+></LI
+><LI
+><P
+><A
+HREF="subsystem_management_functions.html#tk_def_ssy"
+>tk_def_ssy</A
+> - サブシステム定義</P
+></LI
+><LI
+><P
+><A
+HREF="task_exception_handling_functions.html#tk_def_tex"
+>tk_def_tex</A
+> - タスク例外ハンドラの定義</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_del_alm"
+>tk_del_alm</A
+> - アラームハンドラの削除</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_del_cyc"
+>tk_del_cyc</A
+> - 周期ハンドラの削除</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_del_flg"
+>tk_del_flg</A
+> - イベントフラグ削除</P
+></LI
+><LI
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_del_mbf"
+>tk_del_mbf</A
+> - メッセージバッファ削除</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_del_mbx"
+>tk_del_mbx</A
+> - メールボックス削除</P
+></LI
+><LI
+><P
+><A
+HREF="memory_pool_management_functions.html#tk_del_mpf"
+>tk_del_mpf</A
+> - 固定長メモリプール削除</P
+></LI
+><LI
+><P
+><A
+HREF="memory_pool_management_functions.html#tk_del_mpl"
+>tk_del_mpl</A
+> - 可変長メモリプール削除</P
+></LI
+><LI
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_del_mtx"
+>tk_del_mtx</A
+> - ミューテックス削除</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_del_sem"
+>tk_del_sem</A
+> - セマフォ削除</P
+></LI
+><LI
+><P
+><A
+HREF="utk_os_functions.html#tk_del_tsk"
+>tk_del_tsk</A
+> - タスク削除</P
+></LI
+><LI
+><P
+><A
+HREF="system_management_functions.html#tk_dis_dsp"
+>tk_dis_dsp</A
+> - ディスパッチ禁止</P
+></LI
+><LI
+><P
+><A
+HREF="task_exception_handling_functions.html#tk_dis_tex"
+>tk_dis_tex</A
+> - タスク例外の禁止</P
+></LI
+><LI
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> - タスク待ち状態の禁止</P
+></LI
+><LI
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk"
+>tk_dly_tsk</A
+> - タスク遅延</P
+></LI
+><LI
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk_u"
+>tk_dly_tsk_u</A
+> - タスク遅延(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="system_management_functions.html#tk_ena_dsp"
+>tk_ena_dsp</A
+> - ディスパッチ許可</P
+></LI
+><LI
+><P
+><A
+HREF="task_exception_handling_functions.html#tk_ena_tex"
+>tk_ena_tex</A
+> - タスク例外の許可</P
+></LI
+><LI
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_ena_wai"
+>tk_ena_wai</A
+> - タスク待ち禁止の解除</P
+></LI
+><LI
+><P
+><A
+HREF="task_exception_handling_functions.html#tk_end_tex"
+>tk_end_tex</A
+> - タスク例外ハンドラの終了</P
+></LI
+><LI
+><P
+><A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+> - イベント処理関数呼出</P
+></LI
+><LI
+><P
+><A
+HREF="utk_os_functions.html#tk_exd_tsk"
+>tk_exd_tsk</A
+> - 自タスクの終了と削除</P
+></LI
+><LI
+><P
+><A
+HREF="utk_os_functions.html#tk_ext_tsk"
+>tk_ext_tsk</A
+> - 自タスク終了</P
+></LI
+><LI
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_frsm_tsk"
+>tk_frsm_tsk</A
+> - 強制待ち状態のタスクを強制再開</P
+></LI
+><LI
+><P
+><A
+HREF="utk_os_functions.html#tk_get_cpr"
+>tk_get_cpr</A
+> - コプロセッサのレジスタの取得</P
+></LI
+><LI
+><P
+><A
+HREF="memory_pool_management_functions.html#tk_get_mpf"
+>tk_get_mpf</A
+> - 固定長メモリブロック獲得</P
+></LI
+><LI
+><P
+><A
+HREF="memory_pool_management_functions.html#tk_get_mpf_u"
+>tk_get_mpf_u</A
+> - 固定長メモリブロック獲得(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="memory_pool_management_functions.html#tk_get_mpl"
+>tk_get_mpl</A
+> - 可変長メモリブロック獲得</P
+></LI
+><LI
+><P
+><A
+HREF="memory_pool_management_functions.html#tk_get_mpl_u"
+>tk_get_mpl_u</A
+> - 可変長メモリブロック獲得(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_get_otm"
+>tk_get_otm</A
+> - システム稼働時間参照</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_get_otm_u"
+>tk_get_otm_u</A
+> - システム稼働時間参照(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="utk_os_functions.html#tk_get_reg"
+>tk_get_reg</A
+> - タスクレジスタの取得</P
+></LI
+><LI
+><P
+><A
+HREF="system_management_functions.html#tk_get_tid"
+>tk_get_tid</A
+> - 実行状態タスクのタスクID参照</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_get_tim"
+>tk_get_tim</A
+> - システム時刻参照(TRON表現)</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_get_tim_u"
+>tk_get_tim_u</A
+> - システム時刻参照(TRON表現、マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_get_utc"
+>tk_get_utc</A
+> - システム時刻参照</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_get_utc_u"
+>tk_get_utc_u</A
+> - システム時刻参照(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_loc_mtx"
+>tk_loc_mtx</A
+> - ミューテックスのロック</P
+></LI
+><LI
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_loc_mtx_u"
+>tk_loc_mtx_u</A
+> - ミューテックスのロック(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+> - タスク例外を発生</P
+></LI
+><LI
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+> - メッセージバッファから受信</P
+></LI
+><LI
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf_u"
+>tk_rcv_mbf_u</A
+> - メッセージバッファから受信(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+> - メールボックスから受信</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx_u"
+>tk_rcv_mbx_u</A
+> - メールボックスから受信(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_ref_alm"
+>tk_ref_alm</A
+> - アラームハンドラ状態参照</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_ref_alm_u"
+>tk_ref_alm_u</A
+> - アラームハンドラ状態参照(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_ref_cyc"
+>tk_ref_cyc</A
+> - 周期ハンドラ状態参照</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_ref_cyc_u"
+>tk_ref_cyc_u</A
+> - 周期ハンドラ状態参照(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_ref_flg"
+>tk_ref_flg</A
+> - イベントフラグ状態参照</P
+></LI
+><LI
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_ref_mbf"
+>tk_ref_mbf</A
+> - メッセージバッファ状態参照</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_ref_mbx"
+>tk_ref_mbx</A
+> - メールボックス状態参照</P
+></LI
+><LI
+><P
+><A
+HREF="memory_pool_management_functions.html#tk_ref_mpf"
+>tk_ref_mpf</A
+> - 固定長メモリプール状態参照</P
+></LI
+><LI
+><P
+><A
+HREF="memory_pool_management_functions.html#tk_ref_mpl"
+>tk_ref_mpl</A
+> - 可変長メモリプール状態参照</P
+></LI
+><LI
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_ref_mtx"
+>tk_ref_mtx</A
+> - ミューテックス状態参照</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_ref_sem"
+>tk_ref_sem</A
+> - セマフォ状態参照</P
+></LI
+><LI
+><P
+><A
+HREF="subsystem_management_functions.html#tk_ref_ssy"
+>tk_ref_ssy</A
+> - サブシステム定義情報の参照</P
+></LI
+><LI
+><P
+><A
+HREF="system_management_functions.html#tk_ref_sys"
+>tk_ref_sys</A
+> - システム状態参照</P
+></LI
+><LI
+><P
+><A
+HREF="task_exception_handling_functions.html#tk_ref_tex"
+>tk_ref_tex</A
+> - タスク例外の状態参照</P
+></LI
+><LI
+><P
+><A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+> - タスク状態参照</P
+></LI
+><LI
+><P
+><A
+HREF="system_management_functions.html#tk_ref_ver"
+>tk_ref_ver</A
+> - バージョン参照</P
+></LI
+><LI
+><P
+><A
+HREF="memory_pool_management_functions.html#tk_rel_mpf"
+>tk_rel_mpf</A
+> - 固定長メモリブロック返却</P
+></LI
+><LI
+><P
+><A
+HREF="memory_pool_management_functions.html#tk_rel_mpl"
+>tk_rel_mpl</A
+> - 可変長メモリブロック返却</P
+></LI
+><LI
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> - 他タスクの待ち状態解除</P
+></LI
+><LI
+><P
+><A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> - 割込みハンドラから復帰</P
+></LI
+><LI
+><P
+><A
+HREF="system_management_functions.html#tk_rot_rdq"
+>tk_rot_rdq</A
+> - タスクの優先順位の回転</P
+></LI
+><LI
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> - 強制待ち状態のタスクを再開</P
+></LI
+><LI
+><P
+><A
+HREF="utk_os_functions.html#tk_set_cpr"
+>tk_set_cpr</A
+> - コプロセッサのレジスタの設定</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+> - イベントフラグのセット</P
+></LI
+><LI
+><P
+><A
+HREF="system_management_functions.html#tk_set_pow"
+>tk_set_pow</A
+> - 省電力モード設定</P
+></LI
+><LI
+><P
+><A
+HREF="utk_os_functions.html#tk_set_reg"
+>tk_set_reg</A
+> - タスクレジスタの設定</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_set_tim"
+>tk_set_tim</A
+> - システム時刻設定(TRON表現)</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_set_tim_u"
+>tk_set_tim_u</A
+> - システム時刻設定(TRON表現、マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_set_utc"
+>tk_set_utc</A
+> - システム時刻設定</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_set_utc_u"
+>tk_set_utc_u</A
+> - システム時刻設定(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_sig_sem"
+>tk_sig_sem</A
+> - セマフォ資源返却</P
+></LI
+><LI
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_sig_tev"
+>tk_sig_tev</A
+> - タスクイベントの送信</P
+></LI
+><LI
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> - 自タスクを起床待ち状態へ移行</P
+></LI
+><LI
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk_u"
+>tk_slp_tsk_u</A
+> - 自タスクを起床待ち状態へ移行(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+> - メッセージバッファへ送信</P
+></LI
+><LI
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf_u"
+>tk_snd_mbf_u</A
+> - メッセージバッファへ送信(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_snd_mbx"
+>tk_snd_mbx</A
+> - メールボックスへ送信</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_sta_alm"
+>tk_sta_alm</A
+> - アラームハンドラの動作開始</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_sta_alm_u"
+>tk_sta_alm_u</A
+> - アラームハンドラの動作開始(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_sta_cyc"
+>tk_sta_cyc</A
+> - 周期ハンドラの動作開始</P
+></LI
+><LI
+><P
+><A
+HREF="utk_os_functions.html#tk_sta_tsk"
+>tk_sta_tsk</A
+> - タスク起動</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_stp_alm"
+>tk_stp_alm</A
+> - アラームハンドラの動作停止</P
+></LI
+><LI
+><P
+><A
+HREF="time_management_functions.html#tk_stp_cyc"
+>tk_stp_cyc</A
+> - 周期ハンドラの動作停止</P
+></LI
+><LI
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> - 他タスクを強制待ち状態へ移行</P
+></LI
+><LI
+><P
+><A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+> - 他タスク強制終了</P
+></LI
+><LI
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_unl_mtx"
+>tk_unl_mtx</A
+> - ミューテックスのアンロック</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> - イベントフラグ待ち</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg_u"
+>tk_wai_flg_u</A
+> - イベントフラグ待ち(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_wai_sem"
+>tk_wai_sem</A
+> - セマフォ資源獲得</P
+></LI
+><LI
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_wai_sem_u"
+>tk_wai_sem_u</A
+> - セマフォ資源獲得(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_wai_tev"
+>tk_wai_tev</A
+> - タスクイベント待ち</P
+></LI
+><LI
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_wai_tev_u"
+>tk_wai_tev_u</A
+> - タスクイベント待ち(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> - 他タスクの起床</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="api_notation.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="index_of_utk_sm_api.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>APIの記述形式</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>μT-Kernel/SM API索引</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

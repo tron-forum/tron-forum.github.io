@@ -1,0 +1,1952 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Subsystem Management Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/OS Functions"
+HREF="utk_os_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="System Management Functions"
+HREF="system_management_functions.html"><LINK
+REL="NEXT"
+TITLE="μT-Kernel/SM Functions"
+HREF="utk_sm_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="system_management_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/OS Functions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="utk_sm_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="subsystem_management_functions"
+>Subsystem Management Functions</A
+></H1
+><P
+>Subsystem management functions extends the functions of μT-Kernel itself by adding a user-defined function called "subsystem" to the kernel in order to implement middleware and others running on the μT-Kernel. Some functions provided by μT-Kernel/SM are also implemented by utilizing the subsystem management functions.</P
+><P
+>A subsystem consists of extended SVC handlers to execute user-defined system calls (called "extended SVCs"), a break function that performs the required processing when any exception occurs, and an event handling function that performs the required processing when any event is raised from devices, etc. (<A
+HREF="subsystem_management_functions.html#figure_subsystem_management_functions"
+>Figure 10</A
+>)</P
+><DIV
+CLASS="figure"
+><A
+NAME="figure_subsystem_management_functions"
+></A
+><P
+><B
+>Figure 10. μT-Kernel Subsystems</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_37s.png"></P
+></DIV
+></DIV
+><P
+>The extended SVC handler directly accepts requests from applications and others. A break function and event processing function are so-called callback type functions and accept requests from the kernel.</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Additional Notes</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Generally speaking, upper layer middleware including the process management functions and the file management functions are also implemented by utilizing the subsystem management functions. Other examples of middleware that are implemented by utilizing the subsystem management functions include TCP/IP manager, USB manager, and PC card manager.</P
+><P
+>Though subsystem management functions are meant to allow users to add custom system calls (SVC: SuperVisor Calls) as the primary purpose, they can be used to build complex and advanced middleware through not only the addition of just user-defined system calls but also through provision of exception processing functions to handle the exceptions, which are required for the added system calls.</P
+><P
+>In addition to the subsystem management functions, μT-Kernel also provides the device driver functions in order to extend itself. Both subsystems and device drivers are function modules independent from μT-Kernel itself. They can be used by loading their corresponding binary programs and then calling them from a task on μT-Kernel. Both run at the protection level 0. While API is limited to using open/close and read/write type when calling a device driver, API for calling a subsystem can be defined without any restriction.</P
+><P
+>Subsystems are identified by subsystem IDs (<CODE
+CLASS="varname"
+>ssid</CODE
+>), more than one subsystem can be defined and used at the same time. One subsystem can be called and used from within another subsystem.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_def_ssy"
+>tk_def_ssy - Define Subsystem</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17933"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN17935"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_def_ssy</CODE
+>(ID ssid, CONST T_DSSY *pk_dssy);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17944"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17946"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ssid</CODE
+>
+              </TD
+><TD
+>Subsystem ID</TD
+><TD
+>Subsystem ID</TD
+></TR
+><TR
+><TD
+>CONST T_DSSY*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_dssy</CODE
+>
+              </TD
+><TD
+>Packet to Define Subsystem</TD
+><TD
+>Subsystem definition information</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_dssy</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17967"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ssyatr</CODE
+>
+              </TD
+><TD
+>Subsystem Attributes</TD
+><TD
+>Subsystem attributes</TD
+></TR
+><TR
+><TD
+>PRI</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ssypri</CODE
+>
+              </TD
+><TD
+>Subsystem Priority</TD
+><TD
+>Subsystem priority</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>svchdr</CODE
+>
+              </TD
+><TD
+>Extended SVC Handler Address</TD
+><TD
+>Extended SVC handler address</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>breakfn</CODE
+>
+              </TD
+><TD
+>Break Function Address</TD
+><TD
+>Break function address</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>eventfn</CODE
+>
+              </TD
+><TD
+>Event Handling Function Address</TD
+><TD
+>Event handling function address</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18006"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18008"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18021"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18023"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>ssid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>Insufficient memory (memory for control block cannot be allocated)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>Reserved attribute (<CODE
+CLASS="varname"
+>ssyatr</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>pk_dssy</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>ssid</CODE
+> is already defined (when <CODE
+CLASS="varname"
+>pk_dssy</CODE
+> ≠ <TT
+CLASS="literal"
+>NULL</TT
+>)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>ssid</CODE
+> is not defined (when <CODE
+CLASS="varname"
+>pk_dssy</CODE
+> = <TT
+CLASS="literal"
+>NULL</TT
+>)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18065"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18067"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18082"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18085"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_SUBSYSTEM</TT
+>
+              </TD
+><TD
+>Support of subsystem management functions</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>When the service profile items below is set to be effective, subsystem priority (<CODE
+CLASS="varname"
+>ssypri</CODE
+>) can be specified.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18096"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_SSYEVENT</TT
+>
+              </TD
+><TD
+>Support of event processing of subsystems</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>Only when the service profile items below are set to be effective, break function can be specified.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18106"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+              </TD
+><TD
+>Support of task exception handling functions</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18115"
+>Description</A
+></H3
+><P
+>Defines subsystem specified in <CODE
+CLASS="varname"
+>ssid</CODE
+>.</P
+><P
+>One subsystem ID must be assigned to one subsystem without overlapping with other subsystems. The kernel does not have a function for assigning subsystem IDs automatically.</P
+><P
+>Subsystem IDs 1 to 9 are reserved for μT-Kernel use. 10 to 255 are numbers used by middleware, etc. The maximum usable subsystem ID value is implementation-dependent and may be lower than 255 in some implementations.</P
+><P
+><CODE
+CLASS="varname"
+>ssyatr</CODE
+> indicates system attributes in its lower bits and implementation-dependent attributes in its higher bits. The system attribute in <CODE
+CLASS="varname"
+>ssyatr</CODE
+> are not assigned in this version, and no system attributes are used.</P
+><P
+><CODE
+CLASS="varname"
+>ssypri</CODE
+> indicates the subsystem priority. The startup function, cleanup function, and event handling function are called in order of priority. The calling order is undefined when these subsystems have the same priority. Subsystem priority 1 is the highest priority, with larger numbers indicating lower priorities. The range of priorities that can be specified is implementation-dependent, but it must be possible to assign at least priorities 1 to 16.</P
+><P
+><TT
+CLASS="literal"
+>NULL</TT
+> can be specified in <CODE
+CLASS="varname"
+>breakfn</CODE
+> and <CODE
+CLASS="varname"
+>eventfn</CODE
+>, in which case the corresponding function will not be called.</P
+><P
+>Specifying <CODE
+CLASS="varname"
+>pk_dssy</CODE
+> = <TT
+CLASS="literal"
+>NULL</TT
+> deletes a subsystem definition.</P
+><P
+></P
+><UL
+><LI
+><P
+>Extended SVC handler</P
+><P
+>An extended SVC handler accepts requests from applications and other programs as an application programming interface (API) for a subsystem. It can be called in the same way as an ordinary system call, and is normally invoked using a trap instruction or the like.</P
+><P
+>The format of an extended SVC handler is as follows.</P
+><PRE
+CLASS="programlisting"
+>&#13;INT svchdr( void *pk_para, FN fncd )
+{
+        /*
+                branching by fncd
+        */
+
+        return retcode; /* exit extended SVC handler */
+}
+</PRE
+><P
+><CODE
+CLASS="varname"
+>fncd</CODE
+> is a function code. The lower 8 bits of the instruction code are the subsystem ID. The remaining higher bits can be used in any way by the subsystem. Ordinarily they are used as a function code inside the subsystem. A function code must be a positive value, so the most significant bit is always 0.</P
+><P
+><CODE
+CLASS="varname"
+>pk_para</CODE
+> points to a packet of parameters passed to this system call. The packet format can be decided by the subsystem. Generally a format like the stack passed to a C language function is used, which in many cases is the same format as a C language structure.</P
+><P
+>The return code passed from an extended SVC handler is passed to the caller transparently as the function return code. As a rule, negative values are error codes and 0 or positive values are the return code for normal completion. If an extended SVC call fails for some reason, the error code (negative value) set by T-Kernel is returned to the caller without invoking the extended SVC handler, so it is best to avoid confusion with these values.</P
+><P
+>The format by which an extended SVC is called is dependent on the kernel implementation. As a subsystem API, however, it must be specified in a C language function format independent of the kernel implementation. The subsystem must provide an interface library for converting from the C language function format to the kernel-dependent extended SVC calling format.</P
+><P
+>An extended SVC handler runs as a quasi-task portion.</P
+><P
+>It can be called from a task-independent portion, and in this case the extended SVC handler also runs as a task-independent portion.</P
+></LI
+><LI
+><P
+>Break function</P
+><P
+>A break function is a function called when a task exception is raised for a task while an extended SVC handler is executing.</P
+><P
+>When a break function is called, the processing by the extended SVC handler running at the time the task exception was raised must be stopped promptly and control must be returned from the extended SVC handler to its caller. The role of a break function is to abort the processing of the currently running extended SVC handler.</P
+><P
+>The format of a break function is as follows.</P
+><PRE
+CLASS="programlisting"
+>&#13;void breakfn( ID tskid )
+{
+        /*
+                stop the running extended SVC handler
+        */
+}
+</PRE
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> is the ID of the task in which the task exception was raised.</P
+><P
+>A break function is called when a task exception is raised by <A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+>. If extended SVC handler calls are nested, then when the nesting level of the extended SVC handler is decreased by the return from the latest extended SVC handler, the break function corresponding to the former extended SVC handler to which the control will be returned next, is called.</P
+><P
+>A break function is called only once for one extended SVC handler per one task exception.</P
+><P
+>If another nested extended SVC call is made while a task exception is raised, no break function is called for the called extended SVC handler.</P
+><P
+>A break function runs as a quasi-task portion. Its requesting task is identified as follows: If a break function is called by <A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+>, it runs as a quasi-task portion of the task that issued <A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+>. On the other hand, when the nesting level of extended SVC handler is decreased, the break function runs as a quasi-task portion of the task that raised the task exception (the task running the extended SVC handler). This means that the task executing the break function may be different from the task executing the extended SVC handler. In such a case, the break function and extended SVC handler run concurrently as controlled by task scheduling.</P
+><P
+>It is thus conceivable that the extended SVC handler will return to its caller before the break function finished executing, but in that case the extended SVC handler waits at the point right before returning, until the break function completes. How this waiting state maps to the task state transitions is implementation-dependent, but preferably it should remain in READY state (a READY state that does not go to RUNNING state). The precedence of a task may change while it is waiting for a break function to complete, but how task precedence is treated is implementation-dependent.</P
+><P
+>Similarly, an extended SVC handler cannot call an extended SVC until break function execution completes.</P
+><P
+>In other words, during the time from the raising of a task interrupt until the break function completes, the affected task must stay in the extended SVC handler that was executing at the time of the task exception.</P
+><P
+>In the case where the requesting task of the break function differs from that of the extended SVC handler, that is, where the break function and the extended SVC handler run in different task contexts, the task priority of the break function is raised to the same as that of the extended SVC handler only while the break handler is executing if the former is lower than the latter. On the other hand, if the break function task priority is the same as or higher than that of the extended SVC handler, the priority does not change. The priority that gets changed is the current priority; the base priority stays the same.</P
+><P
+>The change in priority occurs only immediately before entry into the break function; any changes after that of the extended SVC handler task priority are not followed by further changes in priority of the break function task. In no case does a change in the break function priority while a break function is running results in a priority change in the extended SVC handler task. At the same time, there is no restriction on priority changes due to a running break function.</P
+><P
+>When the break function completes, the current priority of its task reverts to base priority. If a mutex was locked, however, the priority reverts to that as adjusted by the mutex. (In other words, the ability is provided to adjust the current priority at the entry and exit of the break function only; other than that, the priority is the same as when an ordinary task is running.)</P
+></LI
+><LI
+><P
+>Event handling function</P
+><P
+>An event handling function is called by issuing the <A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+> system call.</P
+><P
+>It processes various requests made to a subsystem.</P
+><P
+>Note that it has to process all requests for all subsystems. If processing is not required, it can simply return <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+> without performing any operation.</P
+><P
+>The format of an event handling function is as follows.</P
+><PRE
+CLASS="programlisting"
+>&#13;ER eventfn( INT evttyp, INT info )
+{
+        /*
+                event processing
+        */
+
+        return ercd;
+}
+</PRE
+><P
+><CODE
+CLASS="varname"
+>evttyp</CODE
+> indicates the request type and <CODE
+CLASS="varname"
+>info</CODE
+> is a parameter that can be used freely. These parameters are specified in <A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+>.</P
+><P
+>If processing completes normally, <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+> is passed in the return code; otherwise an error code (negative value) is returned.</P
+><P
+>The following event types <CODE
+CLASS="varname"
+>evttyp</CODE
+> are defined. For more details, see <A
+HREF="device_management_functions.html"
+>the Section called <I
+>Device Management Functions</I
+> in the Chapter called <I
+>μT-Kernel/SM Functions</I
+></A
+>.</P
+><PRE
+CLASS="programlisting"
+>&#13;#define TSEVT_SUSPEND_BEGIN     1       /* before suspending device */
+#define TSEVT_SUSPEND_DONE      2       /* after suspending device */
+#define TSEVT_RESUME_BEGIN      3       /* before resuming device */
+#define TSEVT_RESUME_DONE       4       /* after resuming device */
+#define TSEVT_DEVICE_REGIST     5       /* device registration notice */
+#define TSEVT_DEVICE_DELETE     6       /* device deletion notice */
+</PRE
+><P
+>An event handling function runs as a quasi-task portion of the task that issued <A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+>.</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18189"
+>Additional Notes</A
+></H3
+><P
+>Extended SVC handlers as well as break functions and event handling functions all have the equivalent of the <TT
+CLASS="literal"
+>TA_HLNG</TT
+> attribute only. There is no means of specifying the <TT
+CLASS="literal"
+>TA_ASM</TT
+> attribute.</P
+><P
+>It is possible to issue a system call that enters WAITING state in the extended SVC handler, but in that case the program must be designed so that it can be stopped by calling a break function. The specific processing flow is as follows: If <A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+> is issued for the caller task while an extended SVC handler is executing, it is necessary to stop the running extended SVC handler as soon as possible and return a stop error to the caller task. For this purpose the break function is used. In order to stop the running extended SVC handler immediately, the break function must forcibly release the WAITING state, even if the system call is in WAITING state during processing the extended SVC handler. For this purpose, the <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> system call is generally used. <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> can prevent the system call from entering WAITING state until the control returns from the extended SVC handler to the caller task, but the implementor should also make it possible to stop the program of the extended SVC handler by calling a break function. For example, leaving from WAITING state with the error code <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+> can mean that the execution is stopped by a break function. So it is best to stop the extended SVC handler immediately and return a stop error to the caller task, without continuing to execute the subsequent processing.</P
+><P
+>An extended SVC handler may be called concurrently by multiple tasks. If the tasks share same resources, the mutual exclusion control must be performed in the extended SVC handler.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18200"
+>Porting Guideline</A
+></H3
+><P
+>Note that, in an environment where INT data type is 16 bits, part of function code that can be used for subsystem function code is only 7 bits wide (0-127), and care must be taken.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_evt_ssy"
+>tk_evt_ssy - Call Event Function</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18205"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN18207"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_evt_ssy</CODE
+>(ID ssid, INT evttyp, ID resid, INT info);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18220"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18222"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ssid</CODE
+>
+              </TD
+><TD
+>Subsystem ID</TD
+><TD
+>Subsystem ID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>evttyp</CODE
+>
+              </TD
+><TD
+>Event Type</TD
+><TD
+>Event request type</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>info</CODE
+>
+              </TD
+><TD
+>Information</TD
+><TD
+>Any parameter</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18247"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18249"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18262"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18264"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>ssid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the subsystem specified in <CODE
+CLASS="varname"
+>ssid</CODE
+> is not defined)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+><TR
+><TD
+>Other</TD
+><TD
+>Error code returned by the event handling function</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18290"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18292"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18307"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18310"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_SUBSYSTEM</TT
+>
+              </TD
+><TD
+>Support of subsystem management functions</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_SSYEVENT</TT
+>
+              </TD
+><TD
+>Support of event processing of subsystems</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18323"
+>Description</A
+></H3
+><P
+>Calls the event handling function of the subsystem specified in <CODE
+CLASS="varname"
+>ssid</CODE
+>.</P
+><P
+>Specifying <CODE
+CLASS="varname"
+>ssid</CODE
+> = 0 makes the system call applied to all currently defined subsystems. In this case the event handling function of each subsystem is called in sequence.</P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>When <CODE
+CLASS="varname"
+>evttyp</CODE
+> is an odd number:</DT
+><DD
+><P
+>Calls subsystems in descending order of priority.</P
+></DD
+><DT
+>When <CODE
+CLASS="varname"
+>evttyp</CODE
+> is an even number:</DT
+><DD
+><P
+>Calls subsystems in ascending order of priority.</P
+></DD
+></DL
+></DIV
+><P
+>The calling order is undefined wheren these subsystems have the same priority.</P
+><P
+>If this system call is issued for a subsystem with no event handling function defined, the function is simply not called; no error results.</P
+><P
+>If the event handling function returns an error, the error code is passed transparently in the system call return code. When <CODE
+CLASS="varname"
+>ssid</CODE
+> = 0 and an event handler returns an error, the event handling functions of all other subsystems continue to be called. In the system call return code, only one error code is returned even if more than one event handling function returned an error. It is not possible to know which subsystem's event handling function returned the error.</P
+><P
+>If a task exception is raised for the task that called <A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+>, during the execution of event handling function, the task exception is held until the event handling function completes its processing.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18346"
+>Additional Notes</A
+></H3
+><P
+>An example of using an event handling function is to perform the suspend/resume processing for the power management functions. Specifically, when the system enters the power-off state (device suspended state) due to power failure or other reason, it notifies each subsystem of its transition to suspended state. Then the event handling function of each subsystem is called to perform the appropriate processing for it. In μT-Kernel/SM, <A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+> is executed for this purpose during the processing of <A
+HREF="device_management_functions.html#tk_sus_dev"
+>tk_sus_dev</A
+>. The event handling function of each subsystem performs any necessary operations before going to suspended state, such as saving the data. On the other hand, when the system returns (resumes) from the suspended state due to power on or other reason, it notifies each subsystem of its return from suspended state. Then the event handling function of each subsystem is called again to perform the appropriate processing for it. For more details, see the description of <A
+HREF="device_management_functions.html#tk_sus_dev"
+>tk_sus_dev</A
+>.</P
+><P
+>For another example, when a new device is registered by <A
+HREF="device_management_functions.html#tk_def_dev"
+>tk_def_dev</A
+>, the system notifies each subsystem of the registration, and the event handling function of each subsystem is called to perform the appropriate processing for it. In μT-Kernel/SM, <A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+> is executed for this purpose during the processing of <A
+HREF="device_management_functions.html#tk_def_dev"
+>tk_def_dev</A
+>.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18356"
+>Porting Guideline</A
+></H3
+><P
+>Note that <CODE
+CLASS="varname"
+>info</CODE
+> is INT type, and its value range is implementation-dependent, so care must be taken.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ref_ssy"
+>tk_ref_ssy - Reference Subsystem Status</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18362"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN18364"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_ssy</CODE
+>(ID ssid, T_RSSY *pk_rssy);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18373"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18375"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="9%"
+TITLE="c1"><COL
+WIDTH="18%"
+TITLE="c2"><COL
+WIDTH="36%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ssid</CODE
+>
+              </TD
+><TD
+>Subsystem ID</TD
+><TD
+>Subsystem ID</TD
+></TR
+><TR
+><TD
+>T_RSSY*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rssy</CODE
+>
+              </TD
+><TD
+>Packet to Return Subsystem Status</TD
+><TD
+>Pointer to the area to return the subsystem definition information</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18394"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18396"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="9%"><COL
+WIDTH="18%"><COL
+WIDTH="36%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rssy</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18411"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="9%"
+TITLE="c1"><COL
+WIDTH="18%"
+TITLE="c2"><COL
+WIDTH="36%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>PRI</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ssypri</CODE
+>
+              </TD
+><TD
+>Subsystem Priority</TD
+><TD
+>Subsystem priority</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18426"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18428"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>ssid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the subsystem specified in <CODE
+CLASS="varname"
+>ssid</CODE
+> is not defined)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (invalid <CODE
+CLASS="varname"
+>pk_rssy</CODE
+>)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18452"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18454"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18469"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18472"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_SUBSYSTEM</TT
+>
+              </TD
+><TD
+>Support of subsystem management functions</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>When the service profile items below is set to be effective, subsystem priority (<CODE
+CLASS="varname"
+>ssypri</CODE
+>) can be acquired.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18483"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_SSYEVENT</TT
+>
+              </TD
+><TD
+>Support of event processing of subsystems</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18492"
+>Description</A
+></H3
+><P
+>References information about the subsystem specified in <CODE
+CLASS="varname"
+>ssid</CODE
+>.</P
+><P
+><CODE
+CLASS="varname"
+>ssypri</CODE
+> returns the subsystem priority specified in <A
+HREF="subsystem_management_functions.html#tk_def_ssy"
+>tk_def_ssy</A
+>.</P
+><P
+>If the subsystem specified in <CODE
+CLASS="varname"
+>ssid</CODE
+> is not defined, <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> is returned.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="system_management_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="utk_sm_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>System Management Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>μT-Kernel/SM Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,2552 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Physical Timer Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/SM Functions"
+HREF="utk_sm_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Memory Cache Control Functions"
+HREF="memory_cache_control_functions.html"><LINK
+REL="NEXT"
+TITLE="Utility Functions"
+HREF="utility_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="memory_cache_control_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/SM Functions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="utility_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="physical_timer_functions"
+>Physical Timer Functions</A
+></H1
+><P
+>Physical timer functions are useful in the system equipped with more than one hardware timer when processing should be performed based on smaller unit of elapsed time than the timer interrupt interval (<TT
+CLASS="literal"
+>TTimPeriod</TT
+>).</P
+><P
+>A physical timer means a hardware counter that is monotonically incremented by one from 0 at a constant time interval. When a count value reaches a certain value (upper limit) specified for each physical timer, the handler (physical timer handler) specified for each physical timer is started and the count value is reset to 0.</P
+><P
+>More than one physical timer can be used depending on the number of hardware timers available in the system. The number of available physical timers is implementation-dependent. In the usual μT-Kernel implementation, one hardware timer is used to realize the time management functions. Therefore it is assumed that remaining hardware timers are used for the physical timers.</P
+><P
+>Positive integer of ascending order like 1, 2, ... is used as a physical timer number. For example, when there are four hardware timers, as one of them is used for the μT-Kernel time management functions, remaining three hardware timers are available with physical timer numbers assigned as 1, 2, and 3, respectively.</P
+><P
+>μT-Kernel/SM physical timer functions do not manage coordination between an individual physical timer and tasks that use the timer. If more than one task share one physical timer, coordination like mutual exclusion control must be performed on the application side.</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Additional Notes</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>For the μT-Kernel time management functions, the kernel starts alarm handler or cyclic handler, processes timeout, and processes these requests, all in the handler that is started on the time interval specified by "timer interrupt interval" (<TT
+CLASS="literal"
+>TTimPeriod</TT
+>) in <A
+HREF="system_configuration_information_management_functions.html#standard_system_configuration_information"
+>the Section called <I
+>Standard System Configuration Information</I
+></A
+>. On the other hand, the physical timer functions only standardize the primitive functions such as setting a hardware timer, reading a count value, and triggering interrupt. They do not handle simultaneous multiple requests like the time management functions do. Based on this observation, the physical timer functions carry the name of "physical timer" since they have lower abstraction level than conventional time management functions, and are closer to hardware layer.</P
+><P
+>Due to the above positioning, the physical timer functions are made to be as simple as possible and limited to a small specification, and are assumed to be realized by library functions which have small overhead. This policy is reflected in the specification of using the statically fixed physical timer numbers rather than dynamical ID numbers, and the specification of never performing the management of mapping with the requesting task or the requests from more than one task.</P
+><P
+>Physical timer functions standardize APIs that operate the timer (counter) device. However, the timer devices have direct relation with time related behaviors such as calling interrupt handler based on a small elapsed time, making such devises more closely connected with the kernel than other devices (storage and communication). For this reason, the physical timer is provided as more generic function by standardizing its specification as a part of the μT-Kernel/SM instead of standardizing it as part of device driver specification.</P
+><P
+>Since the physical timer functions belong to the μT-Kernel/SM <A
+HREF="utk_sm_functions.html"
+>[Overall Note and Supplement]</A
+> is applicable.</P
+><P
+>Hardware timer counter used as a physical timer is assumed to be 32-bit or less. Therefore, 32-bit UW is used for the data type that represents the count values or upper limits. In the future, 64-bit functions can be added.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="use_case_of_physical_timer"
+>Use Case of Physical Timer</A
+></H2
+><P
+>Examples of effective use of physical timer functions are as follows:</P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>(a)Example of processing to be realized</DT
+><DD
+><P
+>Assume that there are a cyclic processing X to be run every 2,500 microseconds and a cyclic processing Y to be run every 1,800 microseconds. Physical timers can achieve this efficiently.</P
+></DD
+><DT
+>(b)Implementation with physical timer functions</DT
+><DD
+><P
+>Two physical timers are used, and one is set to start a physical timer handler every 2,500 microseconds.</P
+><P
+>For example, if the physical timer clock frequency is 10 MHz, as 1 clock corresponds to 0.1 microseconds (= 100 nanoseconds), set a physical timer upper limit (<CODE
+CLASS="varname"
+>limit</CODE
+>) to 24,999 (= 25,000 - 1) to make the physical timer handler start when the count value is changed from 24,999 to 0.</P
+><P
+>As this is a cyclic processing, <CODE
+CLASS="varname"
+>mode</CODE
+> of <A
+HREF="physical_timer_functions.html#StartPhysicalTimer"
+>StartPhysicalTimer</A
+> should be set to <TT
+CLASS="literal"
+>TA_CYC_PTMR</TT
+>.</P
+><P
+>Processing X is performed within this physical timer handler.</P
+><P
+>Similarly using another physical timer, the physical timer handler is set to start every 1,800 microseconds to perform the processing Y within this physical timer handler.</P
+><P
+>The timer interrupt interval (<TT
+CLASS="literal"
+>TTimPeriod</TT
+>) used by the μT-Kernel time management functions can be left at the default value (10 milliseconds) since it has no relationship with the physical timer functions. </P
+></DD
+><DT
+>(c)Implementation without physical timer functions</DT
+><DD
+><P
+>Instead of the physical timer handler, the μT-Kernel 3.0 system call (<A
+HREF="time_management_functions.html#tk_cre_cyc_u"
+>tk_cre_cyc_u</A
+>) that can specify time in microseconds is used to define the cyclic handler that is invoked every 2,500 microseconds to perform the processing X within this cyclic handler. Similarly using another physical timer, a physical timer handler is invoked every 1,800 microseconds to perform the processing Y within this physical timer handler. </P
+><P
+>However, in this case, the timer interrupt interval used by μT-Kernel Time Management Function must be set with small enough interval so that the time of every 2,500 microseconds and every 1,800 microseconds can be processed precisely. Specifically, both processing every 2,500 microseconds and processing every 1,800 microseconds can be achieved with almost exact timing by using the timer interrupt interval of 100 microseconds which is a common divisor of 2,500 microseconds and 1,800 microseconds. </P
+></DD
+></DL
+></DIV
+><P
+>With the method (b) which uses the physical timer functions, the timer interrupt interval can be left as the default value (every 10 milliseconds) since the μT-Kernel time management functions are not used. Interrupts by the physical timer will occur every 2,500 and 1,800 microseconds, from which the physical timer handler is called to perform the processing X and Processing Y. No unnecessary interrupt related to timer will occur other than these.</P
+><P
+>On the other hand, for the method of (c) which does not use a physical timer, because the timer interrupt interval must be shortened, the overhead increases accordingly as the number of timer interrupts increases. For example, when comparing (b) and (c) in terms of the number of timer related interrupts that occur in 10 milliseconds period, (b) will have a total interrupt number of 10; 1 (= 10 milliseconds/10 milliseconds) for time management functions, 4 (= 10 milliseconds/2,500 microseconds) as physical timer interrupt for processing X, and 5 (= 10 milliseconds/1,800 microseconds) as physical timer interrupt for processing Y. For (c), timer interrupt number is 100 (10 milliseconds/100 microseconds) for time management functions. This is a trade-off situation with the accuracy of time. The smaller timer interval may be required depending on the difference between cycles or phases of processing X and processing Y, resulting in even larger overhead. In these cases, the physical timer functions are clearly effective.</P
+><P
+>However, the physical timer functions are highly effective only when the number of processings that depend on time is small and statically fixed, and enough number of hardware timers exist for them. Because the physical timer functions are, as its name shows, subject to the constraints of physical hardware resources, physical timer functions cannot be used effectively when the number of hardware timers is too small. Additionally, it will experience difficulty with the case where the number of time-dependent processings dynamically increases. In these cases, using the conventional time management functions such as the cyclic handler and alarm handler will achieve more flexible handling.</P
+><P
+>Though the application area of physical timer functions and time management functions in microseconds may overlap, they have different characteristics shown above. Therefore, it is recommended to use appropriate one depending on the hardware configuration and applications. The physical timer functions have been added for this reason.</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="StartPhysicalTimer"
+>StartPhysicalTimer - Start Physical Timer</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26283"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN26285"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = StartPhysicalTimer</CODE
+>(UINT ptmrno, UW limit, UINT mode);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26296"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26298"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ptmrno</CODE
+>
+              </TD
+><TD
+>Physical Timer Number</TD
+><TD
+>Physical timer number</TD
+></TR
+><TR
+><TD
+>UW</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>limit</CODE
+>
+              </TD
+><TD
+>Limit</TD
+><TD
+>Upper limit</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mode</CODE
+>
+              </TD
+><TD
+>Mode</TD
+><TD
+>Operation mode</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26323"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26325"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26338"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26340"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>ptmrno</CODE
+>, <CODE
+CLASS="varname"
+>limit</CODE
+>, or <CODE
+CLASS="varname"
+>mode</CODE
+> is invalid or cannot be used)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26356"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26358"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26373"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26376"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_PTIMER</TT
+>
+              </TD
+><TD
+>Support of physical timer function</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>Additionally, the following service profile items are related to this API.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26386"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_MAX_PTIMER</TT
+>
+              </TD
+><TD
+>Maximum number of physical timers</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26395"
+>Description</A
+></H3
+><P
+>Sets the count value of the physical timer specified by <CODE
+CLASS="varname"
+>ptmrno</CODE
+> to 0, and then starts counting. After this function is executed, the count value is incremented by one at a constant time interval that is the inverse of the timer clock frequency.</P
+><P
+><CODE
+CLASS="varname"
+>limit</CODE
+> specifies the upper limit of the count value. When a time period equal to the inverse of the clock frequency has elapsed after the count value reaches the upper limit, the count value is reset to 0. At that timing, if a physical timer handler is defined for this physical timer, that handler will be started. The duration between when the counting is started by <A
+HREF="physical_timer_functions.html#StartPhysicalTimer"
+>StartPhysicalTimer</A
+> call and when the counter is reset to zero is (inverse of timer clock frequency) x (upper limit + 1).</P
+><P
+>If <CODE
+CLASS="varname"
+>limit</CODE
+> is set to 0, an <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> error will occur.</P
+><P
+><CODE
+CLASS="varname"
+>mode</CODE
+> specifies the following modes:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26407"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="14%"
+TITLE="c1"><COL
+WIDTH="29%"
+TITLE="c1"><COL
+WIDTH="57%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_ALM_PTMR</TT
+>
+              </TD
+><TD
+>0</TD
+><TD
+>The counting is stopped when the count value is reset to 0 from the upper limit value. Afterward, the count value remains as 0.</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_CYC_PTMR</TT
+>
+              </TD
+><TD
+>1</TD
+><TD
+>The count value starts to increase again, after it is reset to 0 from the upper limit value. Therefore, the cycle of increasing and resetting the count value repeats periodically.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="StopPhysicalTimer"
+>StopPhysicalTimer - Stop Physical Timer</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26425"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN26427"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = StopPhysicalTimer</CODE
+>(UINT ptmrno);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26434"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26436"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ptmrno</CODE
+>
+              </TD
+><TD
+>Physical Timer Number</TD
+><TD
+>Physical timer number</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26449"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26451"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26464"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26466"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>ptmrno</CODE
+> is invalid or cannot be used)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26480"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26482"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26497"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26500"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_PTIMER</TT
+>
+              </TD
+><TD
+>Support of physical timer function</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>Additionally, the following service profile items are related to this API.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26510"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_MAX_PTIMER</TT
+>
+              </TD
+><TD
+>Maximum number of physical timers</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26519"
+>Description</A
+></H3
+><P
+>Stops the counting operation of the physical timer specified by <CODE
+CLASS="varname"
+>ptmrno</CODE
+>.</P
+><P
+>After executing this function, the last count value of the physical timer is retained. Therefore, if <A
+HREF="physical_timer_functions.html#GetPhysicalTimerCount"
+>GetPhysicalTimerCount</A
+> is executed after this function is executed, that function will return the physical timer count value just before this function is executed.</P
+><P
+>Executing this function for the physical timer that has already stopped counting does nothing. It does not generate any error.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26526"
+>Additional Notes</A
+></H3
+><P
+>If the physical timer that is no longer used is kept running, it may not adversely affect the program operation, but clock signals will be used unnecessarily, which may not be desirable in terms of electric power saving. So, it is recommended to stop the physical timer no longer used by executing this function.</P
+><P
+>Use of this function is effective for the case <TT
+CLASS="literal"
+>TA_CYC_PTMR</TT
+> is specified for the physical timer and its use is ended.<A
+HREF="physical_timer_functions.html#StartPhysicalTimer"
+></A
+><CODE
+CLASS="varname"
+></CODE
+> If <TT
+CLASS="literal"
+>TA_ALM_PTMR</TT
+> is specified as the <CODE
+CLASS="varname"
+>mode</CODE
+>, the physical timer automatically stopped counting after the count value is reset to 0 from the upper limit value, which results in the same state as that after this function being executed. In this case, it is not necessary to issue this function additionally. Issuing this function does not cause any problem, but nothing is changed.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="GetPhysicalTimerCount"
+>GetPhysicalTimerCount - Get Physical Timer Count</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26537"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN26539"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = GetPhysicalTimerCount</CODE
+>(UINT ptmrno, UW *p_count);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26548"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26550"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ptmrno</CODE
+>
+              </TD
+><TD
+>Physical Timer Number</TD
+><TD
+>Physical timer number</TD
+></TR
+><TR
+><TD
+>UW*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>p_count</CODE
+>
+              </TD
+><TD
+>Pointer to Physical Timer Count</TD
+><TD
+>Pointer to the area to return the current physical timer count</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26569"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26571"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+><TR
+><TD
+>UW</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>count</CODE
+>
+              </TD
+><TD
+>Physical Timer Count</TD
+><TD
+>Current count value</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26590"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26592"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>ptmrno</CODE
+> is invalid or cannot be used)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26606"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26608"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26623"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26626"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_PTIMER</TT
+>
+              </TD
+><TD
+>Support of physical timer function</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>Additionally, the following service profile items are related to this API.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26636"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_MAX_PTIMER</TT
+>
+              </TD
+><TD
+>Maximum number of physical timers</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26645"
+>Description</A
+></H3
+><P
+>Gets the current count value of the physical timer specified by <CODE
+CLASS="varname"
+>ptmrno</CODE
+>, and returns it as the return parameter <CODE
+CLASS="varname"
+>count</CODE
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="DefinePhysicalTimerHandler"
+>DefinePhysicalTimerHandler - Define Physical Timer Handler</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26652"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN26654"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = DefinePhysicalTimerHandler</CODE
+>(UINT ptmrno, CONST T_DPTMR *pk_dptmr);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26663"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26665"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ptmrno</CODE
+>
+              </TD
+><TD
+>Physical Timer Number</TD
+><TD
+>Physical timer number</TD
+></TR
+><TR
+><TD
+>CONST T_DPTMR*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_dptmr</CODE
+>
+              </TD
+><TD
+>Packet to Define Physical Timer Handler</TD
+><TD
+>Physical timer handler definition information</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_dptmr</CODE
+> Detail</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26686"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Extended information</TD
+></TR
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ptmratr</CODE
+>
+              </TD
+><TD
+>Physical Timer Attribute</TD
+><TD
+>Physical timer handler attribute (<TT
+CLASS="literal"
+>TA_ASM</TT
+> || <TT
+CLASS="literal"
+>TA_HLNG</TT
+>)</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ptmrhdr</CODE
+>
+              </TD
+><TD
+>Physical Timer Handler Address</TD
+><TD
+>Physical timer handler address</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26713"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26715"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26728"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26730"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>Insufficient memory (memory for control block cannot be allocated)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>Reserved attribute (<CODE
+CLASS="varname"
+>ptmratr</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>ptmrno</CODE
+>, <CODE
+CLASS="varname"
+>pk_dptmr</CODE
+>, or <CODE
+CLASS="varname"
+>ptmrhdr</CODE
+> is invalid or cannot be used, or the physical timer handler for <CODE
+CLASS="varname"
+>ptmrno</CODE
+> cannot be defined)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26756"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26758"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26773"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26776"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_PTIMER</TT
+>
+              </TD
+><TD
+>Support of physical timer function</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>Additionally, the following service profile items are related to this API.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26786"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_MAX_PTIMER</TT
+>
+              </TD
+><TD
+>Maximum number of physical timers</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26795"
+>Description</A
+></H3
+><P
+>If <CODE
+CLASS="varname"
+>pk_dptmr</CODE
+> is not <TT
+CLASS="literal"
+>NULL</TT
+>, this function defines the physical timer handler for the physical timer specified by <CODE
+CLASS="varname"
+>ptmrno</CODE
+>. The physical timer handler is a handler running as a task-independent portion, and is started when the physical timer count is reset to 0 from the upper limit value specified by <CODE
+CLASS="varname"
+>limit</CODE
+> of <A
+HREF="physical_timer_functions.html#StartPhysicalTimer"
+>StartPhysicalTimer</A
+>.</P
+><P
+>The programming format of physical timer handler is similar to that of cyclic handler or alarm handler. This means that if the <TT
+CLASS="literal"
+>TA_HLNG</TT
+> attribute is specified, the physical timer handler is started via a high-level language support routine and terminated by a return from the function. If the <TT
+CLASS="literal"
+>TA_ASM</TT
+> attribute is specified, the physical timer handler format is implementation-dependent. Regardless of which attribute is specified, <CODE
+CLASS="varname"
+>exinf</CODE
+> is passed as a startup parameter of physical timer handler.</P
+><P
+>If <CODE
+CLASS="varname"
+>pk_dptmr</CODE
+> is <TT
+CLASS="literal"
+>NULL</TT
+>, this function cancels the definition of the physical timer handler for the physical timer specified by <CODE
+CLASS="varname"
+>ptmrno</CODE
+>. The physical timer handlers for all the physical timers are undefined right after the system startup.</P
+><P
+>If the physical timer handler for the physical timer specified by <CODE
+CLASS="varname"
+>ptmrno</CODE
+> cannot be defined (if the <CODE
+CLASS="varname"
+>pk_rptmr</CODE
+>-&#62;<CODE
+CLASS="varname"
+>defhdr</CODE
+> in <A
+HREF="physical_timer_functions.html#GetPhysicalTimerConfig"
+>GetPhysicalTimerConfig</A
+> returns <TT
+CLASS="literal"
+>FALSE</TT
+>), the <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> error occurs. If the physical timer specified by <CODE
+CLASS="varname"
+>ptmrno</CODE
+> does not exist or cannot be used, the <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> error also occurs.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26820"
+>Additional Notes</A
+></H3
+><P
+>In a typical implementation, an interrupt handler to implement the function of physical timer is defined within μT-Kernel/SM, and is configured so that an interrupt to be raised when the physical timer counter value wraps around from the upper limit to zero. In this interrupt handler, the physical timer handler which is defined in this function is called as well as other processing for implementation of physical timer such as the support for <TT
+CLASS="literal"
+>TA_ALM_PTMR</TT
+> and <TT
+CLASS="literal"
+>TA_CYC_PTMR</TT
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="GetPhysicalTimerConfig"
+>GetPhysicalTimerConfig - Get Physical Timer Configuration Information</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26827"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN26829"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = GetPhysicalTimerConfig</CODE
+>(UINT ptmrno, T_RPTMR *pk_rptmr);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26838"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26840"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ptmrno</CODE
+>
+              </TD
+><TD
+>Physical Timer Number</TD
+><TD
+>Physical timer number</TD
+></TR
+><TR
+><TD
+>T_RPTMR*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rptmr</CODE
+>
+              </TD
+><TD
+>Packet to Return Physical Timer Configuration Information</TD
+><TD
+>Pointer to the area to return the configuration information of the physical timer</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26859"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26861"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rptmr</CODE
+> Detail</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26876"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UW</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ptmrclk</CODE
+>
+              </TD
+><TD
+>Physical Timer Clock Frequency</TD
+><TD
+>Physical timer clock frequency</TD
+></TR
+><TR
+><TD
+>UW</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>maxcount</CODE
+>
+              </TD
+><TD
+>Maximum Count</TD
+><TD
+>Maximum count value</TD
+></TR
+><TR
+><TD
+>BOOL</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>defhdr</CODE
+>
+              </TD
+><TD
+>Handler Support</TD
+><TD
+>Whether physical timer handler is supported or not</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26901"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26903"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>ptmrno</CODE
+> or <CODE
+CLASS="varname"
+>pk_rptmr</CODE
+> is invalid or cannot be used)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26918"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26920"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26935"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26938"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_PTIMER</TT
+>
+              </TD
+><TD
+>Support of physical timer function</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>Additionally, the following service profile items are related to this API.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26948"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_MAX_PTIMER</TT
+>
+              </TD
+><TD
+>Maximum number of physical timers</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26957"
+>Description</A
+></H3
+><P
+>Gets the configuration information of the physical timer specified by <CODE
+CLASS="varname"
+>ptmrno</CODE
+>.</P
+><P
+>The retrievable configuration information includes the physical timer clock frequency <CODE
+CLASS="varname"
+>ptmrclk</CODE
+>, the maximum count value <CODE
+CLASS="varname"
+>maxcount</CODE
+>, and whether the support for physical timer handler exists <CODE
+CLASS="varname"
+>defhdr</CODE
+>.</P
+><P
+><CODE
+CLASS="varname"
+>ptmrclk</CODE
+> indicates the clock frequency used to count up the target physical timer. If <CODE
+CLASS="varname"
+>ptmrclk</CODE
+> is set to 1, the clock is 1 Hz, and if it is set to MATH: 2<SUP
+>32</SUP
+> - 1, then the clock is MATH: 2<SUP
+>32</SUP
+> - 1 Hz (approximately 4 GHz). If the clock is long (less than 1 Hz), then <CODE
+CLASS="varname"
+>ptmrclk</CODE
+> is 0. If <CODE
+CLASS="varname"
+>ptmrclk</CODE
+> is other than 0, the physical timer count value is monotonically incremented by 1, from 0 to the upper limit value <CODE
+CLASS="varname"
+>limit</CODE
+>, at a constant time interval that is the inverse of <CODE
+CLASS="varname"
+>ptmrclk</CODE
+>.</P
+><P
+><CODE
+CLASS="varname"
+>maxcount</CODE
+> is the maximum value that can be counted by the target physical timer, and also the maximum value that can be set as the upper limit value. Generally, <CODE
+CLASS="varname"
+>maxcount</CODE
+> is MATH: 2<SUP
+>16</SUP
+> - 1 for a 16-bit timer counter, and MATH: 2<SUP
+>32</SUP
+> - 1 for a 32-bit timer counter, but it may be other value depending on the hardware or system configuration.<CODE
+CLASS="varname"
+></CODE
+></P
+><P
+>If <CODE
+CLASS="varname"
+>defhdr</CODE
+> is <TT
+CLASS="literal"
+>TRUE</TT
+>, the physical timer handler, which is started when the target physical timer count reaches the upper limit value, can be defined. If <CODE
+CLASS="varname"
+>defhdr</CODE
+> is <TT
+CLASS="literal"
+>FALSE</TT
+>, the physical timer handler for this physical timer cannot be defined.</P
+><P
+>If the physical timer specified by <CODE
+CLASS="varname"
+>ptmrno</CODE
+> does not exist or cannot be used, the <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> error occurs. For the physical timer number, a positive integer value is assigned in ascending order, so if the system has N physical timers, the <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> error occurs when <CODE
+CLASS="varname"
+>ptmrno</CODE
+> is 0 or larger than N.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26990"
+>Additional Notes</A
+></H3
+><P
+>As the substring "configuration" of this function name suggests, the values acquired by this function, <CODE
+CLASS="varname"
+>ptmrclk</CODE
+>, <CODE
+CLASS="varname"
+>maxcount</CODE
+>, and <CODE
+CLASS="varname"
+>defhdr</CODE
+> are assumed to be statically fixed by hardware or by the initialization done during the startup processing of the system, and are not expected to change during the subsequent execution of the system. Note, however, that there is a chance of adding dynamical reconfiguration feature to the core specification or implementation-defined feature: for example, changing the clock frequency of the physical timer. When such modifications are introduced, the information acquired by this function can be a value dynamically changed during the execution of the system. Such changes of use cases depend heavily on the operation methods or applications, and it was considered better to handle such differences in the upper library that use physical timer rather than in the base μT-Kernel specification. Hence, μT-Kernel specification does not define the possibility of dynamically changing nature of the configuration information acquired by this function. In a nutshell, whether the information acquired by this function may change during the execution of the system is implementation-dependent.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="memory_cache_control_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="utility_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Memory Cache Control Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_sm_functions.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Utility Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

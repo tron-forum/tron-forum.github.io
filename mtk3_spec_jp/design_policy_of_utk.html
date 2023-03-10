@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>μT-Kernel 3.0の設計方針</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel 3.0の概要"
+HREF="utk_overview.html"><LINK
+REL="PREVIOUS"
+TITLE="μT-Kernel 3.0の概要"
+HREF="utk_overview.html"><LINK
+REL="NEXT"
+TITLE="μT-Kernel 3.0の構成"
+HREF="utk_structure.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="utk_overview.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel 3.0の概要</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="utk_structure.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="design_policy_of_utk"
+>μT-Kernel 3.0の設計方針</A
+></H1
+><P
+>μT-Kernel 3.0は、IoTエッジノードの制御用に設計された、省資源の組込み制御用リアルタイムOSの標準仕様である。OSの機能やAPIの仕様の標準化によってソフトウェアの流通性や開発効率を高めつつ、16ビットを含むローエンドのシングルチップマイコン(MCU)やMMU(Memory Management Unit)を持たないマイコン、ROM/RAMの少ない小規模な組込みシステムでも高い性能を発揮できるように設計されている。また、デバイスドライバ管理機能、省電力機能などを備えており、IoTのネットワーク構築に必要となる多様な通信方法、多様なデバイスを組み込んだ省電力対応のシステムを構築できる。</P
+><P
+>μT-Kernel 3.0はリアルタイムOSの標準仕様であり、CPUのアーキテクチャに左右されることなく、いろいろなCPUに実装することが可能である。しかし、ごく小規模なIoTエッジノードなどを想定したハードウェアリソースの厳しいシステムでは、CPUやハードウェア構成に合わせて最大限の性能が発揮できるように、OSの実装を適応化した方がよい場合や、OSの提供する機能をある程度制限した方がよい場合もある。そこでμT-Kernel 3.0では、OSの実装を適応化する余地を残しながらも、ソフトウェアの互換性や移植性を維持するために、「サービスプロファイル」という仕様記述方法を導入している。「サービスプロファイル」の利用により、実装に依存した機能の有無や差異を形式的に記述することができ、OS上で動作するミドルウェアやアプリケーションにおいて、実装依存機能の差異を吸収することが可能となる。</P
+><P
+>μT-Kernel 3.0の仕様には、データタイプなどの共通規定、プログラムの並行実行の単位である「タスク」の状態遷移やスケジューリング方法、割込みハンドラなどの「非タスク部」の動作、OSの提供するAPIなどの仕様が含まれる。ファイル管理やネットワーク通信、プロセス管理などの機能はμT-Kernel 3.0には含まれていないが、ミドルウェアの追加により、これらの機能を備えた比較的大規模なシステムまでスケーラブルに対応できる。すなわち、μT-Kernel 3.0は、ファイル管理やネットワーク通信、プロセス管理などの機能を持った大規模なシステムのマイクロカーネルとして使用することができる。また、マルチコア・プロセッサに対応したシステムへの拡張も可能である。</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="utk_overview.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="utk_structure.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>μT-Kernel 3.0の概要</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_overview.html"
+ACCESSKEY="U"
+>上に戻る</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>μT-Kernel 3.0の構成</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

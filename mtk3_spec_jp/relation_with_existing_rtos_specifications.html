@@ -1,0 +1,362 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>既存のリアルタイムOS仕様との関係</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel 3.0の概要"
+HREF="utk_overview.html"><LINK
+REL="PREVIOUS"
+TITLE="実装仕様書"
+HREF="implementation_specification_of_utk.html"><LINK
+REL="NEXT"
+TITLE="μT-Kernelの概念"
+HREF="concepts_underlying_utk.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="implementation_specification_of_utk.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel 3.0の概要</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="concepts_underlying_utk.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="relation_with_existing_rtos_specifications"
+>既存のリアルタイムOS仕様との関係</A
+></H1
+><P
+>本節では、μT-Kernel 3.0の仕様と関係の深い既存のリアルタイムOS仕様との差異のうち、主なものを示す。</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="relation_with_utk2"
+>μT-Kernel 2.0との関係</A
+></H2
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>プロセス管理や仮想記憶を想定した機能の削除</P
+><P
+>μT-Kernel 3.0は、16ビットから32ビットのCPUを搭載した小規模な組込みシステムやIoTエッジノードを制御するリアルタイムOSである。プロセス管理や仮想記憶の機能を持つ情報系汎用OSのカーネルとして利用することは想定していない。このため、μT-Kernel 2.0が持っていたアドレス空間管理機能(アドレス空間設定、アドレス空間チェック、論理アドレス空間管理)やシステムメモリ割当ての機能は、μT-Kernel 3.0には含まれていない。また、<A
+HREF="subsystem_management_functions.html"
+>サブシステム管理機能</A
+>のうち、スタートアップ/クリーンアップ処理やリソースグループに関連する機能は、μT-Kernel 3.0には含まれていない。</P
+></LI
+><LI
+><P
+>システム時刻を扱うAPIの追加</P
+><P
+>μT-Kernel 3.0では、1970年1月1日0時0分0秒(UTC)をシステム時刻の起点とするAPIとして、<A
+HREF="time_management_functions.html#tk_set_utc"
+>tk_set_utc</A
+>, <A
+HREF="time_management_functions.html#tk_set_utc_u"
+>tk_set_utc_u</A
+>, <A
+HREF="time_management_functions.html#tk_get_utc"
+>tk_get_utc</A
+>, <A
+HREF="time_management_functions.html#tk_get_utc_u"
+>tk_get_utc_u</A
+>, <A
+HREF="utk_ds_functions.html#td_get_utc"
+>td_get_utc</A
+>, <A
+HREF="utk_ds_functions.html#td_get_utc_u"
+>td_get_utc_u</A
+>が追加されている。</P
+></LI
+><LI
+><P
+>ランデブ機能の削除</P
+><P
+>μT-Kernel 3.0では、T-Kernelの拡張同期・通信機能のひとつであったランデブ機能が削除されている。</P
+></LI
+></OL
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="relation_with_tk2"
+>T-Kernel 2.0との関係</A
+></H2
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>プロセス管理や仮想記憶を想定した機能の削除</P
+><P
+>μT-Kernel 3.0は、16ビットから32ビットのCPUを搭載した小規模な組込みシステムやIoTエッジノードを制御するリアルタイムOSである。プロセス管理や仮想記憶の機能を持つ情報系汎用OSのカーネルとして利用することは想定していない。このため、T-Kernelが持っていたアドレス空間管理機能(アドレス空間設定、アドレス空間チェック、論理アドレス空間管理)やシステムメモリ割当ての機能は、μT-Kernel 3.0には含まれていない。また、<A
+HREF="subsystem_management_functions.html"
+>サブシステム管理機能</A
+>のうち、スタートアップ/クリーンアップ処理やリソースグループに関連する機能は、μT-Kernel 3.0には含まれていない。</P
+></LI
+><LI
+><P
+>サービスプロファイルの導入</P
+><P
+>小規模な組込みシステムを対象としたμT-Kernelにおいて、最適化・適応化を行いやすい仕様としながらも、ミドルウェアやアプリケションの流通性・移植性を維持するための仕組みとして、μT-Kernelの実装依存性を記述するための仕組みを導入している。具体的な説明については、<A
+HREF="service_profile_overview.html"
+><I
+>サービスプロファイル</I
+>項<I
+>μT-Kernelの概念</I
+>章</A
+> を参照のこと。</P
+></LI
+><LI
+><P
+>ユーザバッファの指定</P
+><P
+>スタックやメモリプール等の内部メモリ領域を必要とするAPIにおいて、カーネル内でのメモリの自動割当てを行う代わりに、ユーザが指定したバッファ領域を利用する指定が可能である。一般には <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> の指定を行うことでユーザバッファの指定が有効となる。</P
+></LI
+><LI
+><P
+>16ビットCPUを想定した型の変更</P
+><P
+>μT-Kernelの対象には16ビットCPUも含まれており、INT型やUINT型で表現できる整数範囲が16ビット整数の範囲に限られる場合がある。このため、T-Kernel 2.0の一部のAPI引数や構造体メンバ等に対して、必要な値域を表現するのに十分なビット幅を持った整数型への置き換えを行なっている。</P
+></LI
+><LI
+><P
+>小規模組込みシステムを対象とした適応化</P
+><P
+>μT-Kernelは小規模な組込みシステムを対象としていることから、それにあわせた仕様の適応化を行なっている。例としては、タスク優先度の上限値についてより小さい値での実装を許容している点などが挙げられる。</P
+></LI
+><LI
+><P
+>割込み管理機能の整理と拡張</P
+><P
+>μT-Kernel 3.0では、T-Kernel 2.0の割込み管理機能をベースとした上で、それを整理・拡張した割込み管理機能を提供する。具体的には以下の点が異なったものとなっている。
+            <P
+></P
+><OL
+TYPE="a"
+><LI
+><P
+>割込みマスクレベルの設定・取得機能の追加</P
+><P
+>CPUまたは割込みコントローラの割込みマスクレベルを設定・取得するAPIとして、<A
+HREF="interrupt_management_functions_sm.html#SetCpuIntLevel"
+>SetCpuIntLevel</A
+>, <A
+HREF="interrupt_management_functions_sm.html#GetCpuIntLevel"
+>GetCpuIntLevel</A
+>, <A
+HREF="interrupt_management_functions_sm.html#SetCtrlIntLevel"
+>SetCtrlIntLevel</A
+>, <A
+HREF="interrupt_management_functions_sm.html#GetCtrlIntLevel"
+>GetCtrlIntLevel</A
+> を追加する。</P
+></LI
+><LI
+><P
+>割込みベクタ番号(INTVEC)の廃止</P
+><P
+>割込みに関する番号体系を単純化し分かりやすくするため、割込みベクタ番号(INTVEC)による指定を廃止した。T-Kernel 2.0においてINTVECを引数とするAPIについては、すべて <A
+HREF="interrupt_management_functions_os.html#tk_def_int"
+>tk_def_int</A
+> で利用される番号と共通の割込み番号を代わりに指定する。</P
+></LI
+></OL
+></P
+></LI
+><LI
+><P
+>システム時刻を扱うAPIの追加</P
+><P
+>μT-Kernel 3.0では、1970年1月1日0時0分0秒(UTC)をシステム時刻の起点とするAPIとして、<A
+HREF="time_management_functions.html#tk_set_utc"
+>tk_set_utc</A
+>, <A
+HREF="time_management_functions.html#tk_set_utc_u"
+>tk_set_utc_u</A
+>, <A
+HREF="time_management_functions.html#tk_get_utc"
+>tk_get_utc</A
+>, <A
+HREF="time_management_functions.html#tk_get_utc_u"
+>tk_get_utc_u</A
+>, <A
+HREF="utk_ds_functions.html#td_get_utc"
+>td_get_utc</A
+>, <A
+HREF="utk_ds_functions.html#td_get_utc_u"
+>td_get_utc_u</A
+>が追加されている。</P
+></LI
+><LI
+><P
+>ランデブ機能の削除</P
+><P
+>μT-Kernel 3.0では、T-Kernelの拡張同期・通信機能のひとつであったランデブ機能が削除されている。</P
+></LI
+></OL
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="relation_with_ieee2050"
+>IEEE 2050-2018との関係</A
+></H2
+><P
+>μT-Kernel 3.0の仕様は、IEEEがIoTエッジノード向けの標準OSとして仕様を定めた「IEEE 2050-2018」の仕様に対して、上位互換である。このため、μT-Kernel 3.0の仕様に準拠したOSであれば、そのままIEEE 2050-2018の仕様にも準拠したOSとなる。</P
+><P
+>逆に、IEEE 2050-2018の仕様は、μT-Kernel 3.0の仕様のサブセットとなっている。μT-Kernel 3.0の機能のうち、<A
+HREF="subsystem_management_functions.html"
+>サブシステム管理機能</A
+>と、μT-Kernel/DSで提供されるデバッガ用の機能(<A
+HREF="utk_ds_functions.html#kernel_internal_state_reference_functions"
+>カーネル内部状態取得機能</A
+>および<A
+HREF="trace_functions.html"
+>実行トレース機能</A
+>)については、IEEE 2050-2018の仕様には含まれない。また、DSオブジェクト名称(<CODE
+CLASS="varname"
+>dsname</CODE
+>)に関連する機能や、1985年1月1日0時0分0秒(GMT)を起点とするシステム時刻を扱うAPI(<A
+HREF="time_management_functions.html#tk_get_tim"
+>tk_get_tim</A
+>, <A
+HREF="time_management_functions.html#tk_get_tim_u"
+>tk_get_tim_u</A
+>, <A
+HREF="time_management_functions.html#tk_set_tim"
+>tk_set_tim</A
+>, <A
+HREF="time_management_functions.html#tk_set_tim_u"
+>tk_set_tim_u</A
+>)についても、IEEE 2050-2018の仕様には含まれない。</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="implementation_specification_of_utk.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="concepts_underlying_utk.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>実装仕様書</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_overview.html"
+ACCESSKEY="U"
+>上に戻る</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>μT-Kernelの概念</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

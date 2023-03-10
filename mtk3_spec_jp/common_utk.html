@@ -1,0 +1,551 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>μT-Kernel共通規定</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="サービスプロファイル"
+HREF="service_profile_overview.html"><LINK
+REL="NEXT"
+TITLE="システムコール"
+HREF="system_calls.html"></HEAD
+><BODY
+CLASS="chapter"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="service_profile_overview.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="system_calls.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="chapter"
+><H1
+><A
+NAME="common_utk"
+></A
+>μT-Kernel共通規定</H1
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="data_types"
+>データ型</A
+></H1
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="general_data_types"
+>汎用的なデータ型</A
+></H2
+><PRE
+CLASS="programlisting"
+>&#13;typedef signed char          B;     /* 符号付き  8ビット整数 */
+typedef signed short         H;     /* 符号付き 16ビット整数 */
+typedef signed long          W;     /* 符号付き 32ビット整数 */
+typedef signed long long     D;     /* 符号付き 64ビット整数 */
+typedef unsigned char       UB;     /* 符号無し  8ビット整数 */
+typedef unsigned short      UH;     /* 符号無し 16ビット整数 */
+typedef unsigned long       UW;     /* 符号無し 32ビット整数 */
+typedef unsigned long long  UD;     /* 符号無し 64ビット整数 */
+
+typedef char                VB;     /* 型が一定しない  8ビットのデータ */
+typedef short               VH;     /* 型が一定しない 16ビットのデータ */
+typedef long                VW;     /* 型が一定しない 32ビットのデータ */
+typedef long long           VD;     /* 型が一定しない 64ビットのデータ */
+
+typedef volatile B          _B;     /* volatile 宣言付 */
+typedef volatile H          _H;
+typedef volatile W          _W;
+typedef volatile D          _D;
+typedef volatile UB         _UB;
+typedef volatile UH         _UH;
+typedef volatile UW         _UW;
+typedef volatile UD         _UD;
+
+typedef signed int          INT;    /* プロセッサのビット幅の符号付き整数 */
+typedef unsigned int        UINT;   /* プロセッサのビット幅の符号無し整数 */
+
+typedef INT                 SZ;     /* サイズ一般 */
+
+typedef INT                 ID;     /* ID一般 */
+typedef W                   MSEC;   /* 時間一般(ミリ秒) */
+
+typedef void            (*FP)();    /* 関数アドレス一般 */
+typedef INT             (*FUNCP)(); /* 関数アドレス一般 */
+
+#define LOCAL           static      /* ローカルシンボル定義 */
+#define EXPORT                      /* グローバルシンボル定義 */
+#define IMPORT          extern      /* グローバルシンボル参照 */
+
+/*
+ * ブール値
+ *      TRUE = 1 と定義するが、0 以外はすべて真(TRUE)である。
+ *      したがって、if ( bool == TRUE ) の様な判定をしてはいけない。
+ *      if ( bool ) の様に判定すること。
+ */
+typedef UINT            BOOL;
+#define TRUE            1           /* 真 */
+#define FALSE           0           /* 偽 */
+
+</PRE
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+></P
+><UL
+><LI
+><P
+>VB, VH, VW, VDと B, H, W, Dとの違いは、前者はビット数のみが分かっており、データ型の中身が分からないものを表すのに対して、後者は整数を表すことがはっきりしているという点である。</P
+></LI
+><LI
+><P
+>SZは、実装依存のビット幅を持った整数型のデータタイプであり、CPUのビット幅やメモリ空間のサイズなどに応じて実装ごとに適切に定義される。</P
+></LI
+><LI
+><P
+>BOOLは、<TT
+CLASS="literal"
+>TRUE</TT
+> を1と定義するが、0以外はすべて真である。したがって、<TT
+CLASS="literal"
+>TRUE</TT
+> を比較演算子(== および !=)の左辺または右辺の値として用いて真偽の判定を行ってはいけない。すなわち、<FONT
+COLOR="RED"
+>if (ブール値 == TRUE)</FONT
+> の様な比較演算を行うべきではなく、ブール値を直接条件として用いて、たとえば <FONT
+COLOR="RED"
+>if (ブール値)</FONT
+> の様に判定を行うべきである。</P
+></LI
+></UL
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>関連するサービスプロファイル</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>64ビットの型 D, UD, VD は、以下のサービスプロファイルが有効に設定されている場合に限り利用可能であることが保証される。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN1414"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_HAS_DOUBLEWORD</TT
+>
+                  </TD
+><TD
+>64ビットデータ型(D, UD, VD)のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>補足事項</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+><CODE
+CLASS="varname"
+>stksz</CODE
+>, <CODE
+CLASS="varname"
+>wupcnt</CODE
+>, メッセージサイズなど、明らかに負の数にならないパラメータも、原則として符号付き整数(INTやW)のデータ型となっている。これは、整数はできるだけ符号付きの数として扱うというTRON全般のルールに基づいたものである。また、タイムアウト(TMO <CODE
+CLASS="varname"
+>tmout</CODE
+>)のパラメータでは、これが符号付きの整数であることを利用し、<TT
+CLASS="literal"
+>TMO_FEVR</TT
+>(＝ -1) を特殊な意味に使っている。符号無しのデータ型を持つパラメータは、ビットパターンとして扱われるもの(オブジェクト属性やイベントフラグなど)である。</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="other_defined_data_types"
+>意味が定義されているデータ型</A
+></H2
+><P
+>パラメータの意味を明確にするため、出現頻度の高いデータ型や特殊な意味を持つデータ型に対して、以下のような名称を使用する。</P
+><PRE
+CLASS="programlisting"
+>&#13;typedef INT             FN;             /* 機能コード */
+typedef UW              ATR;            /* オブジェクト/ハンドラ属性 */
+typedef INT             ER;             /* エラーコード */
+typedef INT             PRI;            /* 優先度 */
+typedef W               TMO;            /* ミリ秒単位のタイムアウト指定 */
+typedef D               TMO_U;          /* 64ビットでマイクロ秒単位のタイムアウト指定 */
+typedef UW              RELTIM;         /* ミリ秒単位の相対時間 */
+typedef UD              RELTIM_U;       /* 64ビットでマイクロ秒単位の相対時間 */
+
+typedef struct systim {                 /* ミリ秒単位のシステム時刻 */
+        W       hi;                     /* 上位32ビット */
+        UW      lo;                     /* 下位32ビット */
+} SYSTIM;
+
+typedef D               SYSTIM_U;       /* 64ビットでマイクロ秒単位のシステム時刻 */
+
+/*
+ * 共通定数
+ */
+#define NULL            0               /* 無効ポインタ */
+#define TA_NULL         0               /* 特別な属性を指定しない */
+#define TMO_POL         0               /* ポーリング */
+#define TMO_FEVR        (-1)            /* 永久待ち */
+</PRE
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+></P
+><UL
+><LI
+><P
+>複数のデータ型を複合したデータ型の場合は、その内の最も主となるデータ型で代表する。例えば、<A
+HREF="utk_os_functions.html#tk_cre_tsk"
+>tk_cre_tsk</A
+> の戻値はタスクIDかエラーコードであるが、主となるのはタスクIDなので、データ型はIDとなる。</P
+></LI
+></UL
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>関連するサービスプロファイル</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>マイクロ秒単位の時間および時刻に関連する型 TMO_U, RELTIM_U, SYSTIM_U は、以下のサービスプロファイルが有効に設定されている場合に限り利用可能であることが保証される。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN1442"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>マイクロ秒のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>補足事項</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>マイクロ秒(μsec)を意味するパラメータやデータタイプには最後に"_u"(uはμの意味) または"_U"を付け、それ以外の64ビット整数を意味するパラメータやデータタイプには最後に"_d"(dは double integer の意味)または"_D"を付ける方針としている。TMO_U, RELTIM_U, SYSTIM_Uはこの方針によるデータタイプ名である。</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="service_profile_overview.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="system_calls.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>サービスプロファイル</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>システムコール</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

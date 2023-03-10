@@ -1,0 +1,1857 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>実行トレース機能</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/DSの機能"
+HREF="utk_ds_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="μT-Kernel/DSの機能"
+HREF="utk_ds_functions.html"><LINK
+REL="NEXT"
+TITLE="付録"
+HREF="appendixes.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="utk_ds_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/DSの機能</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="appendixes.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="trace_functions"
+>実行トレース機能</A
+></H1
+><P
+>実行トレース機能は、デバッガがプログラムの実行をトレースするための機能である。実行トレースはフックルーチンを設定することによって行う。</P
+><P
+></P
+><UL
+><LI
+><P
+>フックルーチンでは、各種の状態をフックルーチンが呼び出された時点の状態に戻してから、フックルーチンから戻らなければならない。ただし、レジスタに関してはC言語の関数の保存規則にしたがって復帰すればよい。</P
+></LI
+><LI
+><P
+>フックルーチン内では、各種の状態を制限の緩い方へ変更してはいけない。例えば、割込み禁止状態で呼び出された場合は、割込みを許可してはいけない。</P
+></LI
+><LI
+><P
+>フックルーチンは、保護レベル0で呼び出される。</P
+></LI
+><LI
+><P
+>フックルーチンは、フックした時点のスタックをそのまま継承している。したがって、あまり多くスタックを消費するとスタックオーバーフローを引き起こす可能性がある。どの程度のスタックが使用可能であるかは、フックされた時点の状況により異なるため不確定である。フックルーチン内で独自スタックに切り替えれば、より安全である。</P
+></LI
+></UL
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="td_hok_svc"
+>td_hok_svc - システムコール・拡張SVCのフックルーチン定義</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33534"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN33536"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/dbgspt.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = td_hok_svc</CODE
+>(CONST TD_HSVC *hsvc);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33543"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33545"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST TD_HSVC*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>hsvc</CODE
+>
+              </TD
+><TD
+>SVC Hook Routine</TD
+><TD
+>フックルーチン定義情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>hsvc</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33560"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>enter</CODE
+>
+              </TD
+><TD
+>Hook Routine before Calling</TD
+><TD
+>呼出前のフックルーチン</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>leave</CODE
+>
+              </TD
+><TD
+>Hook Routine after Calling</TD
+><TD
+>呼出後のフックルーチン</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33579"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33581"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33594"
+>エラーコード</A
+></H3
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33597"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33599"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33614"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33617"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+              </TD
+><TD
+>μT-Kernel/DSのサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33626"
+>解説</A
+></H3
+><P
+>システムコールおよび拡張SVCの呼出前後に、フックルーチンを設定する。<CODE
+CLASS="varname"
+>hsvc</CODE
+> に <TT
+CLASS="literal"
+>NULL</TT
+> を指定することによりフックルーチンを解除する。</P
+><P
+>トレースの対象となるのは、μT-Kernel/OSのシステムコール(tk_～)、および拡張SVCである。ただし、実装によるが、一般に <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> はトレースの対象とならない。</P
+><P
+>μT-Kernel/DSのシステムコール(td_～)は、トレースの対象とならない。</P
+><P
+>フックルーチンは、フック対象となるシステムコールや拡張SVCを呼び出したタスクの準タスク部として実行される。そのため、例えばフックルーチン内での自タスクは、システムコールや拡張SVCを呼び出したタスクと同じである。</P
+><P
+>システムコール内でタスクディスパッチや割込みが起こる場合があるため、<CODE
+CLASS="function"
+>enter()</CODE
+> と <CODE
+CLASS="function"
+>leave()</CODE
+> が常にペアで連続して呼び出されるとは限らない。また、システムコールから戻らない場合は、<CODE
+CLASS="function"
+>leave()</CODE
+> は呼び出されない。</P
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN33639"
+></A
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void *enter</CODE
+>(FN fncd, TD_CALINF *calinf, 
+            ...
+          );</CODE
+></P
+><P
+></P
+></DIV
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33649"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FN</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>fncd</CODE
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>機能コード<P
+>＜0 システムコール</P
+>
+                <P
+>≧0 拡張SVC</P
+></TD
+></TR
+><TR
+><TD
+>TD_CALINF*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>calinf</CODE
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>呼出元情報</TD
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>...</CODE
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>パラメータ(可変個数)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33676"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+>戻値</TD
+><TD
+>&nbsp;</TD
+><TD
+><CODE
+CLASS="function"
+>leave()</CODE
+> に引き渡す任意の値</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><PRE
+CLASS="programlisting"
+>&#13;typedef struct td_calinf {
+      システムコール・拡張SVCの呼出元(アドレス)を特定するための情報で、
+      スタックのバックトレースを行うための情報が含まれることが望ましい。
+      内容は実装定義となる。
+      一般的には、スタックポインタやプログラムカウンタなどのレジスタの値である。
+} TD_CALINF;
+</PRE
+><P
+>システムコールまたは拡張SVCを呼び出す直前に呼び出される。</P
+><P
+>戻値に返された値は、そのまま対応する <CODE
+CLASS="function"
+>leave()</CODE
+> に渡される。これにより、<CODE
+CLASS="function"
+>enter()</CODE
+> と <CODE
+CLASS="function"
+>leave()</CODE
+> のペアの確認や任意の情報の受け渡しを行うことができる。</P
+><PRE
+CLASS="programlisting"
+>&#13;exinf = enter(fncd, &#38;calinf, ... )
+ret = システムコール・拡張SVCの実行
+leave(fncd , ret, exinf)
+</PRE
+><P
+></P
+><UL
+><LI
+><P
+>システムコールの場合</P
+><P
+>パラメータは、システムコールのパラメータと同じとなる。</P
+><DIV
+CLASS="example"
+><A
+NAME="AEN33699"
+></A
+><P
+><B
+>例 1. tk_wai_sem( ID semid, INT cnt, TMO tmout )の場合</B
+></P
+><PRE
+CLASS="programlisting"
+>&#13;enter(TFN_WAI_SEM, &#38;calinf, semid, cnt, tmout)
+</PRE
+></DIV
+></LI
+><LI
+><P
+>拡張SVCの場合</P
+><P
+>パラメータは、拡張SVCハンドラに渡されるパケットの状態となる。</P
+><P
+><CODE
+CLASS="varname"
+>fncd</CODE
+> も拡張SVCハンドラに渡されるものと同一である。</P
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN33707"
+></A
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>&#13;                enter
+              </CODE
+>(FN fncd, TD_CALINF *calinf, void *pk_para);</CODE
+></P
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void leave</CODE
+>(FN fncd, INT ret, void *exinf);</CODE
+></P
+><P
+></P
+></DIV
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33726"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FN</TD
+><TD
+>&#13;                    <CODE
+CLASS="varname"
+>fncd</CODE
+>
+                  </TD
+><TD
+>&nbsp;</TD
+><TD
+>機能コード</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                    <CODE
+CLASS="varname"
+>ret</CODE
+>
+                  </TD
+><TD
+>&nbsp;</TD
+><TD
+>システムコールまたは拡張SVCの戻値</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                    <CODE
+CLASS="varname"
+>exinf</CODE
+>
+                  </TD
+><TD
+>&nbsp;</TD
+><TD
+><CODE
+CLASS="function"
+>enter()</CODE
+> で戻された任意の値</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></LI
+></UL
+><P
+>システムコールまたは拡張SVCから戻った直後に呼び出される。</P
+><P
+>システムコールまたは拡張SVCが呼び出された後(システムコールまたは拡張SVCの実行中)にフックルーチンが設定された場合、<CODE
+CLASS="function"
+>enter()</CODE
+> が呼び出されずに <CODE
+CLASS="function"
+>leave()</CODE
+> のみ呼び出される場合がある。このような場合、<CODE
+CLASS="varname"
+>exinf</CODE
+> には <TT
+CLASS="literal"
+>NULL</TT
+> が渡される。</P
+><P
+>逆に、システムコールまたは拡張SVCが呼び出された後フックルーチンが解除された場合、<CODE
+CLASS="function"
+>enter()</CODE
+> が呼び出されて、<CODE
+CLASS="function"
+>leave()</CODE
+> が呼び出されない場合がある。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="td_hok_dsp"
+>td_hok_dsp - タスクディスパッチのフックルーチン定義</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33763"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN33765"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/dbgspt.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = td_hok_dsp</CODE
+>(CONST TD_HDSP *hdsp);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33772"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33774"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST TD_HDSP*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>hdsp</CODE
+>
+              </TD
+><TD
+>Dispatcher Hook Routine</TD
+><TD
+>フックルーチン定義情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>hdsp</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33789"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exec</CODE
+>
+              </TD
+><TD
+>Hook Routine when Execution Starts</TD
+><TD
+>実行開始時のフックルーチン</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>stop</CODE
+>
+              </TD
+><TD
+>Hook Routine when Execution Stops</TD
+><TD
+>実行停止時のフックルーチン</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33808"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33810"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33823"
+>エラーコード</A
+></H3
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33826"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33828"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33843"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33846"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+              </TD
+><TD
+>μT-Kernel/DSのサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33855"
+>解説</A
+></H3
+><P
+>タスクディスパッチャに、フックルーチンを設定する。<CODE
+CLASS="varname"
+>hdsp</CODE
+> に <TT
+CLASS="literal"
+>NULL</TT
+>を指定することによりフックルーチンを解除する。</P
+><P
+>フックルーチンは、ディスパッチ禁止状態で呼び出される。フックルーチンでは、μT-Kernel/OSのシステムコール(tk_～)および拡張SVCを呼び出してはいけない。μT-Kernel/DSのシステムコール(td_～)は呼び出すことができる。</P
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN33861"
+></A
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void exec</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33867"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>実行を開始・再開するタスクのタスクID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>タスクの実行が開始・再開されるときに呼び出される。<CODE
+CLASS="function"
+>exec()</CODE
+> が呼び出された時点で、すでに <CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクはRUNNING状態となっている。ただし、<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクのプログラムコードが実行されるのは、<CODE
+CLASS="function"
+>exec()</CODE
+> から戻った後である。</P
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN33885"
+></A
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void stop</CODE
+>(ID tskid, UINT tskstat);</CODE
+></P
+><P
+></P
+></DIV
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33893"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>実行を停止したタスクのタスクID</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskstat</CODE
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+><CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクの状態</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>タスクが実行を停止した時に呼び出される。<CODE
+CLASS="varname"
+>tskstat</CODE
+> には、停止後のタスクの状態が示され、以下のいずれかとなる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33915"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_RDY</TT
+>
+              </TD
+><TD
+>READY状態 (実行可能状態)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_WAI</TT
+>
+              </TD
+><TD
+>WAITING状態 (待ち状態)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_SUS</TT
+>
+              </TD
+><TD
+>SUSPENDED状態 (強制待ち状態)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_WAS</TT
+>
+              </TD
+><TD
+>WAITING-SUSPENDED状態 (二重待ち状態)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TTS_DMT</TT
+>
+              </TD
+><TD
+>DORMANT状態 (休止状態)</TD
+></TR
+><TR
+><TD
+>0</TD
+><TD
+>NON-EXISTENT状態 (未登録状態)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="function"
+>stop()</CODE
+> が呼び出された時点で、すでに <CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクは <CODE
+CLASS="varname"
+>tskstat</CODE
+> で示した状態となっている。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="td_hok_int"
+>td_hok_int - 割込みハンドラのフックルーチン定義</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33949"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN33951"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/dbgspt.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = td_hok_int</CODE
+>(CONST TD_HINT *hint);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33958"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33960"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST TD_HINT*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>hint</CODE
+>
+              </TD
+><TD
+>Interruption Handler Hook Routine</TD
+><TD
+>フックルーチン定義情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>hint</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33975"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>enter</CODE
+>
+              </TD
+><TD
+>Hook Routine before Calling Handler</TD
+><TD
+>ハンドラ呼出前のフックルーチン</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>leave</CODE
+>
+              </TD
+><TD
+>Hook Routine after Calling Handler</TD
+><TD
+>ハンドラ呼出後のフックルーチン</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN33994"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN33996"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34009"
+>エラーコード</A
+></H3
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34012"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN34014"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34029"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN34032"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+              </TD
+><TD
+>μT-Kernel/DSのサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN34041"
+>解説</A
+></H3
+><P
+>割込みハンドラの呼出前後に、フックルーチンを設定する。フックルーチンの設定は、例外・割込み要因ごとに独立に行うことはできない。すべての例外・割込み要因で共通のフックルーチンを1つのみ設定できる。</P
+><P
+><CODE
+CLASS="varname"
+>hint</CODE
+> に <TT
+CLASS="literal"
+>NULL</TT
+> を指定することによりフックルーチンを解除する。</P
+><P
+>フックルーチンはタスク独立部(割込みハンドラの一部)として呼び出される。したがって、フックルーチンからはタスク独立部から発行可能なシステムコールのみ呼び出すことができる。</P
+><P
+>なお、フックルーチンを設定できるのは、<A
+HREF="interrupt_management_functions_os.html#tk_def_int"
+>tk_def_int</A
+> で <TT
+CLASS="literal"
+>TA_HLNG</TT
+> 属性を指定して定義された割込みハンドラのみである。<TT
+CLASS="literal"
+>TA_ASM</TT
+> 属性の割込みハンドラのフックはできない。<TT
+CLASS="literal"
+>TA_ASM</TT
+> 属性の割込みハンドラをフックしたい場合は、例外・割込みベクタテーブルを直接操作してフックするなどの方法があるが、それらの方法は実装によって異なる。</P
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN34053"
+></A
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void enter</CODE
+>(UINT intno);</CODE
+></P
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void leave</CODE
+>(UINT intno);</CODE
+></P
+><P
+></P
+></DIV
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN34064"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>intno</CODE
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>割込み番号</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="function"
+>enter()</CODE
+> および <CODE
+CLASS="function"
+>leave()</CODE
+> に渡される引数は、例外・割込みハンドラに渡される引数と同じものである。実装によっては、<CODE
+CLASS="varname"
+>intno</CODE
+> 以外の情報も渡される場合がある。</P
+><P
+>フックルーチンは、高級言語対応ルーチンから次のようにして呼び出される。</P
+><PRE
+CLASS="programlisting"
+>&#13;enter(intno);
+inthdr(intno); /* 例外・割込みハンドラ */
+leave(intno);
+</PRE
+><P
+><CODE
+CLASS="function"
+>enter()</CODE
+> は割込み禁止状態で呼び出されることになる。また、割込みを許可してはいけない。<CODE
+CLASS="function"
+>leave()</CODE
+> は、<CODE
+CLASS="function"
+>inthdr()</CODE
+> から戻ったときの状態となるため、割込み禁止状態は不確定である。</P
+><P
+><CODE
+CLASS="function"
+>enter()</CODE
+> では、<CODE
+CLASS="function"
+>inthdr()</CODE
+> で得ることのできる情報と同じだけの情報を得ることができる。逆に、<CODE
+CLASS="function"
+>inthdr()</CODE
+> で得ることのできない情報は <CODE
+CLASS="function"
+>enter()</CODE
+> でも得ることはできない。<CODE
+CLASS="function"
+>enter()</CODE
+> および <CODE
+CLASS="function"
+>inthdr()</CODE
+> で得ることのできる情報としては、<CODE
+CLASS="varname"
+>intno</CODE
+> が仕様としては保証されているが、それ以外の情報については実装定義である。なお、<CODE
+CLASS="function"
+>leave()</CODE
+> では割込み禁止状態など各種の状態が変化している場合があるため、<CODE
+CLASS="function"
+>enter()</CODE
+> や <CODE
+CLASS="function"
+>inthdr()</CODE
+> と同じだけの情報を得ることができるとは限らない。</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="utk_ds_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="appendixes.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>μT-Kernel/DSの機能</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_ds_functions.html"
+ACCESSKEY="U"
+>上に戻る</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>付録</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

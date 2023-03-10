@@ -1,0 +1,9028 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Synchronization and Communication Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/OS Functions"
+HREF="utk_os_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Task Exception Handling Functions"
+HREF="task_exception_handling_functions.html"><LINK
+REL="NEXT"
+TITLE="Extended Synchronization and Communication Functions"
+HREF="extended_synchronization_and_communication_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="task_exception_handling_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/OS Functions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="extended_synchronization_and_communication_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="synchronzation_and_communication_functions"
+>Synchronization and Communication Functions</A
+></H1
+><P
+>Synchronization and communication functions use objects independent of tasks used to synchronize tasks and achieve communication between tasks. The objects available for these purposes include semaphores, event flags, and mailboxes.</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="semaphore"
+>Semaphore</A
+></H2
+><P
+>A semaphore is an object indicating the availability of a resource and its quantity as a numerical value. A semaphore is used to realize mutual exclusion control and synchronization when using a resource. Functions are provided for creating and deleting a semaphore, acquiring and returning resources corresponding to semaphores, and referencing semaphore status. A semaphore is an object identified by an ID number. The ID number for the semaphore is called a semaphore ID.</P
+><P
+>A semaphore contains a resource count (semaphore resource count) indicating whether the corresponding resource exists and in what quantity, and a queue of tasks waiting to acquire the resource. When a task (the task making event notification) returns m resources, it increments the semaphore resource count by m. When a task (the task waiting for an event) acquires n resources, it decreases the semaphore resource count by n. If the number of semaphore resources is insufficient (i.e., further reducing the semaphore resource count would cause it to be negative), a task attempting to acquire resources goes into WAITING state until the next time resources are returned. A task waiting for semaphore resources is put in the semaphore queue.</P
+><P
+>To prevent too many resources from being returned to a semaphore, a maximum value of semaphore resource count can be set for each semaphore. Error is reported if it is attempted to return resources to a semaphore that would cause this maximum count to be exceeded.</P
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_cre_sem"
+>tk_cre_sem - Create Semaphore</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN6825"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN6827"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID semid = tk_cre_sem</CODE
+>(CONST T_CSEM *pk_csem);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN6834"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6836"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST T_CSEM*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_csem</CODE
+>
+              </TD
+><TD
+>Packet to Create Semaphore</TD
+><TD
+>Semaphore creation information</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_csem</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6851"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Extended information</TD
+></TR
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>sematr</CODE
+>
+              </TD
+><TD
+>Semaphore Attribute</TD
+><TD
+>Semaphore attribute</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>isemcnt</CODE
+>
+              </TD
+><TD
+>Initial Semaphore Count</TD
+><TD
+>Initial semaphore resource count</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>maxsem</CODE
+>
+              </TD
+><TD
+>Maximum Semaphore Count</TD
+><TD
+>Maximum semaphore resource count</TD
+></TR
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dsname[8]</CODE
+>
+              </TD
+><TD
+>DS Object name</TD
+><TD
+>DS object name</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN6890"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6892"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>semid</CODE
+>
+              </TD
+><TD
+>Semaphore ID</TD
+><TD
+>Semaphore ID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN6909"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6911"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>Insufficient memory (memory for control block cannot be allocated)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>Semaphore count exceeds the system limit</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>Reserved attribute (<CODE
+CLASS="varname"
+>sematr</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>pk_csem</CODE
+> is invalid, or <CODE
+CLASS="varname"
+>isemcnt</CODE
+> or <CODE
+CLASS="varname"
+>maxsem</CODE
+> is negative or invalid)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN6936"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6938"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN6953"
+>Related Service Profile Items</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6955"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+> (reject request to disable wait) to semaphore attribute</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> for semaphore attribute</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SEMAPHORE_MAXCNT</TT
+>
+              </TD
+><TD
+>Upper limit of maximum number of semaphore resource count (&#62;= 32767)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN6974"
+>Description</A
+></H4
+><P
+>Creates a semaphore, assigning a semaphore ID to it. This system call allocates a control block to the created semaphore and sets its initial value of semaphore resource count to <CODE
+CLASS="varname"
+>isemcnt</CODE
+>, and its maximum (upper limit) to <CODE
+CLASS="varname"
+>maxsem</CODE
+>. Note that the lowest number that can be specified to <CODE
+CLASS="varname"
+>maxsem</CODE
+> shall be 32767. Whether a number larger than 32767 can be set is implementation-dependent.</P
+><P
+><CODE
+CLASS="varname"
+>exinf</CODE
+> can be used freely by the user to set miscellaneous information about the created semaphore. The information set in this parameter can be referenced by <A
+HREF="synchronzation_and_communication_functions.html#tk_ref_sem"
+>tk_ref_sem</A
+>. If a larger area is needed for indicating user information, or if the information may need to be changed after the message buffer is created, this can be done by allocating separate memory for this purpose and putting the memory packet address in <CODE
+CLASS="varname"
+>exinf</CODE
+>. The kernel pays no attention to the contents of <CODE
+CLASS="varname"
+>exinf</CODE
+>.</P
+><P
+><CODE
+CLASS="varname"
+>sematr</CODE
+> indicates system attributes in its lower bits and implementation-dependent attributes in its higher bits. The system attribute part of <CODE
+CLASS="varname"
+>sematr</CODE
+> is as follows.</P
+><PRE
+CLASS="synopsis"
+>&#13;sematr := (TA_TFIFO || TA_TPRI) | (TA_FIRST || TA_CNT) | [TA_DSNAME] | [TA_NODISWAI]
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN6989"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>
+              </TD
+><TD
+>Tasks are queued in FIFO order</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TPRI</TT
+>
+              </TD
+><TD
+>Tasks are queued in priority order</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_FIRST</TT
+>
+              </TD
+><TD
+>The first task in the queue has precedence</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_CNT</TT
+>
+              </TD
+><TD
+>Tasks with fewer requests have precedence</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_DSNAME</TT
+>
+              </TD
+><TD
+>Specifies DS object name</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>
+              </TD
+><TD
+>Disabling of wait by <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> is prohibited</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>The queuing order of tasks waiting for a semaphore can be specified in <TT
+CLASS="literal"
+>TA_TFIFO</TT
+> or <TT
+CLASS="literal"
+>TA_TPRI</TT
+>. If the attribute is <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>, tasks are ordered by FIFO, whereas <TT
+CLASS="literal"
+>TA_TPRI</TT
+> specifies queuing of tasks in order of their priority setting.</P
+><P
+><TT
+CLASS="literal"
+>TA_FIRST</TT
+> and <TT
+CLASS="literal"
+>TA_CNT</TT
+> specify precedence of resource acquisition. <TT
+CLASS="literal"
+>TA_FIRST</TT
+> and <TT
+CLASS="literal"
+>TA_CNT</TT
+> do not change the order of the queue, which is determined by <TT
+CLASS="literal"
+>TA_TFIFO</TT
+> and <TT
+CLASS="literal"
+>TA_TPRI</TT
+>.</P
+><P
+>When <TT
+CLASS="literal"
+>TA_FIRST</TT
+> is specified, resources are allocated starting from the first task in the queue regardless of requested semaphore resource count. As long as the first task in the queue cannot obtain the requested number of resources, tasks behind it in the queue are prevented from obtaining resources.</P
+><P
+><TT
+CLASS="literal"
+>TA_CNT</TT
+> means resources are assigned based on the order in which tasks are able to obtain the requested semaphore resource count. The requested semaphore resource counts are checked starting from the first task in the queue, and tasks to which their requested counts can be allocated receive resources. This is not the same as allocating in order of fewest requests.</P
+><P
+>When <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> is specified, <CODE
+CLASS="varname"
+>dsname</CODE
+> is valid and specifies the DS object name. DS object name is used to identify objects by debugger, and it is handled only by T-Kernel/DS API, <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>. For more details, see the description of <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>. If <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> is not specified, <CODE
+CLASS="varname"
+>dsname</CODE
+> is ignored. Then <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> return <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> error.</P
+><PRE
+CLASS="programlisting"
+>&#13;#define TA_TFIFO        0x00000000      /* manage queue by FIFO */
+#define TA_TPRI         0x00000001      /* manage queue by priority */
+#define TA_FIRST        0x00000000      /* first task in queue has precedence */
+#define TA_CNT          0x00000002      /* tasks with fewer requests have precedence */
+#define TA_DSNAME       0x00000040      /* DS object name */
+#define TA_NODISWAI     0x00000080      /* reject request to disable wait */
+</PRE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_del_sem"
+>tk_del_sem - Delete Semaphore</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7050"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN7052"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_del_sem</CODE
+>(ID semid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7059"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7061"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>semid</CODE
+>
+              </TD
+><TD
+>Semaphore ID</TD
+><TD
+>Semaphore ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7074"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7076"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7089"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7091"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>semid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the semaphore specified in <CODE
+CLASS="varname"
+>semid</CODE
+> does not exist)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7110"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7112"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7127"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7130"
+>Description</A
+></H4
+><P
+>Deletes the semaphore specified in <CODE
+CLASS="varname"
+>semid</CODE
+>.</P
+><P
+>The semaphore ID and control block area are released as a result of this system call.</P
+><P
+>This system call completes normally even if there is a task waiting for condition fulfillment on the semaphore, but error code <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+> is returned to the task in WAITING state.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_sig_sem"
+>tk_sig_sem - Signal Semaphore</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7139"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN7141"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_sig_sem</CODE
+>(ID semid, INT cnt);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7150"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7152"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>semid</CODE
+>
+              </TD
+><TD
+>Semaphore ID</TD
+><TD
+>Semaphore ID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cnt</CODE
+>
+              </TD
+><TD
+>Count</TD
+><TD
+>Resource return count</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7171"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7173"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7186"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7188"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>semid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the semaphore specified in <CODE
+CLASS="varname"
+>semid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_QOVR</SPAN
+>
+              </TD
+><TD
+>Queuing or nesting overflow (semaphore resource count <CODE
+CLASS="varname"
+>semcnt</CODE
+> over limit)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>cnt</CODE
+> ≦ 0)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7217"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7219"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7234"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7237"
+>Description</A
+></H4
+><P
+>Returns to the semaphore specified in <CODE
+CLASS="varname"
+>semid</CODE
+> the number of resources indicated in <CODE
+CLASS="varname"
+>cnt</CODE
+>. If there is a task waiting for the semaphore, the requested semaphore resource count is checked and resources allocated if possible. A task allocated resources goes to READY state. In some conditions more than one task may be allocated resources and put in READY state.</P
+><P
+>If the semaphore resource count increases to the point where the maximum semaphore resource count (<CODE
+CLASS="varname"
+>maxsem</CODE
+>) would be exceeded by the return of more resources, error code <SPAN
+CLASS="errorname"
+>E_QOVR</SPAN
+> is returned. In this case no resources are returned and the semaphore resource count (<CODE
+CLASS="varname"
+>semcnt</CODE
+>) does not change.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7246"
+>Additional Notes</A
+></H4
+><P
+>Error is not returned even if <CODE
+CLASS="varname"
+>semcnt</CODE
+> goes over the initial semaphore resource count (<CODE
+CLASS="varname"
+>isemcnt</CODE
+>). When semaphores are used not for mutual exclusion control but for synchronization (like <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> and <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+>), the semaphore resource count (<CODE
+CLASS="varname"
+>semcnt</CODE
+>) will sometimes go over the initial setting (<CODE
+CLASS="varname"
+>isemcnt</CODE
+>). The semaphore function can be used for mutual exclusion control by setting <CODE
+CLASS="varname"
+>isemcnt</CODE
+> and the maximum semaphore resource count (<CODE
+CLASS="varname"
+>maxsem</CODE
+>) to the same value and checking for the error that is returned when the count increases.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_wai_sem"
+>tk_wai_sem - Wait on Semaphore</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7259"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN7261"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_wai_sem</CODE
+>(ID semid, INT cnt, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7272"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7274"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>semid</CODE
+>
+              </TD
+><TD
+>Semaphore ID</TD
+><TD
+>Semaphore ID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cnt</CODE
+>
+              </TD
+><TD
+>Count</TD
+><TD
+>Resource request count</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (ms)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7299"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7301"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7314"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7316"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>semid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the semaphore specified in <CODE
+CLASS="varname"
+>semid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>tmout</CODE
+> ≦ (-2), <CODE
+CLASS="varname"
+>cnt</CODE
+> ≦ 0)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>The object being waited for was deleted (the specified semaphore was deleted while waiting)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7362"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7364"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7379"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7382"
+>Description</A
+></H4
+><P
+>Obtains from the semaphore specified in <CODE
+CLASS="varname"
+>semid</CODE
+> the number of resources indicated in <CODE
+CLASS="varname"
+>cnt</CODE
+>. If the requested resources can be allocated, the task issuing this system call does not enter WAITING state but continues executing. In this case the semaphore resource count (<CODE
+CLASS="varname"
+>semcnt</CODE
+>) is decreased by the size of <CODE
+CLASS="varname"
+>cnt</CODE
+>. If the resources are not available, the task issuing this system call enters WAITING state, and is put in the queue of tasks waiting for the semaphore. The semaphore resource count (<CODE
+CLASS="varname"
+>semcnt</CODE
+>) for this semaphore does not change in this case.</P
+><P
+>A maximum wait time (timeout) can be set in <CODE
+CLASS="varname"
+>tmout</CODE
+>. The time unit for <CODE
+CLASS="varname"
+>tmout</CODE
+> is the same as that for system time (= 1 ms). If the <CODE
+CLASS="varname"
+>tmout</CODE
+> time elapses before the wait release condition is met (<A
+HREF="synchronzation_and_communication_functions.html#tk_sig_sem"
+>tk_sig_sem</A
+> is not executed), the system call terminates, returning timeout error code <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>.</P
+><P
+>When <TT
+CLASS="literal"
+>TMO_POL</TT
+>＝0 is set in <CODE
+CLASS="varname"
+>tmout</CODE
+>, this means 0 was specified as the timeout value, and <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> is returned without entering WAITING state even if no resources are acquired. When <TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1) is set in <CODE
+CLASS="varname"
+>tmout</CODE
+>, this means infinity was specified as the timeout value, and the task continues to wait for resource acquisition without timing out.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_wai_sem_u"
+>tk_wai_sem_u - Wait on Semaphore (Microseconds)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7404"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN7406"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_wai_sem_u</CODE
+>(ID semid, INT cnt, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7417"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7419"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>semid</CODE
+>
+              </TD
+><TD
+>Semaphore ID</TD
+><TD
+>Semaphore ID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>cnt</CODE
+>
+              </TD
+><TD
+>Count</TD
+><TD
+>Resource request count</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (in microseconds)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7444"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7446"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7459"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7461"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>semid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the semaphore specified in <CODE
+CLASS="varname"
+>semid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>tmout_u</CODE
+> ≦ (-2), <CODE
+CLASS="varname"
+>cnt</CODE
+> ≦ 0)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>The object being waited for was deleted (the specified semaphore was deleted while waiting)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7507"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7509"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7524"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7527"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>Support of microsecond</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7536"
+>Description</A
+></H4
+><P
+>This system call takes 64-bit <CODE
+CLASS="varname"
+>tmout_u</CODE
+> in microseconds instead of the parameter <CODE
+CLASS="varname"
+>tmout</CODE
+> of <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_sem"
+>tk_wai_sem</A
+>.</P
+><P
+>The specification of this system call is same as that of <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_sem"
+>tk_wai_sem</A
+>, except that the parameter is replaced with <CODE
+CLASS="varname"
+>tmout_u</CODE
+>. For more details, see the description of <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_sem"
+>tk_wai_sem</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_ref_sem"
+>tk_ref_sem - Reference Semaphore Status</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7548"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN7550"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_sem</CODE
+>(ID semid, T_RSEM *pk_rsem);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7559"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7561"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>semid</CODE
+>
+              </TD
+><TD
+>Semaphore ID</TD
+><TD
+>Semaphore ID</TD
+></TR
+><TR
+><TD
+>T_RSEM*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rsem</CODE
+>
+              </TD
+><TD
+>Packet to Return Semaphore Status</TD
+><TD
+>Pointer to the area to return the semaphore status</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7580"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7582"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rsem</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7597"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Extended information</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wtsk</CODE
+>
+              </TD
+><TD
+>Waiting Task ID</TD
+><TD
+>Waiting task ID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>semcnt</CODE
+>
+              </TD
+><TD
+>Semaphore Count</TD
+><TD
+>Current semaphore resource count</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7624"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7626"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>semid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the semaphore specified in <CODE
+CLASS="varname"
+>semid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (invalid <CODE
+CLASS="varname"
+>pk_rsem</CODE
+>)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7650"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7652"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7667"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7670"
+>Description</A
+></H4
+><P
+>References the status of the semaphore specified in <CODE
+CLASS="varname"
+>semid</CODE
+>, passing in the return parameters the current semaphore resource count (<CODE
+CLASS="varname"
+>semcnt</CODE
+>), the waiting task ID (<CODE
+CLASS="varname"
+>wtsk</CODE
+>), and extended information (<CODE
+CLASS="varname"
+>exinf</CODE
+>).</P
+><P
+><CODE
+CLASS="varname"
+>wtsk</CODE
+> indicates the ID of a task waiting for the semaphore. If there are two or more such tasks, the ID of the task at the head of the queue is returned. If there are no waiting tasks, <CODE
+CLASS="varname"
+>wtsk</CODE
+> = 0 is returned.</P
+><P
+>If the specified semaphore does not exist, error code <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> is returned.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="event_flag"
+>Event Flag</A
+></H2
+><P
+>An event flag is an object used for synchronization, consisting of a pattern of bits used as flags to indicate the existence of the corresponding events. Functions are provided for creating and deleting an event flag, for event flag setting and clearing, event flag waiting, and event flag status reference. An event flag is an object identified by an ID number. The ID number for the event flag is called an event flag ID.</P
+><P
+>In addition to the bit pattern indicating the existence of corresponding events, an event flag has a queue of tasks waiting for the event flag. The event flag bit pattern is sometimes called simply event flag. The event notifier sets or clears the specified bits of the event flag. A task can be made to wait for all or some of the event flag bits to be set. A task waiting for an event flag is put in the queue of that event flag.</P
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_cre_flg"
+>tk_cre_flg - Create Event Flag</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7688"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN7690"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID flgid = tk_cre_flg</CODE
+>(CONST T_CFLG *pk_cflg);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7697"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7699"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST T_CFLG*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_cflg</CODE
+>
+              </TD
+><TD
+>Packet to Create EventFlag</TD
+><TD
+>Event flag creation information</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_cflg</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7714"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Extended information</TD
+></TR
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgatr</CODE
+>
+              </TD
+><TD
+>EventFlag Attribute</TD
+><TD
+>Event flag attribute</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>iflgptn</CODE
+>
+              </TD
+><TD
+>Initial EventFlag Pattern</TD
+><TD
+>Event flag initial value</TD
+></TR
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dsname[8]</CODE
+>
+              </TD
+><TD
+>DS Object name</TD
+><TD
+>DS object name</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7747"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7749"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgid</CODE
+>
+              </TD
+><TD
+>EventFlag ID</TD
+><TD
+>Event flag ID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7766"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7768"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>Insufficient memory (memory for control block cannot be allocated)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>Number of event flags exceeds the system limit</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>Reserved attribute (<CODE
+CLASS="varname"
+>flgatr</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>pk_cflg</CODE
+> is invalid)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7791"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7793"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7808"
+>Related Service Profile Items</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7810"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>Support for specifying prohibition of "disabling wait" (<TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>) to event flag attribute</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> for event flag attribute</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7825"
+>Description</A
+></H4
+><P
+>Creates an event flag, assigning to it an event flag ID. This system call allocates a control block to the created event flag and sets its initial value to <CODE
+CLASS="varname"
+>iflgptn</CODE
+>. An event flag handles one word's worth of bits as a group. All operations are performed in single word units.</P
+><P
+><CODE
+CLASS="varname"
+>exinf</CODE
+> can be used freely by the user to set miscellaneous information about the created event flag. The information set in this parameter can be referenced by <A
+HREF="synchronzation_and_communication_functions.html#tk_ref_flg"
+>tk_ref_flg</A
+>. If a larger area is needed for indicating user information, or if the information may need to be changed after the message buffer is created, this can be done by allocating separate memory for this purpose and putting the memory packet address in <CODE
+CLASS="varname"
+>exinf</CODE
+>. The kernel pays no attention to the contents of <CODE
+CLASS="varname"
+>exinf</CODE
+>.</P
+><P
+><CODE
+CLASS="varname"
+>flgatr</CODE
+> indicates system attributes in its lower bits and implementation-dependent attributes in its higher bits. The system attribute part of <CODE
+CLASS="varname"
+>flgatr</CODE
+> is as follows.</P
+><PRE
+CLASS="synopsis"
+>&#13;flgatr := (TA_TFIFO || TA_TPRI) | (TA_WMUL || TA_WSGL) | [TA_DSNAME] | [TA_NODISWAI]
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7838"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>
+              </TD
+><TD
+>Tasks are queued in FIFO order</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TPRI</TT
+>
+              </TD
+><TD
+>Tasks are queued in priority order</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_WSGL</TT
+>
+              </TD
+><TD
+>Waiting by multiple tasks is not allowed (Wait Single Task)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_WMUL</TT
+>
+              </TD
+><TD
+>Waiting by multiple tasks is allowed (Wait Multiple Tasks)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_DSNAME</TT
+>
+              </TD
+><TD
+>Specifies DS object name</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>
+              </TD
+><TD
+>Disabling of wait by <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> is prohibited</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>When <TT
+CLASS="literal"
+>TA_WSGL</TT
+> is specified, multiple tasks cannot be in the WAITING state at the same time. Specifying <TT
+CLASS="literal"
+>TA_WMUL</TT
+> allows waiting by multiple tasks at the same time.</P
+><P
+>The queuing order of tasks waiting for an event flag can be specified in <TT
+CLASS="literal"
+>TA_TFIFO</TT
+> or <TT
+CLASS="literal"
+>TA_TPRI</TT
+>. If the attribute is <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>, tasks are ordered by FIFO, whereas <TT
+CLASS="literal"
+>TA_TPRI</TT
+> specifies queuing of tasks in order of their priority setting. When <TT
+CLASS="literal"
+>TA_WSGL</TT
+> is specified, however, since tasks cannot be queued, <TT
+CLASS="literal"
+>TA_TFIFO</TT
+> or <TT
+CLASS="literal"
+>TA_TPRI</TT
+> makes no difference.</P
+><P
+>When multiple tasks are waiting for an event flag, tasks are checked in order from the head of the queue, and the wait is released for tasks meeting the conditions. The first task to have its WAITING state released is therefore not necessarily the first in the queue. If multiple tasks meet the conditions, wait state is released for each of them.</P
+><P
+>When <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> is specified, <CODE
+CLASS="varname"
+>dsname</CODE
+> is valid and specifies the DS object name. DS object name is used to identify objects by debugger, and it is handled only by T-Kernel/DS API, <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>. For more details, see the description of <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>. If <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> is not specified, <CODE
+CLASS="varname"
+>dsname</CODE
+> is ignored. Then <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> return <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> error.</P
+><PRE
+CLASS="programlisting"
+>&#13;#define TA_TFIFO        0x00000000      /* manage queue by FIFO */
+#define TA_TPRI         0x00000001      /* manage queue by priority */
+#define TA_WSGL         0x00000000      /* prohibit multiple task waiting */
+#define TA_WMUL         0x00000008      /* permit multiple task waiting */
+#define TA_DSNAME       0x00000040      /* DS object name */
+#define TA_NODISWAI     0x00000080      /* reject request to disable wait */
+</PRE
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7893"
+>Porting Guideline</A
+></H4
+><P
+>Note that member, <CODE
+CLASS="varname"
+>iflgptn</CODE
+>, of T_CFLG is UINT type, and its value range is implementation-dependent, so care must be taken.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_del_flg"
+>tk_del_flg - Delete Event Flag</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7899"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN7901"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_del_flg</CODE
+>(ID flgid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7908"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7910"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgid</CODE
+>
+              </TD
+><TD
+>EventFlag ID</TD
+><TD
+>Event flag ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7923"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7925"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7938"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7940"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>flgid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the event flag specified in <CODE
+CLASS="varname"
+>flgid</CODE
+> does not exist)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7959"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN7961"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7976"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7979"
+>Description</A
+></H4
+><P
+>Deletes the event flag specified in <CODE
+CLASS="varname"
+>flgid</CODE
+>.</P
+><P
+>Issuing this system call releases the corresponding event flag ID and control block memory space.</P
+><P
+>This system call is completed normally even if there are tasks waiting for the event flag, but error code <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+> is returned to each task in WAITING state.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_set_flg"
+>tk_set_flg - Set Event Flag</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7988"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN7990"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_set_flg</CODE
+>(ID flgid, UINT setptn);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN7999"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8001"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgid</CODE
+>
+              </TD
+><TD
+>EventFlag ID</TD
+><TD
+>Event flag ID</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>setptn</CODE
+>
+              </TD
+><TD
+>Set Bit Pattern</TD
+><TD
+>Bit pattern to be set</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8020"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8022"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8035"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8037"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>flgid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the event flag specified in <CODE
+CLASS="varname"
+>flgid</CODE
+> does not exist)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8056"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8058"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8073"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8076"
+>Description</A
+></H4
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+> sets the bits indicated in <CODE
+CLASS="varname"
+>setptn</CODE
+> in a one-word event flag specified in <CODE
+CLASS="varname"
+>flgid</CODE
+>. That is, a logical sum is taken of the values of the event flag specified in <CODE
+CLASS="varname"
+>flgid</CODE
+> and the values indicated in <CODE
+CLASS="varname"
+>setptn</CODE
+>. (the processing <CODE
+CLASS="varname"
+>flgptn</CODE
+> |= <CODE
+CLASS="varname"
+>setptn</CODE
+> is executed for the event flag value <CODE
+CLASS="varname"
+>flgptn</CODE
+>)</P
+><P
+>After event flag values are changed by <A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+>, if the condition for releasing the wait state of a task that called <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> is met, the WAITING state of that task is cleared, putting it in RUNNING state or READY state (or SUSPENDED state if the waiting task was in WAITING-SUSPENDED state).</P
+><P
+>If all the bits of <CODE
+CLASS="varname"
+>setptn</CODE
+> are cleared to 0 in <A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+>, no operation is made to the target event flag. No error will result in either case.</P
+><P
+>Multiple tasks can wait for a single event flag if that event flag has the <TT
+CLASS="literal"
+>TA_WMUL</TT
+> attribute. The event flag in that case has a queue for the waiting tasks. A single <A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+> call for such an event flag may result in the release of multiple waiting tasks.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8096"
+>Porting Guideline</A
+></H4
+><P
+>Note that <CODE
+CLASS="varname"
+>setptn</CODE
+> is UINT type, and its value range is implementation-dependent, so care must be taken.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_clr_flg"
+>tk_clr_flg - Clear Event Flag</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8102"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN8104"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_clr_flg</CODE
+>(ID flgid, UINT clrptn);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8113"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8115"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgid</CODE
+>
+              </TD
+><TD
+>EventFlag ID</TD
+><TD
+>Event flag ID</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>clrptn</CODE
+>
+              </TD
+><TD
+>Clear Bit Pattern</TD
+><TD
+>Bit pattern to be cleared</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8134"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8136"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8149"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8151"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>flgid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the event flag specified in <CODE
+CLASS="varname"
+>flgid</CODE
+> does not exist)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8170"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8172"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8187"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8190"
+>Description</A
+></H4
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_clr_flg"
+>tk_clr_flg</A
+> clears the bits of the one-word event flag specified in <CODE
+CLASS="varname"
+>flgid</CODE
+>, based on the corresponding zero bits of <CODE
+CLASS="varname"
+>clrptn</CODE
+>. That is, a logical product is taken of the values of the event flag specified in <CODE
+CLASS="varname"
+>flgid</CODE
+> and the values indicated in <CODE
+CLASS="varname"
+>clrptn</CODE
+>.(the processing <CODE
+CLASS="varname"
+>flgptn</CODE
+> &#38;= <CODE
+CLASS="varname"
+>clrptn</CODE
+> is executed for the event flag value <CODE
+CLASS="varname"
+>flgptn</CODE
+>)</P
+><P
+>Issuing <A
+HREF="synchronzation_and_communication_functions.html#tk_clr_flg"
+>tk_clr_flg</A
+> never results in wait conditions being released for a task waiting for the specified event flag; that is, dispatching never occurs with tk_clr_flg.</P
+><P
+>If all the bits of <CODE
+CLASS="varname"
+>clrptn</CODE
+> are set to 1 in <A
+HREF="synchronzation_and_communication_functions.html#tk_clr_flg"
+>tk_clr_flg</A
+>, no operation is made to the target event flag. No error will be returned in either case.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8206"
+>Porting Guideline</A
+></H4
+><P
+>Note that <CODE
+CLASS="varname"
+>clrptn</CODE
+> is UINT type, and its value range is implementation-dependent, so care must be taken.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_wai_flg"
+>tk_wai_flg - Wait Event Flag</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8212"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN8214"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_wai_flg</CODE
+>(ID flgid, UINT waiptn, UINT wfmode, UINT *p_flgptn, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8229"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8231"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgid</CODE
+>
+              </TD
+><TD
+>EventFlag ID</TD
+><TD
+>Event flag ID</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>waiptn</CODE
+>
+              </TD
+><TD
+>Wait Bit Pattern</TD
+><TD
+>Wait bit pattern</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wfmode</CODE
+>
+              </TD
+><TD
+>Wait EventFlag Mode</TD
+><TD
+>Wait release condition</TD
+></TR
+><TR
+><TD
+>UINT*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>p_flgptn</CODE
+>
+              </TD
+><TD
+>Pointer to EventFlag Bit Pattern</TD
+><TD
+>Pointer to the area to return the return parameter <CODE
+CLASS="varname"
+>flgptn</CODE
+></TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (ms)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8269"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8271"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgptn</CODE
+>
+              </TD
+><TD
+>EventFlag Bit Pattern</TD
+><TD
+>Event flag bit pattern</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8290"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8292"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>flgid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the event flag specified in <CODE
+CLASS="varname"
+>flgid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>waiptn</CODE
+> = 0, <CODE
+CLASS="varname"
+>wfmode</CODE
+> is invalid, or <CODE
+CLASS="varname"
+>tmout</CODE
+> ≦ (-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (multiple tasks are waiting for an event flag with <TT
+CLASS="literal"
+>TA_WSGL</TT
+> attribute)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>The object being waited for was deleted (the specified event flag was deleted while waiting)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8344"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8346"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8361"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8364"
+>Description</A
+></H4
+><P
+>Waits for the event flag specified in <CODE
+CLASS="varname"
+>flgid</CODE
+> to be set, fulfilling the wait release condition specified in <CODE
+CLASS="varname"
+>wfmode</CODE
+>.<A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+></A
+></P
+><P
+>If the event flag specified in <CODE
+CLASS="varname"
+>flgid</CODE
+> already meets the wait release condition set in <CODE
+CLASS="varname"
+>wfmode</CODE
+>, the waiting task continues executing without going to WAITING state.</P
+><P
+><CODE
+CLASS="varname"
+>wfmode</CODE
+> is specified as follows.</P
+><PRE
+CLASS="synopsis"
+>&#13;wfmode := (TWF_ANDW || TWF_ORW) | [TWF_CLR || TWF_BITCLR]
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8376"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="67%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TWF_ANDW</TT
+>
+              </TD
+><TD
+>0x00</TD
+><TD
+>AND wait condition</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TWF_ORW</TT
+>
+              </TD
+><TD
+>0x01</TD
+><TD
+>OR wait condition</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TWF_CLR</TT
+>
+              </TD
+><TD
+>0x10</TD
+><TD
+>Clear all</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TWF_BITCLR</TT
+>
+              </TD
+><TD
+>0x20</TD
+><TD
+>Clear condition bit only</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>If <TT
+CLASS="literal"
+>TWF_ORW</TT
+> is specified, the issuing task waits for any of the bits specified in <CODE
+CLASS="varname"
+>waiptn</CODE
+> to be set for the event flag specified in <CODE
+CLASS="varname"
+>flgid</CODE
+> (OR wait). If <TT
+CLASS="literal"
+>TWF_ANDW</TT
+> is specified, the issuing task will wait for all of the bits specified in <CODE
+CLASS="varname"
+>waiptn</CODE
+> to be set for the event flag specified in <CODE
+CLASS="varname"
+>flgid</CODE
+> (AND wait).</P
+><P
+>If <TT
+CLASS="literal"
+>TWF_CLR</TT
+> specification is not specified, the event flag values will remain unchanged even after the conditions have been satisfied and the task has been released from WAITING state. If <TT
+CLASS="literal"
+>TWF_CLR</TT
+> is specified, all bits of the event flag will be cleared to 0 once wait conditions of the waiting task have been met. If <TT
+CLASS="literal"
+>TWF_BITCLR</TT
+> is specified, then when the conditions are met and the task is released from WAITING state, only the bits matching the event flag wait release conditions are cleared to 0(event flag values &#38;= ~wait release conditions).</P
+><P
+>The return parameter <CODE
+CLASS="varname"
+>flgptn</CODE
+> returns the value of the event flag after the WAITING state of a task has been released due to this system call. If <TT
+CLASS="literal"
+>TWF_CLR</TT
+> or <TT
+CLASS="literal"
+>TWF_BITCLR</TT
+> was specified, the value before event flag bits were cleared is returned. The value returned by <CODE
+CLASS="varname"
+>flgptn</CODE
+> meets the wait release conditions of this system call. The contents of <CODE
+CLASS="varname"
+>flgptn</CODE
+> are indeterminate if the wait is released due to timeout or the like.</P
+><P
+>A maximum wait time (timeout) can be set in <CODE
+CLASS="varname"
+>tmout</CODE
+>. The time unit for <CODE
+CLASS="varname"
+>tmout</CODE
+> is the same as that for system time (= 1 ms). If the <CODE
+CLASS="varname"
+>tmout</CODE
+> time elapses before the wait release condition is met, the system call terminates, returning timeout error code <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>.</P
+><P
+>When <TT
+CLASS="literal"
+>TMO_POL</TT
+>＝0 is set in <CODE
+CLASS="varname"
+>tmout</CODE
+>, this means 0 was specified as the timeout value, and <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> is returned without entering WAITING state even if the condition is not met. When <TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1) is set in <CODE
+CLASS="varname"
+>tmout</CODE
+>, this means infinity was specified as the timeout value, and the task continues to wait for the condition to be met without timing out.</P
+><P
+>In the case of a timeout, the event flag bits are not cleared even if <TT
+CLASS="literal"
+>TWF_CLR</TT
+> or <TT
+CLASS="literal"
+>TWF_BITCLR</TT
+> was specified.</P
+><P
+>Setting <CODE
+CLASS="varname"
+>waiptn</CODE
+> to 0 results in Parameter error <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>.</P
+><P
+>A task cannot execute <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> for an event flag having the <TT
+CLASS="literal"
+>TA_WSGL</TT
+> attribute while another task is waiting for it. Error code <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> will be returned for the task issuing the subsequent <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+><A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+></A
+>, regardless of whether that task would have gone to WAITING state; i.e., regardless of whether the wait release conditions would be met.</P
+><P
+>If an event flag has the <TT
+CLASS="literal"
+>TA_WMUL</TT
+> attribute, multiple tasks can wait for it at the same time. The event flag in that case has a queue for the waiting tasks. A single <A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+> call for such an event flag may result in the release of multiple waiting tasks.</P
+><P
+>If multiple tasks are queued for an event flag with <TT
+CLASS="literal"
+>TA_WMUL</TT
+> attribute, the behavior is as follows.</P
+><P
+></P
+><UL
+><LI
+><P
+>Tasks are queued in either FIFO or priority order. (Release of wait state does not always start from the head of the queue, however, depending on factors such as <CODE
+CLASS="varname"
+>waiptn</CODE
+> and <CODE
+CLASS="varname"
+>wfmode</CODE
+> settings.)</P
+></LI
+><LI
+><P
+>If TWF_CLR or TWF_BITCLR was specified by a task in the queue, the event flag is cleared when that task is released from WAITING state.</P
+></LI
+><LI
+><P
+>Tasks later in the queue than a task specifying TWF_CLR or TWF_BITCLR will see the event flag after it has already been cleared.</P
+></LI
+></UL
+><P
+>If multiple tasks having the same priority are released from waiting simultaneously as a result of <A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+>, the order of tasks in the ready queue (precedence) after release will continue to be the same as their original order in the event flag queue.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8458"
+>Additional Notes</A
+></H4
+><P
+>If a logical sum of all bits is specified as the wait release condition when <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> is called (<CODE
+CLASS="varname"
+>waiptn</CODE
+> = 0xfff...ff, <CODE
+CLASS="varname"
+>wfmode</CODE
+> = <TT
+CLASS="literal"
+>TWF_ORW</TT
+>), it is possible to transfer messages using one-word bit patterns in combination with <A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+>. However, it is not possible to send a message containing only 0s for all bits. Moreover, if the next message is sent by <A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+> before a previous message has been read by <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+>, the previous message will be lost; that is, message queuing is not possible.</P
+><P
+>Since setting <CODE
+CLASS="varname"
+>waiptn</CODE
+> = 0 will result in an <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> error, it is guaranteed that the <CODE
+CLASS="varname"
+>waiptn</CODE
+> of tasks waiting for an event flag will not be 0. The result is that if <A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+> sets all bits of an event flag to 1, the task at the head of the queue will always be released from waiting no matter what its wait condition is.</P
+><P
+>The ability to have multiple tasks wait for the same event flag is useful in situations like the following. Suppose, for example, that Task B and Task C are waiting for <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+> calls (2) and (3) until Task A issues (1) <A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+>. If multiple tasks are allowed to wait for the event flag, the result will be the same regardless of the order in which system calls (1)(2)(3) are executed (see <A
+HREF="synchronzation_and_communication_functions.html#figure_tk_wai_flg"
+>Figure 1</A
+>). On the other hand, if multiple task waiting is not allowed and system calls are executed in the order (2), (3), (1), an <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> error will result from the execution of (3) <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+>.</P
+><DIV
+CLASS="figure"
+><A
+NAME="figure_tk_wai_flg"
+></A
+><P
+><B
+>Figure 1. Multiple Tasks Waiting for One Event Flag</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_08s.png"></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8486"
+>Rationale for the Specification</A
+></H4
+><P
+>The reason for returning <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> error for specifying <CODE
+CLASS="varname"
+>waiptn</CODE
+> = 0 is that if <CODE
+CLASS="varname"
+>waiptn</CODE
+> = 0 were allowed, it would not be possible to get out of WAITING state regardless of the subsequent event flag values.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8492"
+>Porting Guideline</A
+></H4
+><P
+>Note that the data pointed at <CODE
+CLASS="varname"
+>waiptn</CODE
+> and <CODE
+CLASS="varname"
+>p_flgptn</CODE
+> are UINT type, and their value range is implementation-dependent, so care must be taken.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_wai_flg_u"
+>tk_wai_flg_u - Wait Event Flag (Microseconds)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8499"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN8501"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_wai_flg_u</CODE
+>(ID flgid, UINT waiptn, UINT wfmode, UINT *p_flgptn, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8516"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8518"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgid</CODE
+>
+              </TD
+><TD
+>EventFlag ID</TD
+><TD
+>Event flag ID</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>waiptn</CODE
+>
+              </TD
+><TD
+>Wait Bit Pattern</TD
+><TD
+>Wait bit pattern</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wfmode</CODE
+>
+              </TD
+><TD
+>Wait EventFlag Mode</TD
+><TD
+>Wait mode</TD
+></TR
+><TR
+><TD
+>UINT*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>p_flgptn</CODE
+>
+              </TD
+><TD
+>Pointer to EventFlag Bit Pattern</TD
+><TD
+>Pointer to the area to return the return parameter <CODE
+CLASS="varname"
+>flgptn</CODE
+></TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (in microseconds)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8556"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8558"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgptn</CODE
+>
+              </TD
+><TD
+>EventFlag Bit Pattern</TD
+><TD
+>Bit pattern of wait releasing</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8577"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8579"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>flgid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the event flag specified in <CODE
+CLASS="varname"
+>flgid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>waiptn</CODE
+> = 0, <CODE
+CLASS="varname"
+>wfmode</CODE
+> is invalid, or <CODE
+CLASS="varname"
+>tmout_u</CODE
+> ≦ (-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>Invalid object state (multiple tasks are waiting for an event flag with <TT
+CLASS="literal"
+>TA_WSGL</TT
+> attribute)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>The object being waited for was deleted (the specified event flag was deleted while waiting)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8631"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8633"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8648"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8651"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>Support of microsecond</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8660"
+>Description</A
+></H4
+><P
+>This system call takes 64-bit <CODE
+CLASS="varname"
+>tmout_u</CODE
+> in microseconds instead of the parameter <CODE
+CLASS="varname"
+>tmout</CODE
+> of <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+>.</P
+><P
+>The specification of this system call is same as that of <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+>, except that the parameter is replaced with <CODE
+CLASS="varname"
+>tmout_u</CODE
+>. For more details, see the description of <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+>.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8670"
+>Porting Guideline</A
+></H4
+><P
+>Note that the data pointed at <CODE
+CLASS="varname"
+>waiptn</CODE
+> and <CODE
+CLASS="varname"
+>p_flgptn</CODE
+> are UINT type, and their value range is implementation-dependent, so care must be taken.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_ref_flg"
+>tk_ref_flg - Reference Event Flag Status</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8677"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN8679"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_flg</CODE
+>(ID flgid, T_RFLG *pk_rflg);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8688"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8690"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgid</CODE
+>
+              </TD
+><TD
+>EventFlag ID</TD
+><TD
+>Event flag ID</TD
+></TR
+><TR
+><TD
+>T_RFLG*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rflg</CODE
+>
+              </TD
+><TD
+>Packet to Return EventFlag Status</TD
+><TD
+>Pointer to the area to return the event flag status</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8709"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8711"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rflg</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8726"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Extended information</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wtsk</CODE
+>
+              </TD
+><TD
+>Waiting Task ID</TD
+><TD
+>Waiting task ID</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>flgptn</CODE
+>
+              </TD
+><TD
+>EventFlag Bit Pattern</TD
+><TD
+>The current event flag bit pattern</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8753"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8755"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>flgid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the event flag specified in <CODE
+CLASS="varname"
+>flgid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (invalid <CODE
+CLASS="varname"
+>pk_rflg</CODE
+>)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8779"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8781"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8796"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8799"
+>Description</A
+></H4
+><P
+>References the status of the event flag specified in <CODE
+CLASS="varname"
+>flgid</CODE
+>, passing in the return parameters the current flag pattern (<CODE
+CLASS="varname"
+>flgptn</CODE
+>), waiting task ID (<CODE
+CLASS="varname"
+>wtsk</CODE
+>), and extended information (<CODE
+CLASS="varname"
+>exinf</CODE
+>).</P
+><P
+><CODE
+CLASS="varname"
+>wtsk</CODE
+> returns the ID of a task waiting for this event flag. If more than one task is waiting (only when the <TT
+CLASS="literal"
+>TA_WMUL</TT
+> was specified), the ID of the first task in the queue is returned. If there are no waiting tasks, <CODE
+CLASS="varname"
+>wtsk</CODE
+> = 0 is returned.</P
+><P
+>If the specified event flag does not exist, error code <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> is returned.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="mailbox"
+>Mailbox</A
+></H2
+><P
+>A mailbox is an object used to achieve synchronization and communication by passing messages in system (shared) memory space. Functions are provided for creating and deleting a mailbox, sending and receiving messages in a mailbox, and referencing the mailbox status. A mailbox is an object identified by an ID number. The ID number for the mailbox is called a mailbox ID.</P
+><P
+>A mailbox has a message queue for sent messages, and a task queue for tasks waiting to receive messages. At the message sending end (posting event notification), messages to be sent go in the message queue. On the message receiving end (waiting for event notification), a task fetches one message from the message queue. If there are no queued messages, the task goes to WAITING state for receipt from the mailbox until the next message is sent. Tasks waiting for message receipt from a mailbox are put in the task queue of that mailbox.</P
+><P
+>Since the contents of messages using this function are in memory space shared both by the sending and receiving sides, only the start address of a message located in this shared space is actually sent and received. The contents of the messages themselves are not copied. T-Kernel manages messages in the message queue by means of a linked listed. An application program must allocate space at the beginning of a message to be sent, for linked list processing by T-Kernel. This area is called the message header. The message header and the message body together are called a message packet. When a system call sends a message to a mailbox, the start address of the message packet (<CODE
+CLASS="varname"
+>pk_msg</CODE
+>) is passed in a parameter.</P
+><P
+>When a system call receives a message from a mailbox, the start address of the message packet is passed in a return parameter.</P
+><P
+>If messages are assigned a priority in the message queue, the message priority (<CODE
+CLASS="varname"
+>msgpri</CODE
+>) of each message must be specified in the message header. [<A
+HREF="synchronzation_and_communication_functions.html#figure_mailbox"
+>Figure 2</A
+>]</P
+><P
+>The user puts the message contents not at the beginning of the packet but after the header part (the message contents part in the figure).</P
+><DIV
+CLASS="figure"
+><A
+NAME="figure_mailbox"
+></A
+><P
+><B
+>Figure 2. Format of Messages Using a Mailbox</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_09s.png"></P
+></DIV
+></DIV
+><P
+>T-Kernel overwrites the contents of the header when a message is put in the message queue (except for the message priority area). An application, on the other hand, must not overwrite the header of a message in the queue (including the message priority area). The behavior when an application overwrites the message header is not defined. This specification applies not only to the direct writing of a message header by an application program, but also to the multiple passing of a header address to T-Kernel and having T-Kernel overwrite the message header. Accordingly, the behavior when a message already in the message queue is again sent to a mailbox is undefined.</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Additional Notes</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Since the application program allocates the message header space for this mailbox function, there is no limit on the number of messages that can be queued. A system call sending a message does not enter WAITING state.</P
+><P
+>Memory blocks allocated dynamically from a fixed-size memory pool or variable-size memory pool, or else a statically allocated area can be used for message packets.</P
+><P
+>Generally, a sending task allocates a memory block from a memory pool, sending it as a message packet. After a task on the receiving end fetches the message, it returns the memory block directly to its memory pool.</P
+><P
+>The following sample programs show the above usage:</P
+><PRE
+CLASS="programlisting"
+>&#13;/* Message type definition */
+typedef	struct	{
+	T_MSG	msgque;			/* Message header with T_MFIFO attribute */
+	UB	msgcont[MSG_SIZE];	/* Message content */
+} T_MSG_PACKET;
+</PRE
+><PRE
+CLASS="programlisting"
+>&#13;/* Task operation that acquires a memory block and sends a message */
+
+	T_MSG_PACKET	*pk_msg;
+		...
+
+	/* Acquire a memory block from the fixed-size memory pool. */
+	/* Fixed-memory block size must be sizeof(T_MSG_PACKET) or more */
+	tk_get_mpf( mpfid, (void**)&#38;pk_msg, TMO_FEVR );
+
+	/* Create a message at pk_msg -&#62; msgcont[] */
+		...
+
+	/* Send a message */
+	tk_snd_mbx( mbxid, (T_MSG*)pk_msg );
+</PRE
+><PRE
+CLASS="programlisting"
+>&#13;/* Task operation that receives a message and releases a memory block */
+
+	T_MSG_PACKET	*pk_msg;
+		...
+
+	/* Receive a message */
+	tk_rcv_mbx( mbxid, (T_MSG**)&#38;pk_msg, TMO_FEVR );
+
+	/* Check message content at pk_msg -&#62; msgcont[] and process them accordingly */
+		...
+
+	/* Return the memory block to the fixed-size memory pool. */
+	tk_rel_mpf( mpfid, (void*)pk_msg );
+</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_cre_mbx"
+>tk_cre_mbx - Create Mailbox</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8842"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN8844"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID mbxid = tk_cre_mbx</CODE
+>(CONST T_CMBX *pk_cmbx);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8851"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8853"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST T_CMBX*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_cmbx</CODE
+>
+              </TD
+><TD
+>Packet to Create Mailbox</TD
+><TD
+>Mailbox creation information</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_cmbx</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8868"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Extended information</TD
+></TR
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbxatr</CODE
+>
+              </TD
+><TD
+>Mailbox Attribute</TD
+><TD
+>Mailbox attribute</TD
+></TR
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dsname[8]</CODE
+>
+              </TD
+><TD
+>DS Object name</TD
+><TD
+>DS object name</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8895"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8897"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbxid</CODE
+>
+              </TD
+><TD
+>Mailbox ID</TD
+><TD
+>Mailbox ID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8914"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8916"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>Insufficient memory (memory for control block cannot be allocated)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>Number of mailboxes exceeds the system limit</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>Reserved attribute (<CODE
+CLASS="varname"
+>mbxatr</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>pk_cmbx</CODE
+> is invalid)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8939"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8941"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8956"
+>Related Service Profile Items</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8958"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+> (reject request to disable wait) to mailbox attribute</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+              </TD
+><TD
+>Support for specifying <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> for mailbox attribute</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN8973"
+>Description</A
+></H4
+><P
+>Creates a mailbox, assigning to it a mailbox ID. This system call allocates a control block, etc. for the created mailbox.</P
+><P
+><CODE
+CLASS="varname"
+>exinf</CODE
+> can be used freely by the user to set miscellaneous information about the created mailbox. The information set in this parameter can be referenced by <A
+HREF="synchronzation_and_communication_functions.html#tk_ref_mbx"
+>tk_ref_mbx</A
+>. If a larger area is needed for indicating user information, or if the information may need to be changed after the message buffer is created, this can be done by allocating separate memory for this purpose and putting the memory packet address in <CODE
+CLASS="varname"
+>exinf</CODE
+>. The kernel pays no attention to the contents of <CODE
+CLASS="varname"
+>exinf</CODE
+>.</P
+><P
+><CODE
+CLASS="varname"
+>mbxatr</CODE
+> indicates system attributes in its lower bits and implementation-dependent attributes in its higher bits. The system attribute part of <CODE
+CLASS="varname"
+>mbxatr</CODE
+> is as follows.</P
+><PRE
+CLASS="synopsis"
+>&#13;mbxatr := (TA_TFIFO || TA_TPRI) | (TA_MFIFO || TA_MPRI) | [TA_DSNAME] | [TA_NODISWAI]
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN8985"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>
+              </TD
+><TD
+>Tasks are queued in FIFO order</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TPRI</TT
+>
+              </TD
+><TD
+>Tasks are queued in priority order</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_MFIFO</TT
+>
+              </TD
+><TD
+>Messages are queued in FIFO order</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_MPRI</TT
+>
+              </TD
+><TD
+>Messages are queued in priority order</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_DSNAME</TT
+>
+              </TD
+><TD
+>Specifies DS object name</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>
+              </TD
+><TD
+>Disabling of wait by <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> is prohibited</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>The queuing order of tasks waiting for a mailbox can be specified in <TT
+CLASS="literal"
+>TA_TFIFO</TT
+> or <TT
+CLASS="literal"
+>TA_TPRI</TT
+>. If the attribute is <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>, tasks are ordered by FIFO, whereas <TT
+CLASS="literal"
+>TA_TPRI</TT
+> specifies queuing of tasks in order of their priority setting.</P
+><P
+><TT
+CLASS="literal"
+>TA_MFIFO</TT
+> and <TT
+CLASS="literal"
+>TA_MPRI</TT
+> are used to specify the order of messages in the message queue (messages waiting to be received). If the attribute is <TT
+CLASS="literal"
+>TA_MFIFO</TT
+> , messages are ordered by FIFO; <TT
+CLASS="literal"
+>TA_MPRI</TT
+> specifies queuing of messages in priority order. Message priority is set in a special field in the message packet. Message priority is specified by positive values, with 1 indicating the highest priority and higher numbers indicating successively lower priority. The largest value that can be expressed in the PRI type is the lowest priority. Messages having the same priority are ordered as FIFO.</P
+><P
+>When <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> is specified, <CODE
+CLASS="varname"
+>dsname</CODE
+> is valid and specifies the DS object name. DS object name is used to identify objects by debugger, and it is handled only by T-Kernel/DS API, <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>. For more details, see the description of <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>. If <TT
+CLASS="literal"
+>TA_DSNAME</TT
+> is not specified, <CODE
+CLASS="varname"
+>dsname</CODE
+> is ignored. Then <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> and <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> return <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> error.</P
+><PRE
+CLASS="programlisting"
+>&#13;#define TA_TFIFO        0x00000000      /* manage queue by FIFO */
+#define TA_TPRI         0x00000001      /* manage queue by priority */
+#define TA_MFIFO        0x00000000      /* manage message queue by FIFO */
+#define TA_MPRI         0x00000002      /* manage message queue by priority */
+#define TA_DSNAME       0x00000040      /* DS object name */
+#define TA_NODISWAI     0x00000080      /* reject request to disable wait */
+</PRE
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9038"
+>Additional Notes</A
+></H4
+><P
+>The body of a message passed by the mailbox function is located in memory; only its start address is actually sent and received.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_del_mbx"
+>tk_del_mbx - Delete Mailbox</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9043"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN9045"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_del_mbx</CODE
+>(ID mbxid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9052"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9054"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbxid</CODE
+>
+              </TD
+><TD
+>Mailbox ID</TD
+><TD
+>Mailbox ID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9067"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9069"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9082"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9084"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mbxid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the mailbox specified in <CODE
+CLASS="varname"
+>mbxid</CODE
+> does not exist)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9103"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9105"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9120"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9123"
+>Description</A
+></H4
+><P
+>Deletes the mailbox specified in <CODE
+CLASS="varname"
+>mbxid</CODE
+>.</P
+><P
+>Issuing this system call releases the mailbox ID and control block memory space, etc., associated with the mailbox.</P
+><P
+>This system call completes normally even if there are tasks waiting for messages in the deleted mailbox, but error code <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+> is returned to each of the tasks in WAITING state. Even if there are messages still in the deleted mailbox, the mailbox is deleted without returning an error code.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_snd_mbx"
+>tk_snd_mbx - Send Message to Mailbox</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9132"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN9134"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_snd_mbx</CODE
+>(ID mbxid, T_MSG *pk_msg);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9143"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9145"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbxid</CODE
+>
+              </TD
+><TD
+>Mailbox ID</TD
+><TD
+>Mailbox ID</TD
+></TR
+><TR
+><TD
+>T_MSG*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_msg</CODE
+>
+              </TD
+><TD
+>Packet of Message</TD
+><TD
+>Start address of message packet</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9164"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9166"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9179"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9181"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mbxid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the mailbox specified in <CODE
+CLASS="varname"
+>mbxid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (invalid <CODE
+CLASS="varname"
+>pk_msg</CODE
+>, or <CODE
+CLASS="varname"
+>msgpri</CODE
+> ≦ 0)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9206"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9208"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9223"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9226"
+>Description</A
+></H4
+><P
+>Sends the message packet having <CODE
+CLASS="varname"
+>pk_msg</CODE
+> as its start address to the mailbox specified in <CODE
+CLASS="varname"
+>mbxid</CODE
+>.</P
+><P
+>The message packet contents are not copied; only the start address (<CODE
+CLASS="varname"
+>pk_msg</CODE
+>) is passed at the time of message receipt. Therefore, the content of the message packet must not be overwritten until it is fetched by the task that receives this message.</P
+><P
+>If tasks are already waiting for messages in the same mailbox, the WAITING state of the task at the head of the queue is released, and the <CODE
+CLASS="varname"
+>pk_msg</CODE
+> specified in <A
+HREF="synchronzation_and_communication_functions.html#tk_snd_mbx"
+>tk_snd_mbx</A
+> is sent to that task, becoming a parameter returned by <A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+>. If there are no tasks waiting for messages in the specified mailbox, the sent message goes in the message queue of that mailbox. In neither case does the task issuing <A
+HREF="synchronzation_and_communication_functions.html#tk_snd_mbx"
+>tk_snd_mbx</A
+> enter WAITING state.</P
+><P
+><CODE
+CLASS="varname"
+>pk_msg</CODE
+> is the start address of the packet containing the message, including header. The message header has the following format.</P
+><PRE
+CLASS="programlisting"
+>&#13;typedef struct t_msg {
+        ?       ?               /* Implementation-dependent content (fixed-size) */
+} T_MSG;
+
+typedef struct t_msg_pri {
+        T_MSG   msgque;         /* message queue area */
+        PRI     msgpri;         /* message priority */
+} T_MSG_PRI;
+</PRE
+><P
+>The message header is <TT
+CLASS="literal"
+>T_MSG</TT
+> (if <TT
+CLASS="literal"
+>TA_MFIFO</TT
+> attribute is specified) or <TT
+CLASS="literal"
+>T_MSG_PRI</TT
+> (if <TT
+CLASS="literal"
+>TA_MPRI</TT
+>). In either case the message header has a fixed-size, which can be obtained by sizeof(<TT
+CLASS="literal"
+>T_MSG</TT
+>) or sizeof (<TT
+CLASS="literal"
+>T_MSG_PRI</TT
+>).</P
+><P
+>The actual message must be put in the area after the header. There is no limit on message size, which may be variable.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9249"
+>Additional Notes</A
+></H4
+><P
+>Messages are sent by <A
+HREF="synchronzation_and_communication_functions.html#tk_snd_mbx"
+>tk_snd_mbx</A
+> regardless of the status of the receiving tasks. In other words, message sending is asynchronous. What waits in the queue is not the sending task itself, but the sent message. So while there are queues of waiting messages and receiving tasks, the sending task does not go to WAITING state.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_rcv_mbx"
+>tk_rcv_mbx - Receive Message from Mailbox</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9255"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN9257"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_rcv_mbx</CODE
+>(ID mbxid, T_MSG **ppk_msg, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9268"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9270"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbxid</CODE
+>
+              </TD
+><TD
+>Mailbox ID</TD
+><TD
+>Mailbox ID</TD
+></TR
+><TR
+><TD
+>T_MSG**</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ppk_msg</CODE
+>
+              </TD
+><TD
+>Pointer to Packet of Message</TD
+><TD
+>Pointer to the area to return the return parameter <CODE
+CLASS="varname"
+>pk_msg</CODE
+></TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (ms)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9296"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9298"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+><TR
+><TD
+>T_MSG*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_msg</CODE
+>
+              </TD
+><TD
+>Packet of Message</TD
+><TD
+>Start address of message packet</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9317"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9319"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mbxid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the mailbox specified in <CODE
+CLASS="varname"
+>mbxid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>tmout</CODE
+> ≦ (-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>The object being waited for was deleted (the mailbox was deleted while waiting)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9364"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9366"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9381"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9384"
+>Description</A
+></H4
+><P
+><A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+> receives a message from the mailbox specified in <CODE
+CLASS="varname"
+>mbxid</CODE
+>.</P
+><P
+>If no messages have been sent to the mailbox (the message queue is empty), the task issuing this system call enters WAITING state and is queued for message arrival. If there are messages in the mailbox, the task issuing this system call fetches the first message in the message queue, passing this in the return parameter <CODE
+CLASS="varname"
+>pk_msg</CODE
+>.</P
+><P
+>A maximum wait time (timeout) can be set in <CODE
+CLASS="varname"
+>tmout</CODE
+>. The time unit for <CODE
+CLASS="varname"
+>tmout</CODE
+> is the same as that for system time (= 1 ms). If the <CODE
+CLASS="varname"
+>tmout</CODE
+> time elapses before the wait release condition is met (before a message arrives), the system call terminates, returning timeout error code <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>.</P
+><P
+>When <TT
+CLASS="literal"
+>TMO_POL</TT
+>＝0 is set in <CODE
+CLASS="varname"
+>tmout</CODE
+>, this means 0 was specified as the timeout value, and <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> is returned without entering WAITING state even if no message arrives. When <TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1) is set in <CODE
+CLASS="varname"
+>tmout</CODE
+>, this means infinity was specified as the timeout value, and the task continues to wait for message arrival without timing out.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9402"
+>Additional Notes</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>pk_msg</CODE
+> is the start address of the packet containing the message, including header. The message header is <TT
+CLASS="literal"
+>T_MSG</TT
+> (if <TT
+CLASS="literal"
+>TA_MFIFO</TT
+> attribute is specified) or <TT
+CLASS="literal"
+>T_MSG_PRI</TT
+> (if <TT
+CLASS="literal"
+>TA_MPRI</TT
+>).</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_rcv_mbx_u"
+>tk_rcv_mbx_u - Receive Message from Mailbox (Microseconds)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9412"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN9414"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_rcv_mbx_u</CODE
+>(ID mbxid, T_MSG **ppk_msg, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9425"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9427"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbxid</CODE
+>
+              </TD
+><TD
+>Mailbox ID</TD
+><TD
+>Mailbox ID</TD
+></TR
+><TR
+><TD
+>T_MSG**</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ppk_msg</CODE
+>
+              </TD
+><TD
+>Pointer to Packet of Message</TD
+><TD
+>Pointer to the area to return the return parameter <CODE
+CLASS="varname"
+>pk_msg</CODE
+></TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>Timeout (in microseconds)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9453"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9455"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+><TR
+><TD
+>T_MSG*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_msg</CODE
+>
+              </TD
+><TD
+>Packet of Message</TD
+><TD
+>Start address of message packet</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9474"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9476"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mbxid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the mailbox specified in <CODE
+CLASS="varname"
+>mbxid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>tmout_u</CODE
+> ≦ (-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>The object being waited for was deleted (the mailbox was deleted while waiting)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>Waiting state released (<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> received in waiting state)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>Wait released due to disabling of wait</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>Polling failed or timeout</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>Context error (issued from task-independent portion, or in dispatch disabled state)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9521"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9523"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9538"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this system call can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9541"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>Support of microsecond</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9550"
+>Description</A
+></H4
+><P
+>This system call takes 64-bit <CODE
+CLASS="varname"
+>tmout_u</CODE
+> in microseconds instead of the parameter <CODE
+CLASS="varname"
+>tmout</CODE
+> of <A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+>.</P
+><P
+>The specification of this system call is same as that of <A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+>, except that the parameter is replaced with <CODE
+CLASS="varname"
+>tmout_u</CODE
+>. For more details, see the description of <A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_ref_mbx"
+>tk_ref_mbx - Reference Mailbox Status</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9562"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN9564"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_mbx</CODE
+>(ID mbxid, T_RMBX *pk_rmbx);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9573"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9575"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbxid</CODE
+>
+              </TD
+><TD
+>Mailbox ID</TD
+><TD
+>Mailbox ID</TD
+></TR
+><TR
+><TD
+>T_RMBX*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rmbx</CODE
+>
+              </TD
+><TD
+>Packet to Refer Mailbox Status</TD
+><TD
+>Pointer to the area to return the mailbox status</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9594"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9596"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rmbx</CODE
+> Detail:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9611"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>Extended information</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wtsk</CODE
+>
+              </TD
+><TD
+>Waiting Task ID</TD
+><TD
+>Waiting task ID</TD
+></TR
+><TR
+><TD
+>T_MSG*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_msg</CODE
+>
+              </TD
+><TD
+>Packet of Message</TD
+><TD
+>Next message to be received</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>(Other implementation-dependent parameters may be added beyond this point.)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9638"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9640"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>Invalid ID number (<CODE
+CLASS="varname"
+>mbxid</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>Object does not exist (the mailbox specified in <CODE
+CLASS="varname"
+>mbxid</CODE
+> does not exist)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (invalid <CODE
+CLASS="varname"
+>pk_rmbx</CODE
+>)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9664"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9666"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9681"
+>Related Service Profile Items</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9684"
+>Description</A
+></H4
+><P
+>References the status of the mailbox specified in <CODE
+CLASS="varname"
+>mbxid</CODE
+>, passing in the return parameters the next message to be received (the first message in the message queue), waiting task ID (<CODE
+CLASS="varname"
+>wtsk</CODE
+>), and extended information (<CODE
+CLASS="varname"
+>exinf</CODE
+>).</P
+><P
+><CODE
+CLASS="varname"
+>wtsk</CODE
+> indicates the ID of a task waiting for the mailbox. If there are multiple waiting tasks, the ID of the first task in the queue is returned. If there are no waiting tasks, <CODE
+CLASS="varname"
+>wtsk</CODE
+> = 0 is returned.</P
+><P
+>If the specified mailbox does not exist, error code <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> is returned.</P
+><P
+><CODE
+CLASS="varname"
+>pk_msg</CODE
+> indicates the message that will be received the next time <A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+> is issued. If there are no messages in the message queue, <CODE
+CLASS="varname"
+>pk_msg</CODE
+> = <TT
+CLASS="literal"
+>NULL</TT
+> is returned. At least one of <CODE
+CLASS="varname"
+>pk_msg</CODE
+>= <TT
+CLASS="literal"
+>NULL</TT
+> and <CODE
+CLASS="varname"
+>wtsk</CODE
+> = 0 is always true for this system call.</P
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="task_exception_handling_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="extended_synchronization_and_communication_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Task Exception Handling Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Extended Synchronization and Communication Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

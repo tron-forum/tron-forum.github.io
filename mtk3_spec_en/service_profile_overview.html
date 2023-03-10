@@ -1,0 +1,204 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Service Profile</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel Concepts"
+HREF="concepts_underlying_utk.html"><LINK
+REL="PREVIOUS"
+TITLE="Protection Levels"
+HREF="protection_levels.html"><LINK
+REL="NEXT"
+TITLE="Common Rules of μT-Kernel"
+HREF="common_utk.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="protection_levels.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel Concepts</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="common_utk.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="service_profile_overview"
+>Service Profile</A
+></H1
+><P
+>μT-Kernel 3.0 is an OS specification for small-scale embedded computer systems, and it allows many implementations, and permits customization and optimization suitable for each target platform. For features that have strong dependency on hardware such as floating-point unit (FPU), and features that have potential implications for run-time efficiency such as hooks for debug support, the specification allows subsetting as exceptional case, and this allows efficient implementation of μT-Kernel 3.0 specification OS on target hardware. To accommodate the subsetting in this manner, and the desire to keep the distribution and portability of middleware and application high, μT-Kernel 3.0 has introduced a mechanism to let each implementation of μT-Kernel 3.0 describe the differences in the implementation from other implementation of μT-Kernel 3.0. This description as a whole is called service profile.</P
+><P
+>Service profile in μT-Kernel 3.0 is realized by enumerating the information about a particular implementation of μT-Kernel 3.0 as a list of C language macros that have constant value. For example, an implementation that allows the specification of <TT
+CLASS="literal"
+>TA_USERBUF</TT
+>, the corresponding service profile items must be defined as below to announce the support of <TT
+CLASS="literal"
+>TA_USERBUF</TT
+>.</P
+><PRE
+CLASS="programlisting"
+>&#13;#define  TK_SUPPORT_USERBUF          TRUE   /* Support of user-specified buffer
+                                               (TA_USERBUF) */
+</PRE
+><P
+>Applications and middleware can use the service profile information and write code according to the existence of the support of <TT
+CLASS="literal"
+>TA_USERBUF</TT
+>. For example, the following is a typical use case.</P
+><PRE
+CLASS="programlisting"
+>&#13;T_CTSK  ctsk = {
+        .exinf   = NULL,
+#if TK_SUPPORT_USERBUF
+        .tskatr  = TA_HLNG|TA_RNG0|TA_USERBUF,
+        .bufptr  = taskA_stack,
+#else
+        .tskatr  = TA_HLNG|TA_RNG0,
+#endif
+        .task    = task,
+        .itskpri = 10,
+        .stksz   = 2048
+};
+
+tskid = tk_cre_tsk(&#38;ctsk);
+</PRE
+><P
+>The code sample above changes, depending on the availability of <TT
+CLASS="literal"
+>TA_USERBUF</TT
+>, changes the content of parameter packet <CODE
+CLASS="varname"
+>ctsk</CODE
+> which is passed to <A
+HREF="utk_os_functions.html#tk_cre_tsk"
+>tk_cre_tsk</A
+>. In this manner, it is possible to develop applications and middleware that can be used on both the implementations, those that support <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> and those that do not. Middleware developers are requested to improve the portability and thus facilitate distribution of middleware software packages by using the service profile mechanism appropriately.</P
+><P
+>For the details of service profile items defined in μT-Kernel 3.0, see <A
+HREF="service_profile_definitions.html"
+>the Section called <I
+>Service Profile</I
+> in the Chapter called <I
+>Common Rules of μT-Kernel</I
+></A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="protection_levels.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="common_utk.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Protection Levels</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="concepts_underlying_utk.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Common Rules of μT-Kernel</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

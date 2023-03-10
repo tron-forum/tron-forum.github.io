@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>μT-Kernel 3.0の概要</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="μT-Kernel/DS API索引"
+HREF="index_of_utk_ds_api.html"><LINK
+REL="NEXT"
+TITLE="μT-Kernel 3.0の設計方針"
+HREF="design_policy_of_utk.html"></HEAD
+><BODY
+CLASS="chapter"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="index_of_utk_ds_api.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="design_policy_of_utk.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="chapter"
+><H1
+><A
+NAME="utk_overview"
+></A
+>μT-Kernel 3.0の概要</H1
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="position_of_utk"
+>TRONプロジェクトとμT-Kernel 3.0</A
+></H1
+><P
+>本仕様書では、「μT-Kernel 3.0」と呼ばれるリアルタイムOSの仕様を規定している。μT-Kernel 3.0は、1984年に東京大学の坂村健博士により始められたTRONプロジェクト(http://www.tron.org/)の最新の成果である。</P
+><P
+>TRONプロジェクトでは、当時登場したばかりの小さな制御用マイクロコンピュータが、身の回りのあらゆる機器の中に組み込まれ、相互に通信しながら機器を制御することによって、人間にとって最適な環境を作ることを想定した。TRONプロジェクトにおいては、このような概念を「超機能分散システム(HFDS: Highly-Functionally Distributed System)」と呼び、この制御を効率よく行うためのリアルタイムOS「ITRON」を開発した。ITRONの最初のバージョンであるITRON1の仕様書は1987年に出版されている。さらに、オープンの哲学に基づいてその仕様書や技術情報を誰でも無償で利用できるように公開し、産学協同での研究開発を進めた。その結果、非常に多くのプロセッサで動作するITRON仕様OSが誕生し、組込み機器用リアルタイムOSのデファクトスタンダードとなった。並行して、ITRONの機能を強化し、適応性をより高めたバージョンアップ版である「μITRON」の開発が行われた。ITRONやμITRONは、家電やAV機器などの民生品から自動車のエンジン制御、工場内の機械制御といった産業分野まで、さまざまな分野の組込みシステムに採用された。</P
+><P
+>TRONプロジェクトの提唱したHFDSの概念は、21世紀に入る頃には「ユビキタスコンピューティング」と呼ばれるようになり、さらに現在ではIoT(Internet of Things)と呼ばれている。TRONプロジェクトでは、1984年のプロジェクト開始当初より、今で言うIoTがマイクロコンピュータの重要な応用分野になると考え、そのためのOSやアーキテクチャの研究開発を行ってきた。IoTエッジノード向けとしては、μITRONをさらに改良した省資源の組込みリアルタイムOS「μT-Kernel」が開発された。</P
+><P
+>こういった成果と実績により、プロジェクト開始から30年後の2010年代においては、組込み機器の約60%がTRONプロジェクトの成果を利用していると報告されている(https://www.tron.org/ja/2018/04/press20180403/)。さらに2018年には、世界規模の標準化組織であるIEEE(Institute of Electrical and Electronics Engineers, 米国電気電子学会)が、μT-Kernelのバージョンアップ版であるμT-Kernel 2.0をIoTエッジノード向けリアルタイムOSの標準仕様として認定し、ほぼ同等の仕様を「IEEE 2050-2018」として公開した。</P
+><P
+>本書で仕様を規定するμT-Kernel 3.0は、IoTエッジノードの制御用に特化する形でμT-Kernel 2.0の一部の機能を整理した、μT-Kernelの最新版のOS仕様である。また、μT-Kernel 3.0では、IEEE 2050-2018で追加されたAPIなどをフィードバックする形でIEEE 2050-2018との整合性を高めている。その結果、IEEE 2050-2018に対してμT-Kernel 3.0は完全な上位互換のOSとなっている。</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="index_of_utk_ds_api.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="design_policy_of_utk.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>μT-Kernel/DS API索引</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>μT-Kernel 3.0の設計方針</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

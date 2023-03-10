@@ -1,0 +1,6614 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>拡張同期・通信機能</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/OSの機能"
+HREF="utk_os_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="同期・通信機能"
+HREF="synchronzation_and_communication_functions.html"><LINK
+REL="NEXT"
+TITLE="メモリプール管理機能"
+HREF="memory_pool_management_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="synchronzation_and_communication_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/OSの機能</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="memory_pool_management_functions.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="extended_synchronization_and_communication_functions"
+>拡張同期・通信機能</A
+></H1
+><P
+>拡張同期・通信機能は、タスクとは独立したオブジェクトにより、タスク間の高度な同期・通信を行うための機能である。ミューテックス、メッセージバッファの各機能が含まれる。</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="mutex"
+>ミューテックス</A
+></H2
+><P
+>ミューテックスは、共有資源を使用する際にタスク間で排他制御を行うためのオブジェクトである。ミューテックスは、排他制御に伴う上限のない優先度逆転を防ぐための機構として、優先度継承プロトコル(priority inheritance protocol)と優先度上限プロトコル(priority ceiling protocol)をサポートする。</P
+><P
+>ミューテックス機能には、ミューテックスを生成／削除する機能、ミューテックスをロック／ロック解除する機能、ミューテックスの状態を参照する機能が含まれる。ミューテックスはID番号で識別されるオブジェクトである。ミューテックスのID番号をミューテックスIDと呼ぶ。</P
+><P
+>ミューテックスは、ロックされているかどうかの状態と、ロックを待つタスクの待ち行列を持つ。また、カーネルは、各ミューテックスに対してそれをロックしているタスクを、各タスクに対してそれがロックしているミューテックスの集合を管理する。タスクは、資源を使用する前に、ミューテックスをロックする。ミューテックスが他のタスクにロックされていた場合には、ミューテックスがロック解除されるまで、ミューテックスのロック待ち状態となる。ミューテックスのロック待ち状態になったタスクは、そのミューテックスの待ち行列につながれる。タスクは、資源の使用を終えると、ミューテックスのロックを解除する。</P
+><P
+>ミューテックスは、ミューテックス属性に <TT
+CLASS="literal"
+>TA_INHERIT</TT
+>(＝0x02)を指定することにより優先度継承プロトコルを、<TT
+CLASS="literal"
+>TA_CEILING</TT
+>(＝0x03)を指定することにより優先度上限プロトコルをサポートする。<TT
+CLASS="literal"
+>TA_CEILING</TT
+> 属性のミューテックスに対しては、そのミューテックスをロックする可能性のあるタスクの中で最も高いベース優先度を持つタスクのベース優先度を、ミューテックス生成時に上限優先度として設定する。<TT
+CLASS="literal"
+>TA_CEILING</TT
+> 属性のミューテックスを、その上限優先度よりも高いベース優先度を持つタスクがロックしようとした場合、<SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+> エラーとなる。また、<TT
+CLASS="literal"
+>TA_CEILING</TT
+> 属性のミューテックスをロックしているかロックを待っているタスクのベース優先度を、<A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+> によってそのミューテックスの上限優先度よりも高く設定しようとした場合、<A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+> が <SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+> エラーを返す。</P
+><P
+>これらのプロトコルを用いた場合、上限のない優先度逆転を防ぐために、ミューテックスの操作に伴ってタスクの現在優先度が自動的に変更される。優先度継承プロトコルと優先度上限プロトコルに厳密に従うなら、タスクの現在優先度を、次に挙げる優先度の最高値に常に一致するように変更する必要がある。これを、厳密な優先度制御規則と呼ぶ。<P
+></P
+><UL
+><LI
+><P
+>タスクのベース優先度</P
+></LI
+><LI
+><P
+>タスクが <TT
+CLASS="literal"
+>TA_INHERIT</TT
+> 属性のミューテックスをロックしている場合、それらのミューテックスのロックを待っているタスクの中で、最も高い現在優先度を持つタスクの現在優先度</P
+></LI
+><LI
+><P
+>タスクが <TT
+CLASS="literal"
+>TA_CEILING</TT
+> 属性のミューテックスをロックしている場合、それらのミューテックス中で、最も高い上限優先度を持つミューテックスの上限優先度</P
+></LI
+></UL
+></P
+><P
+>ここで、<TT
+CLASS="literal"
+>TA_INHERIT</TT
+> 属性のミューテックスを待っているタスクの現在優先度が、ミューテックス操作か <A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+> によるベース優先度の変更に伴って変更された場合、そのミューテックスをロックしているタスクの現在優先度の変更が必要になる場合がある。これを推移的な優先度継承と呼ぶ。さらにそのタスクが、別の <TT
+CLASS="literal"
+>TA_INHERIT</TT
+> 属性のミューテックスを待っていた場合には、そのミューテックスをロックしているタスクに対して推移的な優先度継承の処理が必要になる場合がある。</P
+><P
+>T-Kernelでは、上述の厳密な優先度制御規則に加えて、現在優先度を変更する状況を限定した優先度制御規則(これを簡略化した優先度制御規則と呼ぶ)を規定し、どちらを採用するかは実装定義とする。具体的には、簡略化した優先度制御規則においては、タスクの現在優先度を高くする方向の変更はすべて行うのに対して、現在優先度を低くする方向の変更は、タスクがロックしているミューテックスがなくなった時にのみ行う(この場合には、タスクの現在優先度をベース優先度に戻すことになる)。より具体的には、次の状況でのみ現在優先度を変更する処理を行えばよい。<P
+></P
+><UL
+><LI
+><P
+>タスクがロックしている <TT
+CLASS="literal"
+>TA_INHERIT</TT
+> 属性のミューテックスを、そのタスクよりも高い現在優先度を持つタスクが待ち始めた時</P
+></LI
+><LI
+><P
+>タスクAによってロックされている <TT
+CLASS="literal"
+>TA_INHERIT</TT
+> 属性のミューテックスを待っている別のタスクBが、タスクAよりも高い現在優先度に変更された時</P
+></LI
+><LI
+><P
+>タスクが、そのタスクの現在優先度よりも高い上限優先度を持つ <TT
+CLASS="literal"
+>TA_CEILING</TT
+> 属性のミューテックスをロックした時</P
+></LI
+><LI
+><P
+>タスクがロックしているミューテックスがなくなった時</P
+></LI
+></UL
+></P
+><P
+>ミューテックスの操作に伴ってタスクの現在優先度を変更した場合には、次の処理を行う。</P
+><P
+>優先度を変更されたタスクが実行できる状態である場合、タスクの優先順位を、変更後の優先度にしたがって変化させる。変更後の優先度と同じ優先度を持つタスクの間での優先順位は、実装依存である。優先度が変更されたタスクが何らかのタスク優先度順の待ち行列につながれている場合にも、その待ち行列の中での順序を、変更後の優先度にしたがって変化させる。変更後の優先度と同じ優先度を持つタスクの間での順序は、実装依存である。タスクが終了する時に、そのタスクがロックしているミューテックスが残っている場合には、それらのミューテックスをすべてロック解除する。ロックしているミューテックスが複数ある場合には、それらをロック解除する順序は実装依存である。ロック解除の具体的な処理内容については、<A
+HREF="extended_synchronization_and_communication_functions.html#tk_unl_mtx"
+>tk_unl_mtx</A
+> の機能説明を参照すること。</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>補足事項</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+><TT
+CLASS="literal"
+>TA_TFIFO</TT
+> 属性または <TT
+CLASS="literal"
+>TA_TPRI</TT
+> 属性のミューテックスは、最大資源数が1のセマフォ(バイナリセマフォ)と同等の機能を持つ。ただし、ミューテックスは、ロックしたタスク以外はロック解除できない、タスク終了時に自動的にロック解除されるなどの違いがある。</P
+><P
+>ここでいう優先度上限プロトコルは、広い意味での優先度上限プロトコルで、最初に優先度上限プロトコルとして提案されたアルゴリズムではない。厳密には、highest locker protocolなどと呼ばれているアルゴリズムである。</P
+><P
+>ミューテックスの操作に伴ってタスクの現在優先度を変更した結果、優先度を変更されたタスクのタスク優先度順の待ち行列の中での順序が変化した場合、優先度を変更されたタスクないしはその待ち行列で待っている他のタスクの待ち解除が必要になる場合がある。</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>仕様決定の理由</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>ミューテックスの操作に伴ってタスクの現在優先度を変更した場合に、変更後の優先度と同じ優先度を持つタスクの間での優先順位を実装依存としたのは、次の理由による。アプリケーションによっては、ミューテックス機能による現在優先度の変更が頻繁に発生する可能性があり、それに伴ってタスク切替えが多発するのは望ましくない(同じ優先度を持つタスクの間での優先順位を最低とすると、不必要なタスク切替えが起こる)。理想的には、タスクの優先度ではなく優先順位を継承するのが望ましいが、このような仕様にすると実装上のオーバヘッドが大きくなるため、実装依存とすることにした。</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_cre_mtx"
+>tk_cre_mtx - ミューテックス生成</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9767"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN9769"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID mtxid = tk_cre_mtx</CODE
+>(CONST T_CMTX *pk_cmtx);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9776"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9778"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST T_CMTX*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_cmtx</CODE
+>
+              </TD
+><TD
+>Packet to Create Mutex</TD
+><TD
+>ミューテックス生成情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_cmtx</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9793"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>拡張情報</TD
+></TR
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mtxatr</CODE
+>
+              </TD
+><TD
+>Mutex Attribute</TD
+><TD
+>ミューテックス属性</TD
+></TR
+><TR
+><TD
+>PRI</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ceilpri</CODE
+>
+              </TD
+><TD
+>Ceiling Priority of Mutex</TD
+><TD
+>ミューテックスの上限優先度</TD
+></TR
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dsname[8]</CODE
+>
+              </TD
+><TD
+>DS Object name</TD
+><TD
+>DSオブジェクト名称</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9826"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9828"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mtxid</CODE
+>
+              </TD
+><TD
+>Mutex ID</TD
+><TD
+>ミューテックスID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9845"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9847"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>メモリ不足(管理ブロック用の領域が確保できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>ミューテックスの数がシステムの上限を超えた</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>予約属性(<CODE
+CLASS="varname"
+>mtxatr</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>pk_cmtx</CODE
+>, <CODE
+CLASS="varname"
+>ceilpri</CODE
+> が不正)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9871"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9873"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9888"
+>関連するサービスプロファイル</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9890"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>ミューテックス属性として<TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>(待ち禁止の拒否)が指定可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+              </TD
+><TD
+><TT
+CLASS="literal"
+>TA_DSNAME</TT
+>のミューテックス属性指定が可能</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9905"
+>解説</A
+></H4
+><P
+>ミューテックスを生成しミューテックスID番号を割り当てる。具体的には、生成するミューテックスに対して管理ブロックなどを割り付ける。</P
+><P
+><CODE
+CLASS="varname"
+>exinf</CODE
+> は、対象ミューテックスに関する情報を入れておくためにユーザが自由に利用できる。ここで設定した情報は、<A
+HREF="extended_synchronization_and_communication_functions.html#tk_ref_mtx"
+>tk_ref_mtx</A
+> で取り出すことができる。なお、ユーザの情報を入れるためにもっと大きな領域がほしい場合や、途中で内容を変更したい場合には、自分でそのためのメモリを確保し、そのメモリパケットのアドレスを <CODE
+CLASS="varname"
+>exinf</CODE
+> に入れる。カーネルでは <CODE
+CLASS="varname"
+>exinf</CODE
+> の内容について関知しない。</P
+><P
+><CODE
+CLASS="varname"
+>mtxatr</CODE
+> は、下位側がシステム属性を表し、上位側が実装独自属性を表す。<CODE
+CLASS="varname"
+>mtxatr</CODE
+> のシステム属性の部分では、次のような指定を行う。</P
+><PRE
+CLASS="synopsis"
+>&#13;mtxatr := (TA_TFIFO || TA_TPRI || TA_INHERIT || TA_CEILING) | [TA_DSNAME] | [TA_NODISWAI]
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9917"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>
+              </TD
+><TD
+>待ちタスクのキューイングはFIFO</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TPRI</TT
+>
+              </TD
+><TD
+>待ちタスクのキューイングは優先度順</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_INHERIT</TT
+>
+              </TD
+><TD
+>優先度継承プロトコル</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_CEILING</TT
+>
+              </TD
+><TD
+>優先度上限プロトコル</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_DSNAME</TT
+>
+              </TD
+><TD
+>DSオブジェクト名称を指定する</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>
+              </TD
+><TD
+><A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> による待ち禁止を拒否する</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><TT
+CLASS="literal"
+>TA_TFIFO</TT
+> の場合、ミューテックスのタスクの待ち行列はFIFOとなる。<TT
+CLASS="literal"
+>TA_TPRI</TT
+>, <TT
+CLASS="literal"
+>TA_INHERIT</TT
+>, <TT
+CLASS="literal"
+>TA_CEILING</TT
+> では、タスクの優先度順となる。<TT
+CLASS="literal"
+>TA_INHERIT</TT
+> では優先度継承プロトコル、<TT
+CLASS="literal"
+>TA_CEILING</TT
+> では優先度上限プロトコルが適用される。</P
+><P
+><TT
+CLASS="literal"
+>TA_CEILING</TT
+> の場合のみ <CODE
+CLASS="varname"
+>ceilpri</CODE
+> が有効となり、ミューテックスの上限優先度を設定する。</P
+><P
+><TT
+CLASS="literal"
+>TA_DSNAME</TT
+> を指定した場合に <CODE
+CLASS="varname"
+>dsname</CODE
+> が有効となり、DSオブジェクト名称として設定される。DSオブジェクト名称はデバッガがオブジェクトを識別するために使用され、T-Kernel/DSのシステムコール <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> と <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> からのみ操作可能である。詳細は <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> 、<A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> を参照のこと。<TT
+CLASS="literal"
+>TA_DSNAME</TT
+> を指定しなかった場合は、<CODE
+CLASS="varname"
+>dsname</CODE
+> が無視され、<A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> や <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> が、<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> エラーとなる。</P
+><PRE
+CLASS="programlisting"
+>&#13;#define TA_TFIFO        0x00000000      /* 待ちタスクをFIFOで管理 */
+#define TA_TPRI         0x00000001      /* 待ちタスクを優先度順で管理 */
+#define TA_INHERIT      0x00000002      /* 優先度継承プロトコル */
+#define TA_CEILING      0x00000003      /* 優先度上限プロトコル */
+#define TA_DSNAME       0x00000040      /* DSオブジェクト名称を指定 */
+#define TA_NODISWAI     0x00000080      /* 待ち禁止拒否 */
+</PRE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_del_mtx"
+>tk_del_mtx - ミューテックス削除</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9972"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN9974"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_del_mtx</CODE
+>(ID mtxid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9981"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9983"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mtxid</CODE
+>
+              </TD
+><TD
+>Mutex ID</TD
+><TD
+>ミューテックスID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN9996"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN9998"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10011"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10013"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>mtxid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>mtxid</CODE
+> のミューテックスが存在しない)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10032"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10034"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10049"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10052"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>mtxid</CODE
+> で示されたミューテックスを削除する。</P
+><P
+>本システムコールの発行により、対象ミューテックスのID番号および管理ブロック用の領域は解放される。</P
+><P
+>対象ミューテックスにおいてロック待ちしているタスクがあった場合にも、本システムコールは正常終了するが、待ち状態にあったタスクにはエラー <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+> が返される。</P
+><P
+>ミューテックスが削除されると、そのミューテックスをロックしているタスクにとっては、ロックしているミューテックスが減ることになる。したがって、削除されるミューテックスが <TT
+CLASS="literal"
+>TA_INHERIT</TT
+> または <TT
+CLASS="literal"
+>TA_CEILING</TT
+> 属性の場合には、ロックしていたタスクの優先度が変更される場合がある。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_loc_mtx"
+>tk_loc_mtx - ミューテックスのロック</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10064"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN10066"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_loc_mtx</CODE
+>(ID mtxid, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10075"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10077"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mtxid</CODE
+>
+              </TD
+><TD
+>Mutex ID</TD
+><TD
+>ミューテックスID</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト指定(ミリ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10096"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10098"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10111"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10113"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>mtxid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>mtxid</CODE
+> のミューテックスが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>tmout</CODE
+>≦(-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>待ちオブジェクトが削除された(待ちの間に対象ミューテックスが削除)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>ポーリング失敗またはタイムアウト</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+>
+              </TD
+><TD
+>不正使用(多重ロック、上限優先度違反)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10162"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10164"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10179"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10182"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>mtxid</CODE
+> のミューテックスをロックする。ミューテックスがロックできれば、本システムコールの発行タスクは待ち状態に入らず、実行を継続する。この場合、そのミューテックスはロック状態になる。ロックできなければ、本システムコールを発行したタスクは待ち状態に入る。すなわち、そのミューテックスに対する待ち行列につながれる。</P
+><P
+><CODE
+CLASS="varname"
+>tmout</CODE
+> により待ち時間の最大値(タイムアウト値)を指定することができる。<CODE
+CLASS="varname"
+>tmout</CODE
+> の基準時間(時間の単位)はシステム時刻の基準時間(＝1ミリ秒)と同じである。待ち解除の条件が満足されない(ロックが解除されない)まま <CODE
+CLASS="varname"
+>tmout</CODE
+> の時間が経過すると、タイムアウトエラー <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> となってシステムコールが終了する。</P
+><P
+><CODE
+CLASS="varname"
+>tmout</CODE
+> として <TT
+CLASS="literal"
+>TMO_POL</TT
+>＝0を指定した場合は、タイムアウト値として0を指定したことを示し、ロックできなくても待ちに入らず <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> を返す。また、<CODE
+CLASS="varname"
+>tmout</CODE
+> として <TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1)を指定した場合は、タイムアウト値として無限大の時間を指定したことを示し、タイムアウトせずにロックできるまで待ち続ける。</P
+><P
+>自タスクがすでに対象ミューテックスをロックしていた場合には、<SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+>(多重ロック)を返す。</P
+><P
+>対象ミューテックスが <TT
+CLASS="literal"
+>TA_CEILING</TT
+> 属性の場合、自タスクのベース優先度<A
+NAME="AEN10201"
+HREF="#FTN.AEN10201"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+>が対象ミューテックスの上限優先度より高い場合には <SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+>(上限優先度違反)を返す。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10206"
+>補足事項</A
+></H4
+><P
+></P
+><UL
+><LI
+><P
+><TT
+CLASS="literal"
+>TA_INHERIT</TT
+> 属性のミューテックスの場合</P
+><P
+>自タスクがロック待ち状態になる場合、そのミューテックスをロックしているタスクの現在優先度が自タスクより低ければ、ロックしているタスクの優先度を自タスクと同じ優先度まで引き上げる。ロックを待っているタスクがロックを獲得せずに待ちを終了した場合(タイムアウトなど)、そのミューテックスをロック中のタスクの優先度を、次の内の最も高い優先度まで引き下げる。ただし、この優先度の引き下げを行うか否かは実装依存である。</P
+><P
+></P
+><OL
+TYPE="a"
+><LI
+><P
+>そのミューテックスでロック待ちしているタスクの現在優先度の内の最も高い優先度。</P
+></LI
+><LI
+><P
+>そのミューテックスをロック中のタスクがロックしている他のすべてのミューテックスの内の最も高い優先度。</P
+></LI
+><LI
+><P
+>ロック中のタスクのベース優先度。</P
+></LI
+></OL
+></LI
+><LI
+><P
+><TT
+CLASS="literal"
+>TA_CEILING</TT
+> 属性のミューテックスの場合</P
+><P
+>自タスクがロックを獲得した場合、自タスクの現在優先度がミューテックスの上限優先度より低ければ、自タスクの優先度をミューテックスの上限優先度まで引き上げる。</P
+></LI
+></UL
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_loc_mtx_u"
+>tk_loc_mtx_u - ミューテックスのロック(マイクロ秒単位)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10226"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN10228"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_loc_mtx_u</CODE
+>(ID mtxid, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10237"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10239"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mtxid</CODE
+>
+              </TD
+><TD
+>Mutex ID</TD
+><TD
+>ミューテックスID</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト指定(マイクロ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10258"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10260"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10273"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10275"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>mtxid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>mtxid</CODE
+> のミューテックスが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>tmout_u</CODE
+>≦(-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>待ちオブジェクトが削除された(待ちの間に対象ミューテックスが削除)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>ポーリング失敗またはタイムアウト</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+>
+              </TD
+><TD
+>不正使用(多重ロック、上限優先度違反)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10324"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10326"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10341"
+>関連するサービスプロファイル</A
+></H4
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10344"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>マイクロ秒のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10353"
+>解説</A
+></H4
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_loc_mtx"
+>tk_loc_mtx</A
+> のパラメータである <CODE
+CLASS="varname"
+>tmout</CODE
+> を64ビットマイクロ秒単位の <CODE
+CLASS="varname"
+>tmout_u</CODE
+> としたシステムコールである。</P
+><P
+>パラメータが <CODE
+CLASS="varname"
+>tmout_u</CODE
+> となった点を除き、本システムコールの仕様は <A
+HREF="extended_synchronization_and_communication_functions.html#tk_loc_mtx"
+>tk_loc_mtx</A
+> と同じである。詳細は <A
+HREF="extended_synchronization_and_communication_functions.html#tk_loc_mtx"
+>tk_loc_mtx</A
+> の説明を参照のこと。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_unl_mtx"
+>tk_unl_mtx - ミューテックスのアンロック</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10365"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN10367"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_unl_mtx</CODE
+>(ID mtxid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10374"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10376"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mtxid</CODE
+>
+              </TD
+><TD
+>Mutex ID</TD
+><TD
+>ミューテックスID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10389"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10391"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10404"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10406"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>mtxid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>mtxid</CODE
+> のミューテックスが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+>
+              </TD
+><TD
+>不正使用(自タスクがロックしたミューテックスではない)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10429"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10431"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10446"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10449"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>mtxid</CODE
+> のミューテックスのロックを解除する。</P
+><P
+>ロック待ちしているタスクがあれば、待ち行列の先頭のタスクの待ちを解除し、そのタスクをロック獲得状態にする。</P
+><P
+>自タスクがロックしていないミューテックスを指定した場合、<SPAN
+CLASS="errorname"
+>E_ILUSE</SPAN
+> を返す。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10456"
+>補足事項</A
+></H4
+><P
+>ロック解除したミューテックスが <TT
+CLASS="literal"
+>TA_INHERIT</TT
+> または <TT
+CLASS="literal"
+>TA_CEILING</TT
+> 属性の場合、次のようにタスク優先度を引き下げる必要がある。</P
+><P
+>ロックを解除することにより、自タスクがロックしているミューテックスがすべてなくなった場合は、自タスクの優先度をベース優先度まで引き下げる。</P
+><P
+>自タスクがロック中のミューテックスが残っている場合、自タスクの優先度を次の内の最も高い優先度まで引き下げる。</P
+><P
+></P
+><OL
+TYPE="a"
+><LI
+><P
+>自タスクがロックしている <TT
+CLASS="literal"
+>TA_INHERIT</TT
+> 属性を持つミューテックスの待ち行列につながれているタスクの現在優先度の中で最も高い優先度</P
+></LI
+><LI
+><P
+>自タスクがロックしている <TT
+CLASS="literal"
+>TA_CEILING</TT
+> 属性を持つミューテックスに設定されている上限優先度の中で最も高い優先度</P
+></LI
+><LI
+><P
+>自タスクのベース優先度</P
+></LI
+></OL
+><P
+>ただし、ロック中のミューテックスが残っている場合の優先度の引き下げを行うか否かは実装依存である。</P
+><P
+>ミューテックスをロックした状態でタスクを終了した(休止状態(DORMANT)または未登録状態(NON-EXISTENT)になった)場合、当該タスクがロックしているすべてのミューテックスは自動的にロック解除される。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_ref_mtx"
+>tk_ref_mtx - ミューテックス状態参照</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10476"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN10478"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_mtx</CODE
+>(ID mtxid, T_RMTX *pk_rmtx);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10487"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10489"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mtxid</CODE
+>
+              </TD
+><TD
+>Mutex ID</TD
+><TD
+>ミューテックスID</TD
+></TR
+><TR
+><TD
+>T_RMTX*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rmtx</CODE
+>
+              </TD
+><TD
+>Packet to Refer Mutex Status</TD
+><TD
+>ミューテックス状態を返す領域へのポインタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10508"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10510"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rmtx</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10525"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>拡張情報</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>htsk</CODE
+>
+              </TD
+><TD
+>Locking Task ID</TD
+><TD
+>ロックしているタスクのID</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wtsk</CODE
+>
+              </TD
+><TD
+>Lock Waiting Task ID</TD
+><TD
+>ロック待ちタスクのID</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10552"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10554"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>mtxid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>mtxid</CODE
+> のミューテックスが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>pk_rmtx</CODE
+> が不正)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10578"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10580"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10595"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10598"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>mtxid</CODE
+> で示された対象ミューテックスの各種の状態を参照し、リターンパラメータとしてロック中のタスク(<CODE
+CLASS="varname"
+>htsk</CODE
+>)、ロック待ちタスク(<CODE
+CLASS="varname"
+>wtsk</CODE
+>)、拡張情報(<CODE
+CLASS="varname"
+>exinf</CODE
+>) を返す。</P
+><P
+><CODE
+CLASS="varname"
+>htsk</CODE
+> は、このミューテックスをロックしているタスクのIDを示す。ロックしているタスクがない場合は <CODE
+CLASS="varname"
+>htsk</CODE
+>＝0となる。</P
+><P
+><CODE
+CLASS="varname"
+>wtsk</CODE
+> は、このミューテックスで待っているタスクのIDを示す。複数のタスクが待っている場合には、待ち行列の先頭のタスクのIDを返す。待ちタスクが無い場合は <CODE
+CLASS="varname"
+>wtsk</CODE
+>＝0となる。</P
+><P
+>対象ミューテックスが存在しない場合には、エラー <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> となる。</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="message_buffer"
+>メッセージバッファ</A
+></H2
+><P
+>メッセージバッファは、可変長のメッセージを受渡しすることにより、同期と通信を行うためのオブジェクトである。メッセージバッファ機能には、メッセージバッファを生成／削除する機能、メッセージバッファに対してメッセージを送信／受信する機能、メッセージバッファの状態を参照する機能が含まれる。メッセージバッファはID番号で識別されるオブジェクトである。メッセージバッファのID番号をメッセージバッファIDと呼ぶ。</P
+><P
+>メッセージバッファは、メッセージの送信を待つタスクの待ち行列(送信待ち行列)とメッセージの受信を待つタスクの待ち行列(受信待ち行列)を持つ。また、送信されたメッセージを格納するためのメッセージバッファ領域を持つ。メッセージを送信する側(イベントを知らせる側)では、送信したいメッセージをメッセージバッファにコピーする。メッセージバッファ領域の空き領域が足りなくなった場合、メッセージバッファ領域に十分な空きができるまでメッセージバッファへの送信待ち状態になる。</P
+><P
+>メッセージバッファへの送信待ち状態になったタスクは、そのメッセージバッファの送信待ち行列につながれる。一方、メッセージを受信する側(イベントを待つ側)では、メッセージバッファに入っているメッセージを一つ取り出す。メッセージバッファにメッセージが入っていない場合は、次にメッセージが送られてくるまでメッセージバッファからの受信待ち状態になる。メッセージバッファからの受信待ち状態になったタスクは、そのメッセージバッファの受信待ち行列につながれる。</P
+><P
+>メッセージバッファ領域のサイズを0にすることで、同期メッセージ機能を実現することができる。すなわち、送信側のタスクと受信側のタスクが、それぞれ相手のタスクがシステムコールを呼び出すのを待ち合わせ、両者がシステムコールを呼び出した時点で、メッセージの受渡しが行われる。</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>補足事項</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>メッセージバッファ領域のサイズを0にした場合の、メッセージバッファの動作を<A
+HREF="extended_synchronization_and_communication_functions.html#figure_message_buffer"
+>図3</A
+>の例を用いて説明する。この図で、タスクAとタスクBは非同期に実行しているものとする。<P
+></P
+><UL
+><LI
+><P
+>もしタスクAが先に <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+> を呼び出した場合には、タスクBが <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+> を呼び出すまでタスクAは待ち状態となる。この時タスクAは、メッセージバッファへの送信待ち状態になっている(<A
+HREF="extended_synchronization_and_communication_functions.html#figure_message_buffer"
+>図3</A
+>(a))。</P
+></LI
+><LI
+><P
+>逆にタスクBが先に <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+> を呼び出した場合には、タスクAが <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+> を呼び出すまでタスクBは待ち状態となる。この時タスクBは、メッセージバッファからの受信待ち状態になっている(<A
+HREF="extended_synchronization_and_communication_functions.html#figure_message_buffer"
+>図3</A
+>(b))。</P
+></LI
+><LI
+><P
+>タスクAが <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+> を呼び出し、タスクBが <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+> を呼び出した時点で、タスクAからタスクBへメッセージの受渡しが行われる。その後は、両タスクとも実行できる状態となる。</P
+></LI
+></UL
+></P
+><DIV
+CLASS="figure"
+><A
+NAME="figure_message_buffer"
+></A
+><P
+><B
+>図 3. メッセージバッファによる同期通信</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_10s.png"></P
+></DIV
+></DIV
+><P
+>メッセージバッファへの送信を待っているタスクは、待ち行列につながれている順序でメッセージを送信する。例えば、あるメッセージバッファに対して40バイトのメッセージを送信しようとしているタスクAと、10バイトのメッセージを送信しようとしているタスクBが、この順で待ち行列につながれている時に、別のタスクによるメッセージの受信により20バイトの空き領域ができたとする。このような場合でも、タスクAがメッセージを送信するまで、タスクBはメッセージを送信できない。</P
+><P
+>メッセージバッファは、可変長のメッセージをコピーして受渡しする。メールボックスとの違いは、メッセージをコピーすることである。</P
+><P
+>メッセージバッファは、リングバッファで実装することを想定している。</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_cre_mbf"
+>tk_cre_mbf - メッセージバッファ生成</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10650"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN10652"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ID mbfid = tk_cre_mbf</CODE
+>(CONST T_CMBF *pk_cmbf);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10659"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10661"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST T_CMBF*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_cmbf</CODE
+>
+              </TD
+><TD
+>Packet to Create Message Buffer</TD
+><TD
+>メッセージバッファ生成情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_cmbf</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10676"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>拡張情報</TD
+></TR
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfatr</CODE
+>
+              </TD
+><TD
+>Message Buffer Attribute</TD
+><TD
+>メッセージバッファ属性</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>bufsz</CODE
+>
+              </TD
+><TD
+>Buffer Size</TD
+><TD
+>メッセージバッファのサイズ(バイト数)</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>maxmsz</CODE
+>
+              </TD
+><TD
+>Max Message Size</TD
+><TD
+>メッセージの最大長(バイト数)</TD
+></TR
+><TR
+><TD
+>UB</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dsname[8]</CODE
+>
+              </TD
+><TD
+>DS Object name</TD
+><TD
+>DSオブジェクト名称</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>bufptr</CODE
+>
+              </TD
+><TD
+>Buffer Pointer</TD
+><TD
+>ユーザバッファポインタ</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10721"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10723"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfid</CODE
+>
+              </TD
+><TD
+>Message Buffer ID</TD
+><TD
+>メッセージバッファID</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10740"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10742"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>メモリ不足(管理ブロックやリングバッファ用の領域が確保できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_LIMIT</SPAN
+>
+              </TD
+><TD
+>メッセージバッファの数がシステムの上限を超えた</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>予約属性(<CODE
+CLASS="varname"
+>mbfatr</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>pk_cmbf</CODE
+> が不正, <CODE
+CLASS="varname"
+>bufsz</CODE
+>, <CODE
+CLASS="varname"
+>maxmsz</CODE
+> が負または不正, <CODE
+CLASS="varname"
+>bufptr</CODE
+> が不正)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10768"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10770"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10785"
+>関連するサービスプロファイル</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10787"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USERBUF</TT
+>
+              </TD
+><TD
+><TT
+CLASS="literal"
+>TA_USERBUF</TT
+>のメッセージバッファ属性指定が可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_AUTOBUF</TT
+>
+              </TD
+><TD
+>自動バッファ割当て(<TT
+CLASS="literal"
+>TA_USERBUF</TT
+>のメッセージバッファ属性指定なし)が可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>メッセージバッファ属性として<TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>(待ち禁止の拒否)が指定可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+              </TD
+><TD
+><TT
+CLASS="literal"
+>TA_DSNAME</TT
+>のメッセージバッファ属性指定が可能</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10812"
+>解説</A
+></H4
+><P
+>メッセージバッファを生成しメッセージバッファID番号を割り当てる。具体的には、生成するメッセージバッファに対して管理ブロックを割り付ける。また、<CODE
+CLASS="varname"
+>bufsz</CODE
+> の情報を元に、メッセージキュー(受信されるのを待つメッセージの待ち行列) として利用するためのリングバッファの領域を確保する。</P
+><P
+>メッセージバッファは、可変長メッセージの送受信の管理を行うオブジェクトである。メールボックス(mbx)との違いは、送信時と受信時に可変長のメッセージ内容がコピーされるということである。また、バッファが一杯の場合に、メッセージ送信側も待ち状態に入る機能がある。</P
+><P
+><CODE
+CLASS="varname"
+>exinf</CODE
+> は、対象メッセージバッファに関する情報を入れておくためにユーザが自由に利用できる。ここで設定した情報は、<A
+HREF="extended_synchronization_and_communication_functions.html#tk_ref_mbf"
+>tk_ref_mbf</A
+> で取り出すことができる。なお、ユーザの情報を入れるためにもっと大きな領域がほしい場合や、途中で内容を変更したい場合には、自分でそのためのメモリを確保し、そのメモリパケットのアドレスを <CODE
+CLASS="varname"
+>exinf</CODE
+> に入れる。カーネルでは <CODE
+CLASS="varname"
+>exinf</CODE
+> の内容について関知しない。</P
+><P
+><CODE
+CLASS="varname"
+>mbfatr</CODE
+> は、下位側がシステム属性を表し、上位側が実装独自属性を表す。<CODE
+CLASS="varname"
+>mbfatr</CODE
+> のシステム属性の部分では、次のような指定を行う。</P
+><PRE
+CLASS="synopsis"
+>&#13;mbfatr := (TA_TFIFO || TA_TPRI) | [TA_DSNAME] | [TA_USERBUF] | [TA_NODISWAI]
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10826"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TFIFO</TT
+>
+              </TD
+><TD
+>送信待ちタスクのキューイングはFIFO</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_TPRI</TT
+>
+              </TD
+><TD
+>送信待ちタスクのキューイングは優先度順</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_DSNAME</TT
+>
+              </TD
+><TD
+>DSオブジェクト名称を指定する</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_USERBUF</TT
+>
+              </TD
+><TD
+>メッセージバッファ領域としてユーザが指定した領域を利用する</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+>
+              </TD
+><TD
+><A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> による待ち禁止を拒否する</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><TT
+CLASS="literal"
+>TA_TFIFO</TT
+>, <TT
+CLASS="literal"
+>TA_TPRI</TT
+> では、バッファが一杯の場合にメッセージを送信するタスクがメッセージバッファの待ち行列に並ぶ際の並び方を指定することができる。属性が <TT
+CLASS="literal"
+>TA_TFIFO</TT
+> であればタスクの待ち行列はFIFOとなり、属性が <TT
+CLASS="literal"
+>TA_TPRI</TT
+> であればタスクの待ち行列はタスクの優先度順となる。なお、メッセージキューの順序はFIFOのみである。</P
+><P
+>メッセージ受信待ちのタスクの待ち行列の順序はFIFOのみである。</P
+><P
+><TT
+CLASS="literal"
+>TA_USERBUF</TT
+>を指定した場合に<CODE
+CLASS="varname"
+>bufptr</CODE
+>が有効になり、<CODE
+CLASS="varname"
+>bufptr</CODE
+>を先頭とする<CODE
+CLASS="varname"
+>bufsz</CODE
+>バイトのメモリ領域をメッセージバッファ領域として使用する。この場合、メッセージバッファ領域はカーネルで用意しない。<TT
+CLASS="literal"
+>TA_USERBUF</TT
+>を指定しなかった場合は<CODE
+CLASS="varname"
+>bufptr</CODE
+>は無視され、メッセージバッファ領域はカーネルが確保する</P
+><P
+><TT
+CLASS="literal"
+>TA_DSNAME</TT
+> を指定した場合に <CODE
+CLASS="varname"
+>dsname</CODE
+> が有効となり、DSオブジェクト名称として設定される。DSオブジェクト名称はデバッガがオブジェクトを識別するために使用され、T-Kernel/DSのシステムコール <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> と <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> からのみ操作可能である。詳細は <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> 、<A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> を参照のこと。<TT
+CLASS="literal"
+>TA_DSNAME</TT
+> を指定しなかった場合は、<CODE
+CLASS="varname"
+>dsname</CODE
+> が無視され、<A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+> や <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+> が、<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> エラーとなる。</P
+><PRE
+CLASS="programlisting"
+>&#13;#define TA_TFIFO        0x00000000      /* 送信待ちタスクをFIFOで管理 */
+#define TA_TPRI         0x00000001      /* 送信待ちタスクを優先度順で管理 */
+#define TA_USERBUF      0x00000020      /* ユーザバッファポインタを指定 */
+#define TA_DSNAME       0x00000040      /* DSオブジェクト名称を指定 */
+#define TA_NODISWAI     0x00000080      /* 待ち禁止拒否 */
+</PRE
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10878"
+>補足事項</A
+></H4
+><P
+>送信待ちのタスクが複数あった場合、バッファの空きができて送信待ちが解除されるのは常に待ち行列の順となる。</P
+><P
+>例えば、30バイトのメッセージを送信しようとしているタスクAと、10バイトのメッセージを送信しようとしているタスクBがA-Bの順で待っていた場合、メッセージバッファに20バイトの空きができてもAのタスクを追い越してBのタスクが先に送信することはない。</P
+><P
+>メッセージキューを入れるリングバッファの中には、一つ一つのメッセージを管理する情報も入るため、<CODE
+CLASS="varname"
+>bufsz</CODE
+> で指定されたリングバッファのサイズとキューに入るメッセージのサイズの合計とは、一般には一致しない。後者の方が小さい値をとるのが普通である。その意味で、<CODE
+CLASS="varname"
+>bufsz</CODE
+> の情報は厳密な意味をもつものではない。</P
+><P
+><CODE
+CLASS="varname"
+>bufsz</CODE
+>＝0のメッセージバッファを生成することは可能である。この場合、このメッセージバッファでは送受信側が完全に同期した通信を行うことになる。すなわち、<A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+> と <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+> の一方のシステムコールが先に実行されると、それを実行したタスクは待ち状態となる。もう一方のシステムコールが実行された段階で、メッセージの受け渡し(コピー)が行われ、その後双方のタスクが実行を再開する。</P
+><P
+><CODE
+CLASS="varname"
+>bufsz</CODE
+>＝0のメッセージバッファの場合、具体的な動作は次のようになる。</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>[<A
+HREF="extended_synchronization_and_communication_functions.html#figure_tk_cre_mbf"
+>図4</A
+>]で、タスクAとタスクBは非同期に動いている。もし、タスクAが先に(1)に到達し、<A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+>(<CODE
+CLASS="varname"
+>mbfid</CODE
+>) を実行した場合には、タスクBが(2)に到達するまでタスクAはメッセージ送信待ち状態になる。この状態のタスクAを対象として <A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+> を発行すると、<CODE
+CLASS="varname"
+>tskwait</CODE
+>＝<TT
+CLASS="literal"
+>TTW_SMBF</TT
+> となる。逆に、タスクBが先に(2)に到達し、<A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+>(<CODE
+CLASS="varname"
+>mbfid</CODE
+>) を実行した場合には、タスクAが(1)に到達するまでタスクBはメッセージ受信待ち状態になる。この状態のタスクBを対象として <A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+> を発行すると、<CODE
+CLASS="varname"
+>tskwait</CODE
+>＝<TT
+CLASS="literal"
+>TTW_RMBF</TT
+> となる。</P
+></LI
+><LI
+><P
+>タスクAが <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+>(<CODE
+CLASS="varname"
+>mbfid</CODE
+>) を実行し、かつタスクBが <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+>(<CODE
+CLASS="varname"
+>mbfid</CODE
+>) を実行した時点でタスクAからタスクBにメッセージが送信され、どちらのタスクも待ち解除となって実行を再開する。</P
+></LI
+></OL
+><DIV
+CLASS="figure"
+><A
+NAME="figure_tk_cre_mbf"
+></A
+><P
+><B
+>図 4. <CODE
+CLASS="varname"
+>bufsz</CODE
+>＝0のメッセージバッファを使った同期式通信</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_11s.png"></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10920"
+>移植ガイドライン</A
+></H4
+><P
+>T_CMBFのメンバ<CODE
+CLASS="varname"
+>maxmsz</CODE
+>がINT型であり、処理系によってとれる値の範囲に異なる可能性があるため注意が必要である。</P
+><P
+>T-Kernel 2.0には<TT
+CLASS="literal"
+>TA_USERBUF</TT
+>と<CODE
+CLASS="varname"
+>bufptr</CODE
+>が存在しない。そのため、この機能を使っている場合はT-Kernel 2.0への移植の際に修正が必要となるが、正しく<CODE
+CLASS="varname"
+>bufsz</CODE
+>を設定してあれば、<TT
+CLASS="literal"
+>TA_USERBUF</TT
+>と<CODE
+CLASS="varname"
+>bufptr</CODE
+>を削除するだけで移植できる。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_del_mbf"
+>tk_del_mbf - メッセージバッファ削除</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10932"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN10934"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_del_mbf</CODE
+>(ID mbfid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10941"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10943"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfid</CODE
+>
+              </TD
+><TD
+>Message Buffer ID</TD
+><TD
+>メッセージバッファID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10956"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10958"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10971"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10973"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>mbfid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>mbfid</CODE
+> のメッセージバッファが存在しない)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN10992"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN10994"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11009"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11012"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>mbfid</CODE
+> で示されたメッセージバッファを削除する。</P
+><P
+>本システムコールの発行により、対象メッセージバッファのID番号および管理ブロック用の領域およびメッセージを入れるバッファ領域は解放される。</P
+><P
+>対象メッセージバッファにおいてメッセージ受信またはメッセージ送信を待っているタスクがあった場合にも、本システムコールは正常終了するが、待ち状態にあったタスクにはエラー <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+> が返される。また、対象メッセージバッファの中にメッセージが残っている場合でも、エラーとはならず、メッセージバッファの削除が行われ、中にあったメッセージは消滅する。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_snd_mbf"
+>tk_snd_mbf - メッセージバッファへ送信</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11021"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN11023"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_snd_mbf</CODE
+>(ID mbfid, CONST void *msg, INT msgsz, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11036"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11038"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfid</CODE
+>
+              </TD
+><TD
+>Message Buffer ID</TD
+><TD
+>メッセージバッファID</TD
+></TR
+><TR
+><TD
+>CONST void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msg</CODE
+>
+              </TD
+><TD
+>Send Message</TD
+><TD
+>送信メッセージの先頭アドレス</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msgsz</CODE
+>
+              </TD
+><TD
+>Send Message Size</TD
+><TD
+>送信メッセージのサイズ(バイト数)</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト指定(ミリ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11069"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11071"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11084"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11086"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>mbfid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>mbfid</CODE
+> のメッセージバッファが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>msgsz</CODE
+>≦0, <CODE
+CLASS="varname"
+>msgsz</CODE
+>＞<CODE
+CLASS="varname"
+>maxmsz</CODE
+>, <CODE
+CLASS="varname"
+>msg</CODE
+> が不正, <CODE
+CLASS="varname"
+>tmout</CODE
+>≦(-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>待ちオブジェクトが削除された(待ちの間に対象メッセージバッファが削除)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>ポーリング失敗またはタイムアウト</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11135"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11137"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×(※条件により可能)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11152"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11155"
+>解説</A
+></H4
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+> では、<CODE
+CLASS="varname"
+>mbfid</CODE
+> で示されたメッセージバッファに対して、<CODE
+CLASS="varname"
+>msg</CODE
+> のアドレスに入っているメッセージを送信する。メッセージのサイズは <CODE
+CLASS="varname"
+>msgsz</CODE
+> で指定される。すなわち、<CODE
+CLASS="varname"
+>msg</CODE
+> 以下の <CODE
+CLASS="varname"
+>msgsz</CODE
+> バイトが、<CODE
+CLASS="varname"
+>mbfid</CODE
+> で指定されたメッセージバッファのメッセージキューにコピーされる。メッセージキューは、リングバッファによって実現されることを想定している。</P
+><P
+><CODE
+CLASS="varname"
+>msgsz</CODE
+> が、<A
+HREF="extended_synchronization_and_communication_functions.html#tk_cre_mbf"
+>tk_cre_mbf</A
+> で指定した <CODE
+CLASS="varname"
+>maxmsz</CODE
+> よりも大きい場合は、エラー <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> となる。</P
+><P
+>バッファの空き領域が少なく、<CODE
+CLASS="varname"
+>msg</CODE
+> のメッセージをメッセージキューに入れられない場合、本システムコールを発行したタスクはメッセージ送信待ち状態となり、バッファの空きを待つための待ち行列(送信待ち行列)につながれる。待ち行列の順序は <A
+HREF="extended_synchronization_and_communication_functions.html#tk_cre_mbf"
+>tk_cre_mbf</A
+> 時の指定によりFIFOまたはタスク優先度順となる。</P
+><P
+><CODE
+CLASS="varname"
+>tmout</CODE
+> により待ち時間の最大値(タイムアウト値)を指定することができる。<CODE
+CLASS="varname"
+>tmout</CODE
+> の基準時間(時間の単位)はシステム時刻の基準時間(＝1ミリ秒)と同じである。タイムアウト指定が行われた場合、待ち解除の条件が満足されない(バッファに十分な空き領域ができない)まま <CODE
+CLASS="varname"
+>tmout</CODE
+> の時間が経過すると、タイムアウトエラー <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> となってシステムコールが終了する。</P
+><P
+><CODE
+CLASS="varname"
+>tmout</CODE
+> として <TT
+CLASS="literal"
+>TMO_POL</TT
+>＝0を指定した場合は、タイムアウト値として0を指定したことを示し、バッファに十分な空きがない場合は待ちに入らず <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> を返す。また、<CODE
+CLASS="varname"
+>tmout</CODE
+> として <TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1)を指定した場合は、タイムアウト値として無限大の時間を指定したことを示し、タイムアウトせずにバッファに空きができるまで待ち続ける。</P
+><P
+>長さが0のメッセージは送信することができない。<CODE
+CLASS="varname"
+>msgsz</CODE
+>≦0の場合には、エラー <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> となる。</P
+><P
+>タスク独立部やディスパッチ禁止状態から実行した場合はエラー <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+> となるが、<CODE
+CLASS="varname"
+>tmout</CODE
+>＝<TT
+CLASS="literal"
+>TMO_POL</TT
+> の場合は、実装によってはタスク独立部やディスパッチ禁止状態から実行することができる場合がある。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11191"
+>移植ガイドライン</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>msgsz</CODE
+>がINT型であり、処理系によってとれる値の範囲に異なる可能性があるため注意が必要である。例えば、16ビット環境では一度に送れるメッセージのサイズが32767バイトまでに制限される可能性がある。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_snd_mbf_u"
+>tk_snd_mbf_u - メッセージバッファへ送信(マイクロ秒単位)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11197"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN11199"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_snd_mbf_u</CODE
+>(ID mbfid, CONST void *msg, INT msgsz, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11212"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11214"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfid</CODE
+>
+              </TD
+><TD
+>Message Buffer ID</TD
+><TD
+>メッセージバッファID</TD
+></TR
+><TR
+><TD
+>CONST void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msg</CODE
+>
+              </TD
+><TD
+>Send Message</TD
+><TD
+>送信メッセージの先頭アドレス</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msgsz</CODE
+>
+              </TD
+><TD
+>Send Message Size</TD
+><TD
+>送信メッセージのサイズ(バイト数)</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト指定(マイクロ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11245"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11247"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11260"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11262"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>mbfid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>mbfid</CODE
+> のメッセージバッファが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>msgsz</CODE
+>≦0, <CODE
+CLASS="varname"
+>msgsz</CODE
+>＞<CODE
+CLASS="varname"
+>maxmsz</CODE
+>, <CODE
+CLASS="varname"
+>msg</CODE
+> が不正, <CODE
+CLASS="varname"
+>tmout_u</CODE
+>≦(-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>待ちオブジェクトが削除された(待ちの間に対象メッセージバッファが削除)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>ポーリング失敗またはタイムアウト</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11311"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11313"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×(※条件により可能)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11328"
+>関連するサービスプロファイル</A
+></H4
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11331"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>マイクロ秒のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11340"
+>解説</A
+></H4
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+> のパラメータである <CODE
+CLASS="varname"
+>tmout</CODE
+> を64ビットマイクロ秒単位の <CODE
+CLASS="varname"
+>tmout_u</CODE
+> としたシステムコールである。</P
+><P
+>パラメータが <CODE
+CLASS="varname"
+>tmout_u</CODE
+> となった点を除き、本システムコールの仕様は <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+> と同じである。詳細は <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+> の説明を参照のこと。</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11350"
+>移植ガイドライン</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>msgsz</CODE
+>がINT型であり、処理系によってとれる値の範囲に異なる可能性があるため注意が必要である。例えば、16ビット環境では一度に送れるメッセージのサイズが32767バイトまでに制限される可能性がある。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_rcv_mbf"
+>tk_rcv_mbf - メッセージバッファから受信</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11356"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN11358"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT msgsz = tk_rcv_mbf</CODE
+>(ID mbfid, void *msg, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11369"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11371"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfid</CODE
+>
+              </TD
+><TD
+>Message Buffer ID</TD
+><TD
+>メッセージバッファID</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msg</CODE
+>
+              </TD
+><TD
+>Receive Message</TD
+><TD
+>受信メッセージを入れるアドレス</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト指定(ミリ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11396"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11398"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msgsz</CODE
+>
+              </TD
+><TD
+>Receive Message Size</TD
+><TD
+>受信したメッセージのサイズ(バイト数)</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11415"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11417"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>mbfid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>mbfid</CODE
+> のメッセージバッファが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>msg</CODE
+> が不正, <CODE
+CLASS="varname"
+>tmout</CODE
+>≦(-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>待ちオブジェクトが削除された(待ちの間に対象メッセージバッファが削除)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>ポーリング失敗またはタイムアウト</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11459"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11461"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11476"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11479"
+>解説</A
+></H4
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+> では、<CODE
+CLASS="varname"
+>mbfid</CODE
+> で示されたメッセージバッファからメッセージを受信し、<CODE
+CLASS="varname"
+>msg</CODE
+> で指定した領域に入れる。すなわち、<CODE
+CLASS="varname"
+>mbfid</CODE
+> で指定されたメッセージバッファのメッセージキューの先頭のメッセージの内容を、<CODE
+CLASS="varname"
+>msg</CODE
+> 以下の <CODE
+CLASS="varname"
+>msgsz</CODE
+> バイトにコピーする。</P
+><P
+><CODE
+CLASS="varname"
+>mbfid</CODE
+> で示されたメッセージバッファにまだメッセージが送信されていない場合(メッセージキューが空の場合) には、本システムコールを発行したタスクは待ち状態となり、メッセージの到着を待つ待ち行列(受信待ち行列)につながれる。受信待ちタスクの待ち行列はFIFOのみである。</P
+><P
+><CODE
+CLASS="varname"
+>tmout</CODE
+> により待ち時間の最大値(タイムアウト値)を指定することができる。<CODE
+CLASS="varname"
+>tmout</CODE
+> の基準時間(時間の単位)はシステム時刻の基準時間(＝1ミリ秒)と同じである。タイムアウト指定が行われた場合、待ち解除の条件が満足されない(メッセージが到着しない)まま <CODE
+CLASS="varname"
+>tmout</CODE
+> の時間が経過すると、タイムアウトエラー <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> となってシステムコールが終了する。</P
+><P
+><CODE
+CLASS="varname"
+>tmout</CODE
+> として <TT
+CLASS="literal"
+>TMO_POL</TT
+>＝0を指定した場合は、タイムアウト値として0を指定したことを示し、メッセージがない場合にも待ちに入らず <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> を返す。また、<CODE
+CLASS="varname"
+>tmout</CODE
+> として <TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1)を指定した場合は、タイムアウト値として無限大の時間を指定したことを示し、タイムアウトせずにメッセージが到着するまで待ち続ける。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_rcv_mbf_u"
+>tk_rcv_mbf_u - メッセージバッファから受信(マイクロ秒単位)</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11503"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN11505"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT msgsz = tk_rcv_mbf_u</CODE
+>(ID mbfid, void *msg, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11516"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11518"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfid</CODE
+>
+              </TD
+><TD
+>Message Buffer ID</TD
+><TD
+>メッセージバッファID</TD
+></TR
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msg</CODE
+>
+              </TD
+><TD
+>Receive Message</TD
+><TD
+>受信メッセージを入れるアドレス</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト指定(マイクロ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11543"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11545"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msgsz</CODE
+>
+              </TD
+><TD
+>Receive Message Size</TD
+><TD
+>受信したメッセージのサイズ(バイト数)</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11562"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11564"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>mbfid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>mbfid</CODE
+> のメッセージバッファが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>msg</CODE
+> が不正, <CODE
+CLASS="varname"
+>tmout_u</CODE
+>≦(-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DLT</SPAN
+>
+              </TD
+><TD
+>待ちオブジェクトが削除された(待ちの間に対象メッセージバッファが削除)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>ポーリング失敗またはタイムアウト</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11606"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11608"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11623"
+>関連するサービスプロファイル</A
+></H4
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11626"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>マイクロ秒のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11635"
+>解説</A
+></H4
+><P
+><A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+> のパラメータである <CODE
+CLASS="varname"
+>tmout</CODE
+> を64ビットマイクロ秒単位の <CODE
+CLASS="varname"
+>tmout_u</CODE
+> としたシステムコールである。</P
+><P
+>パラメータが <CODE
+CLASS="varname"
+>tmout_u</CODE
+> となった点を除き、本システムコールの仕様は <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+> と同じである。詳細は <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+> の説明を参照のこと。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_ref_mbf"
+>tk_ref_mbf - メッセージバッファ状態参照</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11647"
+>C言語インタフェース</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN11649"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_mbf</CODE
+>(ID mbfid, T_RMBF *pk_rmbf);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11658"
+>パラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11660"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="9%"
+TITLE="c1"><COL
+WIDTH="18%"
+TITLE="c2"><COL
+WIDTH="36%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mbfid</CODE
+>
+              </TD
+><TD
+>Message Buffer ID</TD
+><TD
+>メッセージバッファID</TD
+></TR
+><TR
+><TD
+>T_RMBF*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rmbf</CODE
+>
+              </TD
+><TD
+>Packet to Refer Message Buffer Status</TD
+><TD
+>メッセージバッファ状態を返す領域へのポインタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11679"
+>リターンパラメータ</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11681"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="9%"><COL
+WIDTH="18%"><COL
+WIDTH="36%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rmbf</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11696"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="9%"
+TITLE="c1"><COL
+WIDTH="18%"
+TITLE="c2"><COL
+WIDTH="36%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>exinf</CODE
+>
+              </TD
+><TD
+>Extended Information</TD
+><TD
+>拡張情報</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wtsk</CODE
+>
+              </TD
+><TD
+>Waiting Task ID</TD
+><TD
+>受信待ちタスクのID</TD
+></TR
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>stsk</CODE
+>
+              </TD
+><TD
+>Send Waiting Task ID</TD
+><TD
+>送信待ちタスクのID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>msgsz</CODE
+>
+              </TD
+><TD
+>Message Size</TD
+><TD
+>次に受信されるメッセージのサイズ(バイト数)</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>frbufsz</CODE
+>
+              </TD
+><TD
+>Free Buffer Size</TD
+><TD
+>空きバッファのサイズ(バイト数)</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>maxmsz</CODE
+>
+              </TD
+><TD
+>Maximum Message Size</TD
+><TD
+>メッセージの最大長(バイト数)</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11741"
+>エラーコード</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11743"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>mbfid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>mbfid</CODE
+> のメッセージバッファが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>pk_rmbf</CODE
+> が不正)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11767"
+>利用可能なコンテキスト</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN11769"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11784"
+>関連するサービスプロファイル</A
+></H4
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN11787"
+>解説</A
+></H4
+><P
+><CODE
+CLASS="varname"
+>mbfid</CODE
+> で示された対象メッセージバッファの各種の状態を参照し、リターンパラメータとして送信待ちタスクのID(<CODE
+CLASS="varname"
+>stsk</CODE
+>)、次に受信されるメッセージのサイズ(<CODE
+CLASS="varname"
+>msgsz</CODE
+>)、空きバッファのサイズ(<CODE
+CLASS="varname"
+>frbufsz</CODE
+>)、メッセージの最大長(<CODE
+CLASS="varname"
+>maxmsz</CODE
+>)、受信待ちタスクのID(<CODE
+CLASS="varname"
+>wtsk</CODE
+>)、拡張情報(<CODE
+CLASS="varname"
+>exinf</CODE
+>) を返す。</P
+><P
+><CODE
+CLASS="varname"
+>wtsk</CODE
+> は、このメッセージバッファで受信待ちしているタスクのIDを示す。また、<CODE
+CLASS="varname"
+>stsk</CODE
+> は送信待ちしているタスクのIDを示す。このメッセージバッファで複数のタスクが待っている場合には、待ち行列の先頭のタスクのIDを返す。待ちタスクが無い場合は0となる。</P
+><P
+>対象メッセージバッファが存在しない場合には、エラー <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> となる。</P
+><P
+><CODE
+CLASS="varname"
+>msgsz</CODE
+> には、メッセージキューの先頭のメッセージ(次に受信されるメッセージ)のサイズが返る。メッセージキューにメッセージが無い場合には、<CODE
+CLASS="varname"
+>msgsz</CODE
+>＝0となる。なお、サイズが0のメッセージを送ることはできない。</P
+><P
+>どんな場合でも、<CODE
+CLASS="varname"
+>msgsz</CODE
+>＝0と<CODE
+CLASS="varname"
+>wtsk</CODE
+>＝0の少なくとも一方は成り立つ。</P
+><P
+><CODE
+CLASS="varname"
+>frbufsz</CODE
+> は、メッセージキューを構成するリングバッファの空き領域のサイズを示すものである。この値は、あとどの程度の量のメッセージを送信できるかを知る手掛かりになる。</P
+><P
+><CODE
+CLASS="varname"
+>maxmsz</CODE
+> には、<A
+HREF="extended_synchronization_and_communication_functions.html#tk_cre_mbf"
+>tk_cre_mbf</A
+> で指定したメッセージの最大長が返される。</P
+></DIV
+></DIV
+></DIV
+></DIV
+><H3
+CLASS="FOOTNOTES"
+>注意</H3
+><TABLE
+BORDER="0"
+CLASS="FOOTNOTES"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="5%"
+><A
+NAME="FTN.AEN10201"
+HREF="extended_synchronization_and_communication_functions.html#AEN10201"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="95%"
+><P
+>ベース優先度：ミューテックスによって自動的に引き上げられる前のタスクの優先度を示す。最後(ミューテックスのロック中も含む)に <A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+> によって設定された優先度、または <A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+> を一度も発行していない場合はタスク生成時に指定したタスク優先度が、ベース優先度である。</P
+></TD
+></TR
+></TABLE
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="synchronzation_and_communication_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="memory_pool_management_functions.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>同期・通信機能</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="U"
+>上に戻る</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>メモリプール管理機能</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

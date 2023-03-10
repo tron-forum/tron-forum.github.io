@@ -1,0 +1,1057 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>割込み管理機能</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/OSの機能"
+HREF="utk_os_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="時間管理機能"
+HREF="time_management_functions.html"><LINK
+REL="NEXT"
+TITLE="システム状態管理機能"
+HREF="system_management_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="time_management_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/OSの機能</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="system_management_functions.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="interrupt_management_functions_os"
+>割込み管理機能</A
+></H1
+><P
+>割込み管理機能は、外部割込みおよびCPU例外に対するハンドラの定義などの操作を行うための機能である。</P
+><P
+>割込みハンドラは、タスク独立部として扱われる。タスク独立部でも、タスク部と同じ形式でシステムコールを発行することが可能であるが、タスク独立部で発行できるシステムコールには以下のような制限がつく。<P
+></P
+><UL
+><LI
+><P
+>暗黙に自タスクを指定するシステムコールや自タスクを待ち状態にするシステムコールは発行することができない。<SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+> のエラーとなる。</P
+></LI
+></UL
+></P
+><P
+>タスク独立部の実行中はタスクの切り換え(ディスパッチ)は起らず、システムコールの処理の結果ディスパッチの要求が出されても、タスク独立部を抜けるまでディスパッチが遅らされる。これを遅延ディスパッチ(delayed dispatching)の原則と呼ぶ。</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_def_int"
+>tk_def_int - 割込みハンドラ定義</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16749"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN16751"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_def_int</CODE
+>(UINT intno, CONST T_DINT *pk_dint);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16760"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16762"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>intno</CODE
+>
+              </TD
+><TD
+>Interrupt Number</TD
+><TD
+>割込み番号</TD
+></TR
+><TR
+><TD
+>CONST T_DINT*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_dint</CODE
+>
+              </TD
+><TD
+>Packet to Define Interrupt Handler</TD
+><TD
+>割込みハンドラ定義情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_dint</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16783"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>intatr</CODE
+>
+              </TD
+><TD
+>Interrupt Handler Attribute</TD
+><TD
+>割込みハンドラ属性</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>inthdr</CODE
+>
+              </TD
+><TD
+>Interrupt Handler Address</TD
+><TD
+>割込みハンドラアドレス</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16804"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16806"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16819"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16821"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>メモリ不足(管理ブロック用の領域が確保できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>予約属性(<CODE
+CLASS="varname"
+>intatr</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>intno</CODE
+>, <CODE
+CLASS="varname"
+>pk_dint</CODE
+>, <CODE
+CLASS="varname"
+>inthdr</CODE
+> が不正あるいは利用できない)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16846"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16848"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16863"
+>関連するサービスプロファイル</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16865"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_ASM</TT
+>
+              </TD
+><TD
+><TT
+CLASS="literal"
+>TA_ASM</TT
+>の割込みハンドラ属性指定が可能</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16875"
+>解説</A
+></H3
+><P
+>割込みには、デバイスからの外部割込みと、CPU例外による割込みの両方を含む。</P
+><P
+><CODE
+CLASS="varname"
+>intno</CODE
+> で示される割込み番号に対して割込みハンドラを定義し、割込みハンドラを使用可能にする。すなわち、<CODE
+CLASS="varname"
+>intno</CODE
+> で示される割込み番号と割込みハンドラのアドレスや属性との対応付けを行う。</P
+><P
+><CODE
+CLASS="varname"
+>intno</CODE
+> は、割込みの種類を区別するための番号である。その具体的な意味は実装ごとに定義されるが、一般には、CPUハードウェアの割込み処理で定義される割込み番号(IRQ番号など)をそのまま使うか、その番号との対応付けが可能な何らかの番号を使う。</P
+><P
+><CODE
+CLASS="varname"
+>intatr</CODE
+> は、下位側がシステム属性を表し、上位側が実装独自属性を表す。<CODE
+CLASS="varname"
+>intatr</CODE
+> のシステム属性の部分では、次のような指定を行う。</P
+><PRE
+CLASS="synopsis"
+>&#13;intatr := (TA_ASM || TA_HLNG)
+</PRE
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16887"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_ASM</TT
+>
+              </TD
+><TD
+>対象ハンドラがアセンブリ言語で書かれている</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TA_HLNG</TT
+>
+              </TD
+><TD
+>対象ハンドラが高級言語で書かれている</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><PRE
+CLASS="programlisting"
+>&#13;#define TA_ASM          0x00000000      /* アセンブリ言語によるプログラム */
+#define TA_HLNG         0x00000001      /* 高級言語によるプログラム */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TA_ASM</TT
+> 属性の場合、原則として、割込みハンドラの起動時にはカーネルが介入しない。割込み発生時には、CPUハードウェアの割込み処理機能により、このシステムコールで定義した割込みハンドラが直接起動される(実装によってはプログラムによる処理が含まれる場合もある)。したがって、割込みハンドラの先頭と最後では、割込みハンドラで使用するレジスタの退避と復帰を行う必要がある。割込みハンドラは、<A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> システムコールまたはCPUの割込みリターン命令(またはそれに相当する手段)によって終了する。</P
+><P
+><A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> を使用せずにカーネルを介すことなく割込みハンドラから復帰する手段は必須である。ただし、<A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> を使用しない場合は、遅延ディスパッチが行われなくてもよい。</P
+><P
+><A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> による割込みハンドラからの復帰も必須であり、この場合は遅延ディスパッチが行われなければならない。</P
+><P
+><TT
+CLASS="literal"
+>TA_HLNG</TT
+> 属性の場合は、高級言語対応ルーチンを経由して割込みハンドラを起動する。高級言語対応ルーチンによって、レジスタの退避と復帰が行われる。割込みハンドラは、C言語関数からのリターンによって終了する。<TT
+CLASS="literal"
+>TA_HLNG</TT
+> 属性の場合の割込みハンドラは次の形式となる。</P
+><PRE
+CLASS="programlisting"
+>&#13;void inthdr( UINT intno )
+{
+        /*
+                割込み処理
+        */
+
+        return; /* 割込みハンドラの終了 */
+}
+</PRE
+><P
+>割込みハンドラに渡される <CODE
+CLASS="varname"
+>intno</CODE
+> は、発生した割込みの種類を区別するための番号で、<A
+HREF="interrupt_management_functions_os.html#tk_def_int"
+>tk_def_int</A
+> で指定するものと同一である。実装によっては、<CODE
+CLASS="varname"
+>intno</CODE
+> 以外にも発生した割込みに関する情報が渡される場合がある。このような情報がある場合は、割込みハンドラの2番目以降のパラメータとして実装ごとに定義する。</P
+><P
+><TT
+CLASS="literal"
+>TA_HLNG</TT
+> 属性の場合、割込み発生から割込みハンドラが呼び出されるまで、CPUの割込みフラグは割込み禁止状態であるものとする。つまり、割込み発生直後から多重割込みが禁止された状態であり、多重割込みが禁止された状態のまま割込みハンドラが呼び出される。多重割込みを許可する場合は、割込みハンドラ内でCPUの割込みフラグを操作して許可する必要がある。</P
+><P
+>また、<TT
+CLASS="literal"
+>TA_HLNG</TT
+> 属性の場合は、割込みハンドラに入った時点で、システムコールの呼出が可能な状態となっていなければならない。ただし、上述の機能を標準とした上で、多重割込みを許可した状態で割込みハンドラに入る機能を追加するなどの拡張は許される。</P
+><P
+><TT
+CLASS="literal"
+>TA_ASM</TT
+> 属性の場合、割込みハンドラに入った時点の状態は実装ごとに定義される。割込みハンドラに入った時点のスタックやレジスタの状態、システムコールの呼出の可否、システムコールを呼び出せるようにする方法、および割込みハンドラからカーネルを介さずに復帰する方法などが明確に定義されていなければならない。</P
+><P
+><TT
+CLASS="literal"
+>TA_ASM</TT
+> 属性の場合、実装によっては、割込みハンドラ実行中もタスク独立部として判定されない場合がある。タスク独立部として判定されない場合は、次の点に注意が必要である。</P
+><P
+></P
+><UL
+><LI
+><P
+>割込みを許可すると、タスクディスパッチが発生する可能性がある。</P
+></LI
+><LI
+><P
+>システムコールを呼び出した場合、タスク部または準タスク部から呼び出したものとして処理される。</P
+></LI
+></UL
+><P
+>なお、割込みハンドラ内で何らかの操作を行ってタスク独立部として判定させる方法がある場合は、実装ごとにその方法を示すものとする。</P
+><P
+>割込みハンドラの中でシステムコールを発行することにより、それまで実行状態(RUNNING)であったタスクがその他の状態に移行し、代わりに別のタスクが実行状態(RUNNING)となった場合でも、割込みハンドラ実行中はディスパッチ(実行タスクの切り替え)が起こらない。ディスパッチングが必要になっても、まず割込みハンドラを最後まで実行することが優先され、割込みハンドラを終了する時にはじめてディスパッチが行われる。すなわち、割込みハンドラ実行中に生じたディスパッチ要求はすぐに処理されず、割込みハンドラ終了までディスパッチが遅らされる。これを遅延ディスパッチの原則と呼ぶ。</P
+><P
+>割込みハンドラはタスク独立部として実行される。したがって、割込みハンドラの中では、待ち状態に入るシステムコールや、自タスクの指定を意味するシステムコールを実行することはできない。</P
+><P
+><CODE
+CLASS="varname"
+>pk_dint</CODE
+>＝<TT
+CLASS="literal"
+>NULL</TT
+> とした場合には、前に定義した割込みハンドラの定義解除を行う。割込みハンドラの定義解除状態では、システムの定義するデフォルトハンドラが設定される。</P
+><P
+>既に定義済みの割込み番号に対して、割込みハンドラを再定義することも可能である。再定義のときにも、あらかじめその番号のハンドラの定義解除を行っておく必要はない。既に割込みハンドラが定義された <CODE
+CLASS="varname"
+>intno</CODE
+> に対して新しいハンドラを再定義しても、エラーにはならない。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16938"
+>補足事項</A
+></H3
+><P
+><TT
+CLASS="literal"
+>TA_ASM</TT
+> 属性に関する種々の規定は、主に割込みのフックを行うためのものである。例えば、不正アドレスのアクセスによる例外の場合、通常は上位のプログラムで定義した割込みハンドラによって例外を検出してエラー処理を行うが、デバッグ中の場合は上位のプログラムでエラー処理を行う代りに、システムの定義するデフォルトの割込みハンドラに処理させてデバッガを起動するというようなことを行う。この場合、上位のプログラムで定義した割込みハンドラは、システムの定義するデフォルトの割込みハンドラをフックする形になる。そして、状況に応じてデバッガ等のシステムプログラムに割込み処理を引き渡すか、そのまま自身で処理することになる。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ret_int"
+>tk_ret_int - 割込みハンドラから復帰</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16944"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN16946"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void tk_ret_int</CODE
+>(void);</CODE
+></P
+><P
+></P
+></DIV
+><P
+>C言語インタフェースは形式として定義されるが、高級言語対応ルーチンを使用した場合には呼び出されることがない。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16953"
+>パラメータ</A
+></H3
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16956"
+>リターンパラメータ</A
+></H3
+><P
+>※ システムコールを発行したコンテキストには戻らない</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16959"
+>エラーコード</A
+></H3
+><P
+>※ 次のようなエラーを検出する可能性があるが、エラーを検出した場合でも、システムコールを発行したコンテキストには戻らない。したがって、システムコールのリターンパラメータとして直接エラーコードを返すことはできない。万一エラーを検出した場合の動作は、実装依存となる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16962"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(割込みハンドラ以外から発行,実装依存)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16971"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16973"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>×</TD
+><TD
+ALIGN="center"
+>○</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN16988"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN16991"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_ASM</TT
+>
+              </TD
+><TD
+><TT
+CLASS="literal"
+>TA_ASM</TT
+>属性の割り込みハンドラのサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17001"
+>解説</A
+></H3
+><P
+>割込みハンドラを終了する。</P
+><P
+>割込みハンドラの中でシステムコールを実行してもディスパッチは起らず、<A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> によって割込みハンドラを終了するまでディスパッチが遅延させられる(遅延ディスパッチの原則)。そのため、<A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> では、割込みハンドラの中から発行されたシステムコールによるディスパッチ要求がまとめて処理される。</P
+><P
+><A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> は <TT
+CLASS="literal"
+>TA_ASM</TT
+> 属性の割込みハンドラの場合にのみ呼び出す。<TT
+CLASS="literal"
+>TA_HLNG</TT
+> 属性の割込みハンドラの場合は、高級言語対応ルーチン内で暗黙に <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> 相当の機能が実行されるので、<A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> を明示的には呼び出さない(呼び出してはいけない)。</P
+><P
+><TT
+CLASS="literal"
+>TA_ASM</TT
+> 属性の場合、原則として、割込みハンドラの起動時にはカーネルが介入しない。割込み発生時には、CPUハードウェアの割込み処理機能により、割込みハンドラが直接起動される。そのため、割込みハンドラで使用するレジスタの退避や復帰は割込みハンドラの中で行わなければならない。</P
+><P
+>また、この理由により、<A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> を発行した時のスタックやレジスタの状態は、割込みハンドラへ入った時と同じでなければならず、この関係で <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> では機能コードを使用できないことがある。この場合は、他のシステムコールとは別ベクトルのトラップ命令を用いて <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> を実現する。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17019"
+>補足事項</A
+></H3
+><P
+><A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> は発行元のコンテキストに戻らないシステムコールである。したがって、何らかのエラーを検出した場合にエラーコードを返しても、これらのシステムコールを呼んだ側ではエラーのチェックを行っていないのが普通であり、プログラムが暴走する可能性がある。そこで、これらのシステムコールでは、エラーを検出した場合にも、システムコール発行元へは戻らないものとする。</P
+><P
+>割込みハンドラから戻っても、ディスパッチが起こらない(必ず同じタスクが実行を継続する)ことがはっきりしている、またはディスパッチしなくても構わない場合には、<A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> ではなく、アセンブリ言語の割込みリターン命令によって割込みハンドラを終了しても構わない。</P
+><P
+>また、CPUのアーキテクチャやカーネルの構成法によっては、アセンブリ言語の割込みリターン命令によって割込みハンドラを終了しても、遅延ディスパッチが可能となる場合がある。このような場合は、アセンブリ言語の割込みリターン命令がそのまま <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> のシステムコールであると解釈しても構わない。</P
+><P
+>タイムイベントハンドラから <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+> を呼んだ場合の <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+> のエラーチェックは実装依存である。実装によっては、種類の違うハンドラからそのままリターンしてしまう場合がある。</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="time_management_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="system_management_functions.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>時間管理機能</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="U"
+>上に戻る</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>システム状態管理機能</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

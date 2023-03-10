@@ -1,0 +1,1256 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>システムコール</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel共通規定"
+HREF="common_utk.html"><LINK
+REL="PREVIOUS"
+TITLE="μT-Kernel共通規定"
+HREF="common_utk.html"><LINK
+REL="NEXT"
+TITLE="高級言語対応ルーチン"
+HREF="high_level_language_support_routines.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="common_utk.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel共通規定</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="high_level_language_support_routines.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="system_calls"
+>システムコール</A
+></H1
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="system_call_format"
+>システムコールの形式</A
+></H2
+><P
+>μT-Kernelでは、C言語を標準的な高級言語として使用することにしており、C言語からシステムコールを実行する場合のインタフェース方法を標準化している。</P
+><P
+>一方、アセンブリ言語のインタフェース方法は実装定義とする。アセンブリ言語でプログラムを作成する場合でも、C言語のインタフェースを利用して呼び出す方法を推奨する。これにより、アセンブリ言語で作成したプログラムも同一CPUであればOSが変わっても移植性が確保できる。</P
+><P
+>システムコールインタフェースでは、次のような共通原則を設けている。</P
+><P
+></P
+><UL
+><LI
+><P
+>システムコールはすべてC言語の関数として定義される。</P
+></LI
+><LI
+><P
+>関数としての戻値は、0または正の値が正常終了、負の値がエラーコードとなる。</P
+></LI
+></UL
+><P
+>システムコールインタフェースの実装方法は実装依存とする。例えば、C言語のマクロやインライン関数、インラインアセンブリなどを用いて実装することが考えられる。</P
+><P
+>システムコールのC言語インタフェースのうち、パケットやポインタを使ってパラメータを渡すものについては、μT-Kernelがポインタ参照先のパラメータを書き換えないことを明示するために、CONSTという修飾子を付けている。</P
+><P
+>CONSTは、C言語の <CODE
+CLASS="varname"
+>const</CODE
+> 修飾子を意図したものであるが、<CODE
+CLASS="varname"
+>const</CODE
+> 修飾子に未対応のプログラムが混在した場合に、#defineのマクロ機能を使ってコンパイラのチェックを無効化できるように、<CODE
+CLASS="varname"
+>const</CODE
+> と類似した別名を使っている。</P
+><P
+>具体的なCONSTの使い方は以下のようになる。なお、詳細は開発環境に依存する。</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>共通のインクルードファイルに次の記述を含める。</P
+><PRE
+CLASS="programlisting"
+>&#13;/* TKERNEL_CHECK_CONST の定義がある場合に const のチェックを有効化 */
+#ifdef TKERNEL_CHECK_CONST
+#define CONST const
+#else
+#define CONST
+#endif
+</PRE
+></LI
+><LI
+><P
+>プログラム中の関数定義やシステムコールの定義は、CONSTを用いて記述する。</P
+><DIV
+CLASS="example"
+><A
+NAME="AEN1479"
+></A
+><P
+><B
+>例 1. CONSTの記述例</B
+></P
+><PRE
+CLASS="programlisting"
+>&#13;tk_cre_tsk( CONST T_CTSK *pk_ctsk );
+foo_bar( CONST void *buf );
+</PRE
+></DIV
+></LI
+></OL
+><P
+>μT-Kernel 3.0以降では、プログラム中にCONSTを明示し、<CODE
+CLASS="varname"
+>const</CODE
+> のチェックをコンフィギュレーションで有効にして運用することを強く推奨する。</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="system_call_possible_from_task_independent_portion"
+>タスク独立部から発行できるAPI</A
+></H2
+><P
+>μT-Kernel/OSの次のシステムコールは、タスク独立部およびディスパッチ禁止状態から発行できる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN1487"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+ALIGN="left"
+>システムコール名称</TH
+><TH
+ALIGN="left"
+>説明</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                  <A
+HREF="utk_os_functions.html#tk_sta_tsk"
+>tk_sta_tsk</A
+>
+                </TD
+><TD
+>タスク起動</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+>
+                </TD
+><TD
+>タスク状態参照</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+>
+                </TD
+><TD
+>他タスクの起床</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+>
+                </TD
+><TD
+>他タスクの待ち状態解除</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+>
+                </TD
+><TD
+>他タスクを強制待ち状態へ移行</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="task_dependent_synchronization_functions.html#tk_sig_tev"
+>tk_sig_tev</A
+>
+                </TD
+><TD
+>タスクイベントの送信</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="synchronzation_and_communication_functions.html#tk_sig_sem"
+>tk_sig_sem</A
+>
+                </TD
+><TD
+>セマフォ資源返却</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+>
+                </TD
+><TD
+>イベントフラグのセット</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_sta_cyc"
+>tk_sta_cyc</A
+>
+                </TD
+><TD
+>周期ハンドラの動作開始</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_stp_cyc"
+>tk_stp_cyc</A
+>
+                </TD
+><TD
+>周期ハンドラの動作停止</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_ref_cyc"
+>tk_ref_cyc</A
+>
+                </TD
+><TD
+>周期ハンドラ状態参照</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_ref_cyc_u"
+>tk_ref_cyc_u</A
+>
+                </TD
+><TD
+>周期ハンドラ状態参照(マイクロ秒単位)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_sta_alm"
+>tk_sta_alm</A
+>
+                </TD
+><TD
+>アラームハンドラの動作開始</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_sta_alm_u"
+>tk_sta_alm_u</A
+>
+                </TD
+><TD
+>アラームハンドラの動作開始(マイクロ秒単位)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_stp_alm"
+>tk_stp_alm</A
+>
+                </TD
+><TD
+>アラームハンドラの動作停止</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_ref_alm"
+>tk_ref_alm</A
+>
+                </TD
+><TD
+>アラームハンドラ状態参照</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_ref_alm_u"
+>tk_ref_alm_u</A
+>
+                </TD
+><TD
+>アラームハンドラ状態参照(マイクロ秒単位)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+>
+                </TD
+><TD
+>割込みハンドラから復帰(アセンブリ言語で記述された割込みハンドラからのみ発行可能)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="system_management_functions.html#tk_rot_rdq"
+>tk_rot_rdq</A
+>
+                </TD
+><TD
+>タスクの優先順位の回転</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="system_management_functions.html#tk_get_tid"
+>tk_get_tid</A
+>
+                </TD
+><TD
+>実行状態タスクのタスクID参照</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="system_management_functions.html#tk_ref_sys"
+>tk_ref_sys</A
+>
+                </TD
+><TD
+>システム状態参照</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>μT-Kernel/SMの次のAPIは、タスク独立部およびディスパッチ禁止状態から発行できる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN1579"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+ALIGN="left"
+>API名称</TH
+><TH
+ALIGN="left"
+>説明</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI</A
+>
+                </TD
+><TD
+>外部割込み禁止</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI</A
+>
+                </TD
+><TD
+>外部割込み許可</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#isDI"
+>isDI</A
+>
+                </TD
+><TD
+>外部割込み禁止状態の取得</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#SetCpuIntLevel"
+>SetCpuIntLevel</A
+>
+                </TD
+><TD
+>CPU内割込みマスクレベルの設定</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#GetCpuIntLevel"
+>GetCpuIntLevel</A
+>
+                </TD
+><TD
+>CPU内割込みマスクレベルの取得</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#EnableInt"
+>EnableInt</A
+>
+                </TD
+><TD
+>割込み許可</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#DisableInt"
+>DisableInt</A
+>
+                </TD
+><TD
+>割込み禁止</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#ClearInt"
+>ClearInt</A
+>
+                </TD
+><TD
+>割込み発生のクリア</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#EndOfInt"
+>EndOfInt</A
+>
+                </TD
+><TD
+>割込みコントローラにEOI発行</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#CheckInt"
+>CheckInt</A
+>
+                </TD
+><TD
+>割込み発生の検査</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#SetIntMode"
+>SetIntMode</A
+>
+                </TD
+><TD
+>割込みモード設定</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#SetCtrlIntLevel"
+>SetCtrlIntLevel</A
+>
+                </TD
+><TD
+>割込みコントローラ内割込みマスクレベルの設定</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#GetCtrlIntLevel"
+>GetCtrlIntLevel</A
+>
+                </TD
+><TD
+>割込みコントローラ内割込みマスクレベルの取得</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#out_b"
+>out_b</A
+>
+                </TD
+><TD
+>I/Oポート書込み(バイト)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#out_h"
+>out_h</A
+>
+                </TD
+><TD
+>I/Oポート書込み(ハーフワード)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#out_w"
+>out_w</A
+>
+                </TD
+><TD
+>I/Oポート書込み(ワード)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#out_d"
+>out_d</A
+>
+                </TD
+><TD
+>I/Oポート書込み(ダブルワード)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#in_b"
+>in_b</A
+>
+                </TD
+><TD
+>I/Oポート読込み(バイト)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#in_h"
+>in_h</A
+>
+                </TD
+><TD
+>I/Oポート読込み(ハーフワード)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#in_w"
+>in_w</A
+>
+                </TD
+><TD
+>I/Oポート読込み(ワード)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#in_d"
+>in_d</A
+>
+                </TD
+><TD
+>I/Oポート読込み(ダブルワード)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#WaitUsec"
+>WaitUsec</A
+>
+                </TD
+><TD
+>微小待ち(マイクロ秒)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#WaitNsec"
+>WaitNsec</A
+>
+                </TD
+><TD
+>微小待ち(ナノ秒)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="utility_functions.html#SetOBJNAME"
+>SetOBJNAME</A
+>
+                </TD
+><TD
+>オブジェクト名設定</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>μT-Kernel/DSのすべてのシステムコールは、タスク独立部およびディスパッチ禁止状態から発行できる。</P
+><P
+>上記以外のシステムコールやAPIがタスク独立部およびディスパッチ禁止状態から発行できるか否かは実装依存である。</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="restricting_system_call_invocation"
+>システムコールの呼出制限</A
+></H2
+><P
+>システムコールを呼び出すことのできる保護レベルを制限することができる。この場合、指定した保護レベルより低い保護レベルで動作しているタスク(タスク部)からシステムコールを発行した場合に、<SPAN
+CLASS="errorname"
+>E_OACV</SPAN
+> エラーとする。</P
+><P
+>拡張SVCの呼出は制限されない。</P
+><P
+>例えば、保護レベル1より低い保護レベルからのシステムコールの呼出を禁止した場合、保護レベル2,3で実行しているタスクからはシステムコールは発行できなくなる。つまり、保護レベル2,3で動作しているタスクは、拡張SVCしか発行できないということになり、サブシステムの機能のみを使ってプログラムすることになる。</P
+><P
+>この機能は、μT-Kernelをプロセス管理機能などを含むミドルウェアと組み合わせて使用する場合に、ミドルウェアの仕様に基づくタスク(ユーザプロセスなど)からμT-Kernelの機能を直接操作させないために使用する。すなわち、μT-Kernelをマイクロカーネルとして使用するための機能である。この場合、ユーザプロセスのAPIではマイクロカーネルを直接操作することができず、ミドルウェアのみが操作可能となる。</P
+><P
+>システムコール呼出制限をする保護レベルは、システム構成情報管理機能により設定する。システム構成情報管理機能については、<A
+HREF="system_configuration_information_management_functions.html"
+><I
+>システム構成情報管理機能</I
+>項<I
+>μT-Kernel/SMの機能</I
+>章</A
+>を参照のこと。</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="modifying_a_parameter_packet"
+>パラメータパケット形式の変更</A
+></H2
+><P
+>システムコールへ渡すパラメータのいくつかは、パケット形式になっている。このパケット形式のパラメータには、システムコールへ情報を渡す入力パラメータとなるもの(T_CTSKなど)とシステムコールから情報を返される出力パラメータとなるもの(T_RTSKなど)がある。</P
+><P
+>これらパケット形式のパラメータには、実装独自の情報を追加することができる。ただし、標準仕様で定義されている情報の後ろに追加しなければならない。パラメータの削除については、サービスプロファイルで無効に指定されたものに限って許容され、それ以外のパラメータを削除することは許容されない。なお、標準仕様で定義されているデータの型および順序を変更してはならない。</P
+><P
+>システムコールへの入力パラメータとなるパケット(T_CTSKなど)では、実装独自で追加された情報が未初期化(メモリの内容が不定)のまま、システムコールを呼び出した場合でも正常に動作するようにしなければならない。</P
+><P
+>通常は、追加した情報に有効な値が入っていることを示すフラグを標準仕様に含まれている属性フラグの実装独自領域に定義する。そのフラグがセットされている(1)場合にのみ追加した情報を使用し、セットされていない(0)場合にはその追加情報は未初期化(メモリの内容が不定)であるとして、デフォルト値を適用する。</P
+><P
+>これは、このOSが実装独自の機能拡張をしているかどうかに関わらず、同じアプリケーションプログラムを、再コンパイルのみで動作させるための規定である。</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>移植ガイドライン</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>サービスプロファイルで無効に指定されたパラメータを削除することが認められたため、パラメータパケットの初期化の際には注意が必要である。例えば、T_CTSK構造体に対して以下のような初期化を行うことは移植性の観点から推奨されない。</P
+><PRE
+CLASS="programlisting"
+>&#13;T_CTSK  ctsk = {
+        NULL,
+        TA_HLNG|TA_RNG0|TA_USERBUF,
+        task,
+        10,
+        2048,
+        "",
+        buf
+};
+</PRE
+><P
+>代わりに、ISO/IEC 9899:1999で規定された構文を用いて、以下のように初期化を行うことが推奨される。</P
+><PRE
+CLASS="programlisting"
+>&#13;T_CTSK  ctsk = {
+        .exinf   = NULL,
+        .tskatr  = TA_HLNG|TA_RNG0|TA_USERBUF,
+        .task    = task,
+        .itskpri = 10,
+        .stksz   = 2048,
+        .bufptr  = buf
+};
+</PRE
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="function_codes"
+>機能コード</A
+></H2
+><P
+>機能コードは、システムコールを識別するために、各システムコールに割り付けられる番号である。</P
+><P
+>システムコールの機能コードは特に定めない。すべて実装定義とする。</P
+><P
+>拡張SVCの機能コードについては、<A
+HREF="subsystem_management_functions.html#tk_def_ssy"
+>tk_def_ssy</A
+> を参照。</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="error_codes"
+>エラーコード</A
+></H2
+><P
+>システムコールの戻値は原則として符号付きの整数で、エラーが発生した場合には負の値のエラーコード、処理を正常に終了した場合は <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>(＝<SPAN
+CLASS="errorcode"
+>0</SPAN
+>)または正の値とする。正常終了した場合の戻値の意味はシステムコール毎に規定する。この原則の例外として、呼び出されるとリターンすることのないシステムコールがある。リターンすることのないシステムコールは、C言語インタフェースでは戻値を持たないもの(すなわちvoid型の関数)として宣言する。</P
+><P
+>エラーコードは、メインエラーコードとサブエラーコードで構成される。エラーコードの下位16ビットがサブエラーコード、残りの上位ビットがメインエラーコードとなる。メインエラーコードは、検出の必要性や発生状況などにより、エラークラスに分類される。</P
+><PRE
+CLASS="programlisting"
+>&#13;#define MERCD(er)       ( (ER)(er) &#62;&#62; 16 )    /* メインエラーコード */
+#define SERCD(er)       ( (H)(er) )           /* サブエラーコード */
+#define ERCD(mer, ser)  ( (ER)(mer) &#60;&#60; 16 | (ER)(UH)(ser) )
+</PRE
+><P
+>ただし、ER型が16ビットの環境ではサブエラーコードを含めず、メインエラーコードをそのままエラーコードとしても良い。この場合、SERCDマクロを定義してはいけない。</P
+><PRE
+CLASS="programlisting"
+>&#13;#define MERCD(er)       ( (ER)(er) )    /* メインエラーコード */
+#define ERCD(mer, ser)  ( (ER)(mer) )
+</PRE
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>関連するサービスプロファイル</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、エラーコードにサブエラーコードが含まれ、SERCDマクロがサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN1724"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_SERCD</TT
+>
+                  </TD
+><TD
+>サブエラーコードのサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="timeout"
+>タイムアウト</A
+></H2
+><P
+>待ち状態に入る可能性のあるシステムコールには、タイムアウトの機能を持たせる。タイムアウトは、指定された時間が経過しても処理が完了しない場合に、処理をキャンセルしてシステムコールからリターンするものである(この時、システムコールは <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> エラーを返す)。</P
+><P
+>そのため、「システムコールがエラーコードを返した場合には、システムコールを呼び出したことによる副作用はない」という原則より、タイムアウトした場合には、システムコールを呼び出したことで、システムの状態は変化していないのが原則である。ただし、システムコールの機能上、処理のキャンセル時に元の状態に戻せない場合は例外とし、システムコールの説明でその旨を明示する。</P
+><P
+>タイムアウト時間を0に設定すると、システムコールの中で待ち状態に入るべき状況になっても、待ち状態には入らない。そのため、タイムアウト時間を0としたシステムコール呼出では、待ち状態に入る可能性がない。タイムアウト時間を0としたシステムコール呼出を、ポーリングと呼ぶ。すなわち、ポーリングを行うシステムコールでは、待ち状態に入る可能性がない。</P
+><P
+>各システムコールの説明では、タイムアウトがない(言い換えると、永久待ちの)場合の振舞いを説明するのを原則とする。システムコールの説明で「待ち状態に入る」ないしは「待ち状態に移行させる」と記述されている場合でも、タイムアウト時間を指定した場合には、指定時間経過後に待ち状態が解除され、メインエラーコードを <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> としてシステムコールからリターンする。また、ポーリングの場合には、待ち状態に入らずにメインエラーコードを <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> としてシステムコールからリターンする。</P
+><P
+>タイムアウト指定(TMO型およびTMO_U型)は、正の値でタイムアウト時間、<TT
+CLASS="literal"
+>TMO_POL</TT
+>(＝0)でポーリング、<TT
+CLASS="literal"
+>TMO_FEVR</TT
+>(＝-1)で永久待ちを指定する。タイムアウト時間が指定された場合、タイムアウトの処理は、システムコールが呼び出されてから、指定された以上の時間が経過した後に行うことを保証しなければならない。</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>補足事項</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>ポーリングを行うシステムコールでは待ち状態に入らないため、それを呼び出したタスクの優先順位は変化しない。</P
+><P
+>一般的な実装においては、タイムアウト時間に1が指定されると、システムコールが呼び出されてから2回めのタイマ割込み(「タイムティック」と呼ぶ場合がある)でタイムアウト処理を行う。タイムアウト時間に0を指定することはできないため(0は <TT
+CLASS="literal"
+>TMO_POL</TT
+> に割り付けられている)、このような実装では、システムコールが呼び出された後の最初のタイマ割込みでタイムアウトすることはない。</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="relative_time_and_system_time"
+>相対時間とシステム時刻</A
+></H2
+><P
+>イベントの発生する時刻を、システムコールを呼び出した時刻などからの相対値で指定する場合には、相対時間(RELTIM型またはRELTIM_U型)を用いる。相対時間を用いてイベントの発生時刻が指定された場合、イベントの処理は、基準となる時刻から指定された以上の時間が経過した後に行うことを保証しなければならない。イベントの発生間隔など、イベントの発生する時刻以外を指定する場合にも、相対時間(RELTIM型またはRELTIM_U型)を用いる。その場合、指定された相対時間の解釈方法は、それぞれの場合毎に定める。時刻を絶対値で指定する場合には、システム時刻(SYSTIM型またはSYSTIM_U型)を用いる。μT-Kernelには現在のシステム時刻を設定する機能が用意されているが、この機能を用いてシステム時刻を変更した場合にも、相対時間を用いて指定されたイベントが発生する実世界の時刻(これを実時刻と呼ぶ)は変化しない。言い換えると、相対時間を用いて指定されたイベントが発生するシステム時刻は変化することになる。</P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>SYSTIM システム時刻</DT
+><DD
+><P
+>基準時間1ミリ秒、64ビットの符号付整数</P
+><PRE
+CLASS="programlisting"
+>&#13;typedef struct systim {
+        W       hi;             /* 上位32ビット */
+        UW      lo;             /* 下位32ビット */
+} SYSTIM;
+</PRE
+></DD
+><DT
+>SYSTIM_U システム時刻</DT
+><DD
+><P
+>基準時間1マイクロ秒、64ビットの符号付整数</P
+><PRE
+CLASS="programlisting"
+>&#13;typedef D       SYSTIM_U;       /* 64ビット */
+</PRE
+></DD
+><DT
+>RELTIM 相対時間</DT
+><DD
+><P
+>基準時間1ミリ秒、32ビットの符号なし整数(UW)</P
+><PRE
+CLASS="programlisting"
+>&#13;typedef UW      RELTIM;
+</PRE
+></DD
+><DT
+>RELTIM_U 相対時間</DT
+><DD
+><P
+>基準時間1マイクロ秒、64ビットの符号なし整数(UD)</P
+><PRE
+CLASS="programlisting"
+>&#13;typedef UD      RELTIM_U;       /* 64ビットでマイクロ秒単位の相対時間 */
+</PRE
+></DD
+><DT
+>TMO タイムアウト時間</DT
+><DD
+><P
+>基準時間1ミリ秒、32ビットの符号付整数(W)</P
+><PRE
+CLASS="programlisting"
+>&#13;typedef W       TMO;
+</PRE
+><P
+><TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1)で永久待ちを指定できる。</P
+></DD
+><DT
+>TMO_U タイムアウト時間</DT
+><DD
+><P
+>基準時間1マイクロ秒、64ビットの符号付整数(D)</P
+><PRE
+CLASS="programlisting"
+>&#13;typedef D       TMO_U;          /* 64ビットでマイクロ秒単位のタイムアウト */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1)で永久待ちを指定できる。</P
+></DD
+></DL
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>関連するサービスプロファイル</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>マイクロ秒単位の時間および時刻に関連する型 TMO_U, RELTIM_U, SYSTIM_U は、以下のサービスプロファイルが有効に設定されている場合に限り利用可能であることが保証される。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN1791"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>マイクロ秒のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>補足事項</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>RELTIM, RELTIM_U, TMO, TMO_Uで指定された時間は、指定された時間以上経過した後にタイムアウト等が起こることを保証しなければならない。例えば、タイマ割込み間隔が1ミリ秒で、タイムアウト時間として1ミリ秒が指定された場合、システムコール呼出後の2回目のタイマ割込みでタイムアウトする。(1回目のタイマ割込みでは1ミリ秒未満である。)</P
+><P
+>システム時刻(SYSTIM_U)がカーネル内部でオーバーフローしてしまうような値を引数に指定した場合のシステムコールの動作は未定義である。</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="common_utk.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="high_level_language_support_routines.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>μT-Kernel共通規定</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="common_utk.html"
+ACCESSKEY="U"
+>上に戻る</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>高級言語対応ルーチン</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

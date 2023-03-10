@@ -1,0 +1,332 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Relation with Existing RTOS Specifications</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Overview of μT-Kernel 3.0"
+HREF="utk_overview.html"><LINK
+REL="PREVIOUS"
+TITLE="Implementation Specification Document"
+HREF="implementation_specification_of_utk.html"><LINK
+REL="NEXT"
+TITLE="μT-Kernel Concepts"
+HREF="concepts_underlying_utk.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="implementation_specification_of_utk.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Overview of μT-Kernel 3.0</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="concepts_underlying_utk.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="relation_with_existing_rtos_specifications"
+>Relation with Existing RTOS Specifications</A
+></H1
+><P
+>This section lists the major differences between the μT-Kernel 3.0 specification and other legacy RTOS specifications that have close relationship with μT-Kernel 3.0.</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="relation_with_utk2"
+>Relation with μT-Kernel 2.0</A
+></H2
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>Removal of features that assumes process management and virtual memory</P
+><P
+>μT-Kernel 3.0 defines a real-time OS to control small embedded systems and IoT edge nodes equipped with 16-bit or 32-bit CPU. It is not designed to be used as the OS kernel with process management or virtual memory for generic information processing systems. Because of this design decision, Address Space Management Functions (Address Space Configuration, Address Space Checking, Logical Address Space Management) and System Memory Allocation function which μT-Kernel 2.0 has are not included in μT-Kernel 3.0. Also, among <A
+HREF="subsystem_management_functions.html"
+>Subsystem Management Functions</A
+>, startup/cleanup processing and functions for resource group are not included in μT-Kernel 3.0.</P
+></LI
+><LI
+><P
+>Addition of handling system time</P
+><P
+>API that uses 0:00:00 of January 1st 1970 (UTC) as epoch to set system time have been added to μT-Kernel 3.0: these are <A
+HREF="time_management_functions.html#tk_set_utc"
+>tk_set_utc</A
+>, <A
+HREF="time_management_functions.html#tk_set_utc_u"
+>tk_set_utc_u</A
+>, <A
+HREF="time_management_functions.html#tk_get_utc"
+>tk_get_utc</A
+>, <A
+HREF="time_management_functions.html#tk_get_utc_u"
+>tk_get_utc_u</A
+>, <A
+HREF="utk_ds_functions.html#td_get_utc"
+>td_get_utc</A
+>, <A
+HREF="utk_ds_functions.html#td_get_utc_u"
+>td_get_utc_u</A
+>.</P
+></LI
+><LI
+><P
+>Removal of Rendezvous Function</P
+><P
+>μT-Kernel 3.0 does not have Rendezvous function, one of Extended Synchronization and Communication Functions of T-Kernel.</P
+></LI
+></OL
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="relation_with_tk2"
+>Relation with T-Kernel 2.0</A
+></H2
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>Removal of features that assumes process management and virtual memory</P
+><P
+>μT-Kernel 3.0 defines a real-time OS to control small embedded systems and IoT edge nodes equipped with 16-bit or 32-bit CPU. It is not designed to be used as the OS kernel with process management or virtual memory for generic information processing systems. Because of this design decision, Address Space Management Functions (Address Space Configuration, Address Space Checking, Logical Address Space Management) and System Memory Allocation function which T-Kernel 2.0 has are not included in μT-Kernel 3.0. Also, among <A
+HREF="subsystem_management_functions.html"
+>Subsystem Management Functions</A
+>, startup/cleanup processing and functions for resource group are not included in μT-Kernel 3.0.</P
+></LI
+><LI
+><P
+>Introduction of service profile</P
+><P
+>For μT-Kernel that addresses the needs of small-scale embedded systems, the specification aims at the ease of optimization and customization. However, at the same time, to improve the ease of distribution of middleware and applications by increasing portability, a formal mechanism to describe the issues for implementation-dependency of μT-Kernel is now introduced. For details, see <A
+HREF="service_profile_overview.html"
+>the Section called <I
+>Service Profile</I
+> in the Chapter called <I
+>μT-Kernel Concepts</I
+></A
+> . </P
+></LI
+><LI
+><P
+>Specification of user buffer</P
+><P
+>APIs that need to use internal memory on the stack or in the memory pools can use a user-specified buffer area instead of using the automatically allocated area by the kernel. Specification by <TT
+CLASS="literal"
+>TA_USERBUF</TT
+> is enough to use a user-specified buffer in general. </P
+></LI
+><LI
+><P
+>Type changes for supporting 16-bit CPU</P
+><P
+>μT-Kernel needs to support 16-bit CPU, and the integer that can be represented by INT or UINT type may be restricted to 16-bit integer values. For this reason, some arguments of APIs and members of structures now have wide enough scalar types, instead of INT or UINT types, so that they can present the values adequately. </P
+></LI
+><LI
+><P
+>Customization for small-scale embedded systems</P
+><P
+>μT-Kernel is meant for small-scale embedded systems, and so the specification has been tuned to such usage. For example, an implementation with a smaller value, than in T-Kernel, for the largest value of task priority is allowed. </P
+></LI
+><LI
+><P
+>Re-organization and extension of interrupt management function</P
+><P
+>μT-Kernel 3.0 offers interrupt management functions that are based on those of T-Kernel 2.0 after re-organizing and extending these one way or the other. There are differences as follows.
+            <P
+></P
+><OL
+TYPE="a"
+><LI
+><P
+>Addition of functions to obtain and set interrupt mask level</P
+><P
+>Add APIs for obtaining and setting the interrupt mask level of CPU and/or interrupt controller namely <A
+HREF="interrupt_management_functions_sm.html#SetCpuIntLevel"
+>SetCpuIntLevel</A
+>, <A
+HREF="interrupt_management_functions_sm.html#GetCpuIntLevel"
+>GetCpuIntLevel</A
+>, <A
+HREF="interrupt_management_functions_sm.html#SetCtrlIntLevel"
+>SetCtrlIntLevel</A
+>, and <A
+HREF="interrupt_management_functions_sm.html#GetCtrlIntLevel"
+>GetCtrlIntLevel</A
+>. </P
+></LI
+><LI
+><P
+>Abolishing interrupt vector number (INTVEC)</P
+><P
+>In order to simplify number systems used for interrupts and make it simple to understand, we abolished with the specification using interrupt vector number (INTVEC) For APIs that take INTVEC as argument in T-Kernel 2.0, we use the common interrupt number used in <A
+HREF="interrupt_management_functions_os.html#tk_def_int"
+>tk_def_int</A
+>() as the argument instead of INTVEC. </P
+></LI
+></OL
+></P
+></LI
+></OL
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="relation_with_ieee2050"
+>Relation with IEEE 2050-2018</A
+></H2
+><P
+>Specification of μT-Kernel 3.0 is upward compatible with the specification of IEEE 2050-2018 standard which IEEE published for the standard RTOS for IoT edge nodes. Because of this, an OS that satisfies the μT-Kernel 3.0 specification automatically satisfies IEEE 2050-2018 specification.</P
+><P
+>On the other hand, the specification of IEEE 2050-2018 is a subset of μT-Kernel 3.0 specification. The following functions of μT-Kernel 3.0 are not included in IEEE 2050-2018: <A
+HREF="subsystem_management_functions.html"
+>Subsystem Management Functions</A
+>, and <A
+HREF="utk_ds_functions.html#kernel_internal_state_reference_functions"
+>Kernel Internal State Acquisition Functions</A
+> and <A
+HREF="trace_functions.html"
+>Trace Functions</A
+> for debugging purposes provided by μT-Kernel/DS. Also the following functions are not in IEEE 2050-2018: Functions that handle DS Object Names(<CODE
+CLASS="varname"
+>dsname</CODE
+>) and APIs to handle system time using 00:00:00, January 1, 1985 (GMT) as epoch (<A
+HREF="time_management_functions.html#tk_get_tim"
+>tk_get_tim</A
+>, <A
+HREF="time_management_functions.html#tk_get_tim_u"
+>tk_get_tim_u</A
+>, <A
+HREF="time_management_functions.html#tk_set_tim"
+>tk_set_tim</A
+>, <A
+HREF="time_management_functions.html#tk_set_tim_u"
+>tk_set_tim_u</A
+>).</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="implementation_specification_of_utk.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="concepts_underlying_utk.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Implementation Specification Document</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_overview.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>μT-Kernel Concepts</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

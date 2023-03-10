@@ -1,0 +1,405 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>付録</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="実行トレース機能"
+HREF="trace_functions.html"><LINK
+REL="NEXT"
+TITLE="キーワード"
+HREF="list_of_keywords.html"></HEAD
+><BODY
+CLASS="chapter"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="trace_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="list_of_keywords.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="chapter"
+><H1
+><A
+NAME="appendixes"
+></A
+>付録</H1
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="system_configuration_of_reference_implementation"
+>システムコンフィギュレーション</A
+></H1
+><P
+>μT-Kernelを実際の製品に組み込む際には、システムに合わせてμT-Kernelを改変したり不要な機能を取り外したりしても良い。μT-Kernel 3.0のリファレンス実装には、資源数や制限値などのパラメータを設定する機能が提供されている。これをシステムコンフィギュレーションと呼ぶ。</P
+><P
+>本節では、μT-Kernel 3.0リファレンス実装において提供されるシステムコンフィギュレーション項目を示す。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN34104"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>名称</TH
+><TH
+>説明</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_PRI</TT
+>
+              </TD
+><TD
+>最大タスク優先度 (サービスプロファイル項目<TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+>にも反映される)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_SYSTEMAREA_TOP</TT
+>
+              </TD
+><TD
+>μT-Kernelのメモリ管理機能により動的に管理される領域の最下位アドレス</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_SYSTEMAREA_END</TT
+>
+              </TD
+><TD
+>μT-Kernelのメモリ管理機能により動的に管理される領域の最上位アドレス</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_TIMER_PERIOD</TT
+>
+              </TD
+><TD
+>システムタイマの割込み周期（ミリ秒）</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_TSKID</TT
+>
+              </TD
+><TD
+>最大タスク数</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_SEMID</TT
+>
+              </TD
+><TD
+>最大セマフォ数</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_FLGID</TT
+>
+              </TD
+><TD
+>最大イベントフラグ数</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_MBXID</TT
+>
+              </TD
+><TD
+>最大メールボックス数</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_MTXID</TT
+>
+              </TD
+><TD
+>最大ミューテックス数</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_MBFID</TT
+>
+              </TD
+><TD
+>最大メッセージバッファ数</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_MPFID</TT
+>
+              </TD
+><TD
+>最大固定長メモリプール数</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_MPLID</TT
+>
+              </TD
+><TD
+>最大可変長メモリプール数</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_CYCID</TT
+>
+              </TD
+><TD
+>最大周期ハンドラ数</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_ALMID</TT
+>
+              </TD
+><TD
+>最大アラームハンドラ数</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_SSYID</TT
+>
+              </TD
+><TD
+>最大サブシステム数</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_SSYPRI</TT
+>
+              </TD
+><TD
+>最大サブシステム優先度数</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_REGDEV</TT
+>
+              </TD
+><TD
+>最大デバイス登録数</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_OPNDEV</TT
+>
+              </TD
+><TD
+>最大デバイスオープン数</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>CFN_MAX_REQDEV</TT
+>
+              </TD
+><TD
+>最大デバイスリクエスト数</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>補足事項</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>システムコンフィギュレーションはμT-Kernel 3.0仕様の範囲ではない。しかし、同様の機能を提供する場合は、これらと対応のとれた名称にすることが望ましい。</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="trace_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="list_of_keywords.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>実行トレース機能</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>キーワード</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

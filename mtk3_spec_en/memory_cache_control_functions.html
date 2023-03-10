@@ -1,0 +1,1097 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Memory Cache Control Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/SM Functions"
+HREF="utk_sm_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="System Configuration Information Management Functions"
+HREF="system_configuration_information_management_functions.html"><LINK
+REL="NEXT"
+TITLE="Physical Timer Functions"
+HREF="physical_timer_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="system_configuration_information_management_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/SM Functions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="physical_timer_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="memory_cache_control_functions"
+>Memory Cache Control Functions</A
+></H1
+><P
+>Memory cache control functions perform a cache control or mode setting.</P
+><P
+>The approach of cache control in μT-Kernel is as follows:</P
+><P
+>Basically, even if application and device driver programs are created without paying attention to the existence of cache, the appropriate cache control should be automatically performed during their execution. Especially, in consideration of program portability, functions with strong dependency on system including cache are better to be handled separately from application programs wherever possible. For this reason, it is the policy of individual systems based on μT-Kernel to make the μT-Kernel itself control the cache automatically.</P
+><P
+>Specifically, μT-Kernel sets the cache so that it is turned ON for space like memory to store usual programs or data, and OFF for space such as I/O. For this reason, ordinary application programs do not need to explicitly call a function for cache control. Appropriate cache control is automatically performed even if cache control is not explicitly performed from the program.</P
+><P
+>However, the cache control by μT-Kernel only (cache control by default setting) may not be enough for particular situations. For example, for I/O processing with DMA transfer or using memory space outside the kernel management, explicit cache control may be required. When executing a program by dynamically loading or generating (compiling) it, such cache control may be required so that data cache and instruction cache are appropriately synchronized. Memory cache control functions are assumed to be used in these situations.</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="SetCacheMode"
+>SetCacheMode - Set Cache Mode</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25926"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN25928"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>SZ rlen = SetCacheMode</CODE
+>(void *addr, SZ len, UINT mode);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25939"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25941"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>addr</CODE
+>
+              </TD
+><TD
+>Start Address</TD
+><TD
+>Start address</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>len</CODE
+>
+              </TD
+><TD
+>Length</TD
+><TD
+>memory area size (in bytes)</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mode</CODE
+>
+              </TD
+><TD
+>Mode</TD
+><TD
+>Cache mode</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25966"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25968"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>rlen</CODE
+>
+              </TD
+><TD
+>Result Length</TD
+><TD
+>Size of the area for which the cache mode was set (in bytes)</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25985"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25987"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (<CODE
+CLASS="varname"
+>addr</CODE
+>, <CODE
+CLASS="varname"
+>len</CODE
+>, or <CODE
+CLASS="varname"
+>mode</CODE
+> is invalid or cannot be used)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOSPT</SPAN
+>
+              </TD
+><TD
+>Unsupported function (function specified in <CODE
+CLASS="varname"
+>mode</CODE
+> is unsupported)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26008"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26010"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26025"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26028"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_CACHECTRL</TT
+>
+              </TD
+><TD
+>Support of memory cache control functions</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_SETCACHEMODE</TT
+>
+              </TD
+><TD
+>Support of set cache mode function</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>Additionally, the following service profile items are related to this API.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26042"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_WBCACHE</TT
+>
+              </TD
+><TD
+>Support for specifying write-back mode for cache mode(<TT
+CLASS="literal"
+>CM_WB</TT
+>)</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_WTCACHE</TT
+>
+              </TD
+><TD
+>Support for specifying write-through mode for cache mode(<TT
+CLASS="literal"
+>CM_WT</TT
+>)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26057"
+>Description</A
+></H3
+><P
+>Sets the cache mode for a memory area. Specifically, performs the setting specified in <CODE
+CLASS="varname"
+>mode</CODE
+> for the cache of the <CODE
+CLASS="varname"
+>len</CODE
+> bytes memory area from the address <CODE
+CLASS="varname"
+>addr</CODE
+>.</P
+><PRE
+CLASS="synopsis"
+>&#13;mode := ( CM_OFF || CM_WB || CM_WT ) | [CM_CONT]
+                CM_OFF Cache off
+                CM_WB   Cache on (write back)
+                CM_WT   Cache on (write through)
+                CM_CONT Applies the cache setting only for the contiguous address space
+                        (physical address)
+                   ...
+                /* Implementation-dependent mode may be added */
+</PRE
+><P
+>Specify <TT
+CLASS="literal"
+>CM_OFF</TT
+> in <CODE
+CLASS="varname"
+>mode</CODE
+> to flush (writes back) the cache, invalidate it, and turn it off.</P
+><P
+>Specify <TT
+CLASS="literal"
+>CM_WT</TT
+> in <CODE
+CLASS="varname"
+>mode</CODE
+> to flush the cache and then set the write through cache mode.</P
+><P
+>Specify <TT
+CLASS="literal"
+>CM_WB</TT
+> in <CODE
+CLASS="varname"
+>mode</CODE
+> to set the write back cache mode. In this case, whether or not to flush the cache is implementation-dependent.</P
+><P
+>Specify <TT
+CLASS="literal"
+>CM_CONT</TT
+> in <CODE
+CLASS="varname"
+>mode</CODE
+> to apply the cache mode setting only for the contiguous address (physical address) space area starting from <CODE
+CLASS="varname"
+>addr</CODE
+>. If non-allocated area exists within the specified space, the processing is aborted immediately before the area and the size of the processed space is returned. If <TT
+CLASS="literal"
+>CM_CONT</TT
+> is not specified, then the all area is the target of the cache mode processing, and the size of the area for which the processing has been performed is returned.</P
+><P
+>Some or all of the cache mode settings may be unusable depending on CPU or implementation. If an unusable mode is specified, <SPAN
+CLASS="errorname"
+>E_NOSPT</SPAN
+> is returned without any processing.</P
+><P
+><CODE
+CLASS="varname"
+>len</CODE
+> must be 1 or more. If a value of 0 or less is specified, the error code <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> is returned.</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26083"
+>Additional Notes</A
+></H3
+><P
+>Generally speaking, because the cache mode setting is performed in page units, the start address of the page including <CODE
+CLASS="varname"
+>addr</CODE
+> and subsequent addresses is taken as the setting target when <CODE
+CLASS="varname"
+>addr</CODE
+> is not at the start of the specified area. Note that unintended cache access may occur to an adjacent area when using this API. Care should be taken.</P
+><P
+>When you want more detailed cache mode settings depending on the hardware configuration or the cache function of CPU, add and use an implementation-dependent <CODE
+CLASS="varname"
+>mode</CODE
+>. For example, <TT
+CLASS="literal"
+>NORMAL CACHE OFF (Weakly Order)</TT
+>, <TT
+CLASS="literal"
+>DEVICE CACHE OFF (Weakly Order)</TT
+>, <TT
+CLASS="literal"
+>STRONG ORDER</TT
+>, or other cache mode may be specified.</P
+><P
+>When an unavailable <CODE
+CLASS="varname"
+>mode</CODE
+> is specified, it is implementation-dependent whether to generate an error as <SPAN
+CLASS="errorname"
+>E_NOSPT</SPAN
+> or <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="ControlCache"
+>ControlCache - Control Cache</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26099"
+>C Language Interface</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN26101"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>SZ rlen = ControlCache</CODE
+>(void *addr, SZ len, UINT mode);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26112"
+>Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26114"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>addr</CODE
+>
+              </TD
+><TD
+>Start Address</TD
+><TD
+>Start address</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>len</CODE
+>
+              </TD
+><TD
+>Length</TD
+><TD
+>Memory area size (in bytes)</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mode</CODE
+>
+              </TD
+><TD
+>Mode</TD
+><TD
+>Control mode</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26139"
+>Return Parameter</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26141"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>rlen</CODE
+>
+              </TD
+><TD
+>Result Length</TD
+><TD
+>Size of the area for which the cache mode was set (in bytes)</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26158"
+>Error Code</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26160"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>Normal completion</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>Parameter error (invalid <CODE
+CLASS="varname"
+>addr</CODE
+>, <CODE
+CLASS="varname"
+>len</CODE
+> or <CODE
+CLASS="varname"
+>mode</CODE
+>)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOSPT</SPAN
+>
+              </TD
+><TD
+>Unsupported function (function specified in <CODE
+CLASS="varname"
+>mode</CODE
+> is unsupported)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26181"
+>Valid Context</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26183"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26198"
+>Related Service Profile Items</A
+></H3
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26201"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_CACHECTRL</TT
+>
+              </TD
+><TD
+>Support of memory cache control functions</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26210"
+>Description</A
+></H3
+><P
+>Control the cache (flush or invalidate) of a memory area. Specifically, performs the control specified in <CODE
+CLASS="varname"
+>mode</CODE
+> for the cache of the <CODE
+CLASS="varname"
+>len</CODE
+> bytes memory area from the logical address <CODE
+CLASS="varname"
+>addr</CODE
+>.</P
+><PRE
+CLASS="synopsis"
+>&#13;mode := (CC_FLUSH | CC_INVALIDATE)
+                CC_FLUSH        Flush (write back) cache
+                CC_INVALIDATE   Invalidate cache
+                     ...
+                /* Implementation-dependent mode values may be added */
+</PRE
+><P
+>Both <TT
+CLASS="literal"
+>CC_FLUSH</TT
+> and <TT
+CLASS="literal"
+>CC_INVALIDATE</TT
+> can be set at the same time. This combination flushes the cache and then invalidates it.</P
+><P
+>If the processing is successful, the size of the processed space is returned.</P
+><P
+>A range that spans areas with different cache modes or attributes must not be specified. For example, a range that spans areas with cache on and cache off, or areas with different protection levels must not be specified. If such a range is specified, the subsequent correct behavior is not guaranteed.</P
+><P
+>The detail of the function varies depending on CPU, hardware, or implementation because the cache control depends heavily on the hardware. The cache control is basically applied on the specified area using the specified mode, but it may affect more area including the specified area. For example, there are the following cases:</P
+><P
+></P
+><UL
+><LI
+><P
+>Only the exactly specified range is not always controlled (flushed or invalidated). An area including the specified range is controlled, but it is also possible to flush or invalidate the cache for other areas (for example, entire memory) depending on CPU, hardware, or implementation.</P
+></LI
+><LI
+><P
+>Normally, no operation is performed when a cache-off area is specified. Even in this case, it is possible to flush or invalidate the cache for areas other than the specified range.(always flush the entire space, etc.)</P
+></LI
+><LI
+><P
+>No operation is performed in a system without cache.</P
+></LI
+></UL
+><P
+>Generally, the cache control is performed in cache line size units. For this reason, note that unintended cache access may occur to adjacent area when using this API.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="system_configuration_information_management_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="physical_timer_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>System Configuration Information Management Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_sm_functions.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Physical Timer Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

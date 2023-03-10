@@ -1,0 +1,714 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>μT-Kernel 3.0 Specification</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="NEXT"
+TITLE="API Notation"
+HREF="api_notation.html"></HEAD
+><BODY
+CLASS="book"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="BOOK"
+><A
+NAME="index"
+></A
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="title"
+><A
+NAME="index"
+>μT-Kernel 3.0 Specification</A
+></H1
+><P
+CLASS="copyright"
+>Copyright &copy; 2019-2023 TRON Forum</P
+><DIV
+CLASS="legalnotice"
+><A
+NAME="AEN8"
+></A
+><P
+><B
+>μT-Kernel Specification Ver.3.00.01</B
+></P
+><P
+>Copyright © 2019-2023 by TRON Forum</P
+><P
+>You should not transcribe the content, duplicate a part of this specification, etc. without the consent of TRON Forum.</P
+><P
+>For improvement, etc., information in this specification is subject to change without notice.</P
+><P
+>For information about this specification, please contact the following:
+      <P
+CLASS="address"
+><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<SPAN
+CLASS="othername"
+>TRON Forum Secretariat</SPAN
+><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<SPAN
+CLASS="othername"
+>In YRP Ubiquitous Networking Laboratory</SPAN
+><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<SPAN
+CLASS="street"
+>SEIJITSU BLD-1, 2-12-3, Nishi-Gotanda</SPAN
+>&nbsp;<SPAN
+CLASS="city"
+>Shinagawa</SPAN
+>,&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<SPAN
+CLASS="state"
+>Tokyo</SPAN
+>&nbsp;<SPAN
+CLASS="country"
+>Japan</SPAN
+><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<SPAN
+CLASS="postcode"
+>141-0031</SPAN
+><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TEL:&nbsp;<SPAN
+CLASS="phone"
+>+81-(0)-3-5437-0572</SPAN
+><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FAX:&nbsp;<SPAN
+CLASS="fax"
+>+81-(0)-3-5437-2399</SPAN
+><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;E-mail:&nbsp;<CODE
+CLASS="email"
+>&#60;<A
+HREF="mailto:office@tron.org"
+>office@tron.org</A
+>&#62;</CODE
+><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</P
+></P
+></DIV
+><HR></DIV
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+><A
+HREF="api_notation.html"
+>API Notation</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="api_notation.html#api_name_summary_description"
+>API Name - Description</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="index_of_utk_os_api.html"
+>Index of μT-Kernel/OS APIs</A
+></DT
+><DT
+><A
+HREF="index_of_utk_sm_api.html"
+>Index of μT-Kernel/SM APIs</A
+></DT
+><DT
+><A
+HREF="index_of_utk_ds_api.html"
+>Index of μT-Kernel/DS APIs</A
+></DT
+><DT
+><A
+HREF="utk_overview.html"
+>Overview of μT-Kernel 3.0</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="utk_overview.html#position_of_utk"
+>TRON Project and μT-Kernel 3.0</A
+></DT
+><DT
+><A
+HREF="design_policy_of_utk.html"
+>Design Policy of μT-Kernel 3.0</A
+></DT
+><DT
+><A
+HREF="utk_structure.html"
+>Structure of μT-Kernel 3.0</A
+></DT
+><DT
+><A
+HREF="reference_code_of_utk.html"
+>Reference Code</A
+></DT
+><DT
+><A
+HREF="adaptability_and_service_profile_of_utk.html"
+>Adaptability and Service Profile</A
+></DT
+><DT
+><A
+HREF="implementation_specification_of_utk.html"
+>Implementation Specification Document</A
+></DT
+><DT
+><A
+HREF="relation_with_existing_rtos_specifications.html"
+>Relation with Existing RTOS Specifications</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="concepts_underlying_utk.html"
+>μT-Kernel Concepts</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="concepts_underlying_utk.html#meaning_of_basic_terminology"
+>Meaning of Basic Terminology</A
+></DT
+><DT
+><A
+HREF="task_states_and_scheduling_rules.html"
+>Task States and Scheduling Rules</A
+></DT
+><DT
+><A
+HREF="interrupt_handling.html"
+>Interrupt Handling</A
+></DT
+><DT
+><A
+HREF="task_exception_handling.html"
+>Task Exception Handling</A
+></DT
+><DT
+><A
+HREF="system_states.html"
+>System States</A
+></DT
+><DT
+><A
+HREF="objects.html"
+>Objects</A
+></DT
+><DT
+><A
+HREF="protection_levels.html"
+>Protection Levels</A
+></DT
+><DT
+><A
+HREF="service_profile_overview.html"
+>Service Profile</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="common_utk.html"
+>Common Rules of μT-Kernel</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="common_utk.html#data_types"
+>Data Types</A
+></DT
+><DT
+><A
+HREF="system_calls.html"
+>System Calls</A
+></DT
+><DT
+><A
+HREF="high_level_language_support_routines.html"
+>High-Level Language Support Routines</A
+></DT
+><DT
+><A
+HREF="service_profile_definitions.html"
+>Service Profile</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="utk_os_functions.html"
+>μT-Kernel/OS Functions</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="utk_os_functions.html#task_management_functions"
+>Task Management Functions</A
+></DT
+><DT
+><A
+HREF="task_dependent_synchronization_functions.html"
+>Task Synchronization Functions</A
+></DT
+><DT
+><A
+HREF="task_exception_handling_functions.html"
+>Task Exception Handling Functions</A
+></DT
+><DT
+><A
+HREF="synchronzation_and_communication_functions.html"
+>Synchronization and Communication Functions</A
+></DT
+><DT
+><A
+HREF="extended_synchronization_and_communication_functions.html"
+>Extended Synchronization and Communication Functions</A
+></DT
+><DT
+><A
+HREF="memory_pool_management_functions.html"
+>Memory Pool Management Functions</A
+></DT
+><DT
+><A
+HREF="time_management_functions.html"
+>Time Management Functions</A
+></DT
+><DT
+><A
+HREF="interrupt_management_functions_os.html"
+>Interrupt Management Functions</A
+></DT
+><DT
+><A
+HREF="system_management_functions.html"
+>System Management Functions</A
+></DT
+><DT
+><A
+HREF="subsystem_management_functions.html"
+>Subsystem Management Functions</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="utk_sm_functions.html"
+>μT-Kernel/SM Functions</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="utk_sm_functions.html#system_memory_management_functions"
+>System Memory Management Functions</A
+></DT
+><DT
+><A
+HREF="device_management_functions.html"
+>Device Management Functions</A
+></DT
+><DT
+><A
+HREF="interrupt_management_functions_sm.html"
+>Interrupt Management Functions</A
+></DT
+><DT
+><A
+HREF="io_port_management_functions.html"
+>I/O Port Access Support Functions</A
+></DT
+><DT
+><A
+HREF="power_management_functions.html"
+>Power Management Functions</A
+></DT
+><DT
+><A
+HREF="system_configuration_information_management_functions.html"
+>System Configuration Information Management Functions</A
+></DT
+><DT
+><A
+HREF="memory_cache_control_functions.html"
+>Memory Cache Control Functions</A
+></DT
+><DT
+><A
+HREF="physical_timer_functions.html"
+>Physical Timer Functions</A
+></DT
+><DT
+><A
+HREF="utility_functions.html"
+>Utility Functions</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="utk_ds_functions.html"
+>μT-Kernel/DS Functions</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="utk_ds_functions.html#kernel_internal_state_reference_functions"
+>Kernel Internal State Acquisition Functions</A
+></DT
+><DT
+><A
+HREF="trace_functions.html"
+>Trace Functions</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="appendixes.html"
+>Appendix</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="appendixes.html#system_configuration_of_reference_implementation"
+>System Configuration</A
+></DT
+><DT
+><A
+HREF="list_of_keywords.html"
+>Keywords</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="reference.html"
+>Reference</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="reference.html#list_of_c_language_interface"
+>List of C Language Interface</A
+></DT
+><DT
+><A
+HREF="list_of_error_codes.html"
+>List of Error Codes</A
+></DT
+><DT
+><A
+HREF="list_of_api_and_service_profiles.html"
+>List of APIs and Service Profile Items</A
+></DT
+></DL
+></DD
+></DL
+></DIV
+><DIV
+CLASS="LOT"
+><DL
+CLASS="LOT"
+><DT
+><B
+>List of Tables</B
+></DT
+><DT
+>1. <A
+HREF="task_states_and_scheduling_rules.html#table_task_status"
+>State Transitions Distinguishing Invoking Task and Other Tasks</A
+></DT
+><DT
+>1. <A
+HREF="utk_os_functions.html#table_tk_ter_tsk"
+>Target Task State and Execution Result (tk_ter_tsk)</A
+></DT
+><DT
+>2. <A
+HREF="utk_os_functions.html#table_tk_ref_tsk"
+>Values of <CODE
+CLASS="varname"
+>tskwait</CODE
+> and <CODE
+CLASS="varname"
+>wid</CODE
+></A
+></DT
+><DT
+>3. <A
+HREF="task_dependent_synchronization_functions.html#table_tk_rel_wai"
+>Target Task State and Execution Result (tk_rel_wai)</A
+></DT
+><DT
+>1. <A
+HREF="device_management_functions.html#table_tk_opn_dev"
+>Whether Concurrent Open of Same Device is Allowed or NOT</A
+></DT
+></DL
+></DIV
+><DIV
+CLASS="LOT"
+><DL
+CLASS="LOT"
+><DT
+><B
+>List of Figures</B
+></DT
+><DT
+>1. <A
+HREF="utk_structure.html#figure_mtk_structure"
+>Position and Structure of μT-Kernel 3.0</A
+></DT
+><DT
+>1. <A
+HREF="task_states_and_scheduling_rules.html#figure_task_status"
+>Task State Transition Diagram</A
+></DT
+><DT
+>2. <A
+HREF="task_states_and_scheduling_rules.html#figure_a_task_scheduling"
+>Precedence in Initial State</A
+></DT
+><DT
+>3. <A
+HREF="task_states_and_scheduling_rules.html#figure_b_task_scheduling"
+>Precedence After Task B Goes To RUNNING State</A
+></DT
+><DT
+>4. <A
+HREF="task_states_and_scheduling_rules.html#figure_c_task_scheduling"
+>Precedence After Task B Goes To WAITING State</A
+></DT
+><DT
+>5. <A
+HREF="task_states_and_scheduling_rules.html#figure_d_task_scheduling"
+>Precedence After Task B WAITING State Is Released</A
+></DT
+><DT
+>6. <A
+HREF="system_states.html#figure_system_status_in_nontask"
+>Classification of System States</A
+></DT
+><DT
+>7. <A
+HREF="system_states.html#figure_task_independent"
+>Interrupt Nesting and Delayed Dispatching</A
+></DT
+><DT
+>1. <A
+HREF="high_level_language_support_routines.html#figure_high_level_language_support_routines"
+>Behavior of High-Level Language Support Routine</A
+></DT
+><DT
+>1. <A
+HREF="synchronzation_and_communication_functions.html#figure_tk_wai_flg"
+>Multiple Tasks Waiting for One Event Flag</A
+></DT
+><DT
+>2. <A
+HREF="synchronzation_and_communication_functions.html#figure_mailbox"
+>Format of Messages Using a Mailbox</A
+></DT
+><DT
+>3. <A
+HREF="extended_synchronization_and_communication_functions.html#figure_message_buffer"
+>Synchronous Communication by Message Buffer</A
+></DT
+><DT
+>4. <A
+HREF="extended_synchronization_and_communication_functions.html#figure_tk_cre_mbf"
+>Synchronous Communication Using Message Buffer of <CODE
+CLASS="varname"
+>bufsz</CODE
+> = 0</A
+></DT
+><DT
+>5. <A
+HREF="system_management_functions.html#figure_a_tk_rot_rdq"
+>Precedence Before Issuing tk_rot_rdq</A
+></DT
+><DT
+>6. <A
+HREF="system_management_functions.html#figure_b_tk_rot_rdq"
+>Precedence After Issuing tk_rot_rdq (<CODE
+CLASS="varname"
+>tskpri</CODE
+> = 2)</A
+></DT
+><DT
+>7. <A
+HREF="system_management_functions.html#figure_a_tk_ref_ver"
+><CODE
+CLASS="varname"
+>maker</CODE
+> Format</A
+></DT
+><DT
+>8. <A
+HREF="system_management_functions.html#figure_b_tk_ref_ver"
+><CODE
+CLASS="varname"
+>prid</CODE
+> Format</A
+></DT
+><DT
+>9. <A
+HREF="system_management_functions.html#figure_c_tk_ref_ver"
+><CODE
+CLASS="varname"
+>spver</CODE
+> Format</A
+></DT
+><DT
+>10. <A
+HREF="subsystem_management_functions.html#figure_subsystem_management_functions"
+>μT-Kernel Subsystems</A
+></DT
+><DT
+>1. <A
+HREF="device_management_functions.html#figure_basic_concepts_device_management"
+>Device Management Functions</A
+></DT
+></DL
+></DIV
+><DIV
+CLASS="LOT"
+><DL
+CLASS="LOT"
+><DT
+><B
+>List of Examples</B
+></DT
+><DT
+>1. <A
+HREF="api_notation.html#AEN102"
+>Example of Using Parameters Notation</A
+></DT
+><DT
+>1. <A
+HREF="system_calls.html#AEN1468"
+>Description Example of CONST</A
+></DT
+><DT
+>1. <A
+HREF="device_management_functions.html#AEN18989"
+>Example of Device Name</A
+></DT
+><DT
+>2. <A
+HREF="device_management_functions.html#AEN19023"
+>Example of Device ID</A
+></DT
+><DT
+>3. <A
+HREF="device_management_functions.html#AEN19072"
+>Example of Device-specific Data</A
+></DT
+><DT
+>4. <A
+HREF="interrupt_management_functions_sm.html#AEN23726"
+>Sample Usage of isDI</A
+></DT
+><DT
+>5. <A
+HREF="system_configuration_information_management_functions.html#AEN25484"
+>Example of Format of System Configuration Information</A
+></DT
+><DT
+>6. <A
+HREF="system_configuration_information_management_functions.html#AEN25911"
+>Example of Storage Order of More than One Numeric Value</A
+></DT
+><DT
+>7. <A
+HREF="utility_functions.html#AEN27075"
+>Sample Usage of SetOBJNAME</A
+></DT
+><DT
+>1. <A
+HREF="trace_functions.html#AEN33717"
+>tk_wai_sem(ID semid, INT cnt, TMO tmout)</A
+></DT
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="api_notation.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>API Notation</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

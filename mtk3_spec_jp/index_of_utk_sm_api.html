@@ -1,0 +1,667 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>μT-Kernel/SM API索引</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="μT-Kernel/OS API索引"
+HREF="index_of_utk_os_api.html"><LINK
+REL="NEXT"
+TITLE="μT-Kernel/DS API索引"
+HREF="index_of_utk_ds_api.html"></HEAD
+><BODY
+CLASS="chapter"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="index_of_utk_os_api.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="index_of_utk_ds_api.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="chapter"
+><H1
+><A
+NAME="index_of_utk_sm_api"
+></A
+>μT-Kernel/SM API索引</H1
+><P
+>この索引は、本仕様書で説明されるμT-Kernel/SM APIのアルファベット順索引である。</P
+><P
+></P
+><UL
+><LI
+><P
+><A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+> - 中止処理関数</P
+></LI
+><LI
+><P
+><A
+HREF="interrupt_management_functions_sm.html#CheckInt"
+>CheckInt</A
+> - 割込み発生の検査</P
+></LI
+><LI
+><P
+><A
+HREF="interrupt_management_functions_sm.html#ClearInt"
+>ClearInt</A
+> - 割込み発生のクリア</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#closefn"
+>closefn</A
+> - クローズ関数</P
+></LI
+><LI
+><P
+><A
+HREF="memory_cache_control_functions.html#ControlCache"
+>ControlCache</A
+> - キャッシュの制御</P
+></LI
+><LI
+><P
+><A
+HREF="utility_functions.html#CreateLock"
+>CreateLock</A
+> - 高速ロックの生成</P
+></LI
+><LI
+><P
+><A
+HREF="utility_functions.html#CreateMLock"
+>CreateMLock</A
+> - 高速マルチロックの生成</P
+></LI
+><LI
+><P
+><A
+HREF="physical_timer_functions.html#DefinePhysicalTimerHandler"
+>DefinePhysicalTimerHandler</A
+> - 物理タイマハンドラ定義</P
+></LI
+><LI
+><P
+><A
+HREF="utility_functions.html#DeleteLock"
+>DeleteLock</A
+> - 高速ロックの削除</P
+></LI
+><LI
+><P
+><A
+HREF="utility_functions.html#DeleteMLock"
+>DeleteMLock</A
+> - 高速マルチロックの削除</P
+></LI
+><LI
+><P
+><A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI</A
+> - 外部割込み禁止</P
+></LI
+><LI
+><P
+><A
+HREF="interrupt_management_functions_sm.html#DisableInt"
+>DisableInt</A
+> - 割込み禁止</P
+></LI
+><LI
+><P
+><A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI</A
+> - 外部割込み許可</P
+></LI
+><LI
+><P
+><A
+HREF="interrupt_management_functions_sm.html#EnableInt"
+>EnableInt</A
+> - 割込み許可</P
+></LI
+><LI
+><P
+><A
+HREF="interrupt_management_functions_sm.html#EndOfInt"
+>EndOfInt</A
+> - 割込みコントローラにEOI発行</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#eventfn"
+>eventfn</A
+> - イベント関数</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+> - 処理開始関数</P
+></LI
+><LI
+><P
+><A
+HREF="interrupt_management_functions_sm.html#GetCpuIntLevel"
+>GetCpuIntLevel</A
+> - CPU内割込みマスクレベルの取得</P
+></LI
+><LI
+><P
+><A
+HREF="interrupt_management_functions_sm.html#GetCtrlIntLevel"
+>GetCtrlIntLevel</A
+> - 割込みコントローラ内割込みマスクレベルの取得</P
+></LI
+><LI
+><P
+><A
+HREF="physical_timer_functions.html#GetPhysicalTimerConfig"
+>GetPhysicalTimerConfig</A
+> - 物理タイマのコンフィグレーション情報取得</P
+></LI
+><LI
+><P
+><A
+HREF="physical_timer_functions.html#GetPhysicalTimerCount"
+>GetPhysicalTimerCount</A
+> - 物理タイマのカウント値取得</P
+></LI
+><LI
+><P
+><A
+HREF="io_port_management_functions.html#in_b"
+>in_b</A
+> - I/Oポート読込み(バイト)</P
+></LI
+><LI
+><P
+><A
+HREF="io_port_management_functions.html#in_d"
+>in_d</A
+> - I/Oポート読込み(ダブルワード)</P
+></LI
+><LI
+><P
+><A
+HREF="io_port_management_functions.html#in_h"
+>in_h</A
+> - I/Oポート読込み(ハーフワード)</P
+></LI
+><LI
+><P
+><A
+HREF="io_port_management_functions.html#in_w"
+>in_w</A
+> - I/Oポート読込み(ワード)</P
+></LI
+><LI
+><P
+><A
+HREF="interrupt_management_functions_sm.html#isDI"
+>isDI</A
+> - 外部割込み禁止状態の取得</P
+></LI
+><LI
+><P
+><A
+HREF="utk_sm_functions.html#Kcalloc"
+>Kcalloc</A
+> - メモリの割当てとクリア</P
+></LI
+><LI
+><P
+><A
+HREF="utk_sm_functions.html#Kfree"
+>Kfree</A
+> - メモリの解放</P
+></LI
+><LI
+><P
+><A
+HREF="utk_sm_functions.html#Kmalloc"
+>Kmalloc</A
+> - メモリの割当て</P
+></LI
+><LI
+><P
+><A
+HREF="utk_sm_functions.html#Krealloc"
+>Krealloc</A
+> - メモリの再割当て</P
+></LI
+><LI
+><P
+><A
+HREF="utility_functions.html#Lock"
+>Lock</A
+> - 高速ロックのロック操作</P
+></LI
+><LI
+><P
+><A
+HREF="power_management_functions.html#low_pow"
+>low_pow</A
+> - システムを低消費電力モードに移行</P
+></LI
+><LI
+><P
+><A
+HREF="utility_functions.html#MLock"
+>MLock</A
+> - 高速マルチロックのロック操作</P
+></LI
+><LI
+><P
+><A
+HREF="utility_functions.html#MLockTmo"
+>MLockTmo</A
+> - 高速マルチロックのロック操作(タイムアウト指定付き)</P
+></LI
+><LI
+><P
+><A
+HREF="utility_functions.html#MLockTmo_u"
+>MLockTmo_u</A
+> - 高速マルチロックのロック操作(タイムアウト指定付き、マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="utility_functions.html#MUnlock"
+>MUnlock</A
+> - 高速マルチロックのロック解除操作</P
+></LI
+><LI
+><P
+><A
+HREF="power_management_functions.html#off_pow"
+>off_pow</A
+> - システムをサスペンド状態に移行</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#openfn"
+>openfn</A
+> - オープン関数</P
+></LI
+><LI
+><P
+><A
+HREF="io_port_management_functions.html#out_b"
+>out_b</A
+> - I/Oポート書込み(バイト)</P
+></LI
+><LI
+><P
+><A
+HREF="io_port_management_functions.html#out_d"
+>out_d</A
+> - I/Oポート書込み(ダブルワード)</P
+></LI
+><LI
+><P
+><A
+HREF="io_port_management_functions.html#out_h"
+>out_h</A
+> - I/Oポート書込み(ハーフワード)</P
+></LI
+><LI
+><P
+><A
+HREF="io_port_management_functions.html#out_w"
+>out_w</A
+> - I/Oポート書込み(ワード)</P
+></LI
+><LI
+><P
+><A
+HREF="memory_cache_control_functions.html#SetCacheMode"
+>SetCacheMode</A
+> - キャッシュモードの設定</P
+></LI
+><LI
+><P
+><A
+HREF="interrupt_management_functions_sm.html#SetCpuIntLevel"
+>SetCpuIntLevel</A
+> - CPU内割込みマスクレベルの設定</P
+></LI
+><LI
+><P
+><A
+HREF="interrupt_management_functions_sm.html#SetCtrlIntLevel"
+>SetCtrlIntLevel</A
+> - 割込みコントローラ内割込みマスクレベルの設定</P
+></LI
+><LI
+><P
+><A
+HREF="interrupt_management_functions_sm.html#SetIntMode"
+>SetIntMode</A
+> - 割込みモード設定</P
+></LI
+><LI
+><P
+><A
+HREF="utility_functions.html#SetOBJNAME"
+>SetOBJNAME</A
+> - オブジェクト名設定</P
+></LI
+><LI
+><P
+><A
+HREF="physical_timer_functions.html#StartPhysicalTimer"
+>StartPhysicalTimer</A
+> - 物理タイマの動作開始</P
+></LI
+><LI
+><P
+><A
+HREF="physical_timer_functions.html#StopPhysicalTimer"
+>StopPhysicalTimer</A
+> - 物理タイマの動作停止</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_cls_dev"
+>tk_cls_dev</A
+> - デバイスのクローズ</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_def_dev"
+>tk_def_dev</A
+> - デバイスの登録</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_evt_dev"
+>tk_evt_dev</A
+> - デバイスにドライバ要求イベントを送信</P
+></LI
+><LI
+><P
+><A
+HREF="system_configuration_information_management_functions.html#tk_get_cfn"
+>tk_get_cfn</A
+> - システム構成情報から数値列取得</P
+></LI
+><LI
+><P
+><A
+HREF="system_configuration_information_management_functions.html#tk_get_cfs"
+>tk_get_cfs</A
+> - システム構成情報から文字列取得</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_get_dev"
+>tk_get_dev</A
+> - デバイスのデバイス名取得</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_lst_dev"
+>tk_lst_dev</A
+> - 登録済みデバイス一覧の取得</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_opn_dev"
+>tk_opn_dev</A
+> - デバイスのオープン</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_oref_dev"
+>tk_oref_dev</A
+> - デバイスのデバイス情報取得</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+> - デバイスの読込み開始</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_rea_dev_du"
+>tk_rea_dev_du</A
+> - デバイスの読込み開始(64ビットマイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_ref_dev"
+>tk_ref_dev</A
+> - デバイスのデバイス情報取得</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_ref_idv"
+>tk_ref_idv</A
+> - デバイス初期情報の取得</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_srea_dev"
+>tk_srea_dev</A
+> - デバイスの同期読込み</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_srea_dev_d"
+>tk_srea_dev_d</A
+> - デバイスの同期読込み(64ビット)</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_sus_dev"
+>tk_sus_dev</A
+> - デバイスのサスペンド</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_swri_dev"
+>tk_swri_dev</A
+> - デバイスの同期書込み</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_swri_dev_d"
+>tk_swri_dev_d</A
+> - デバイスの同期書込み(64ビット)</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+> - デバイスの要求完了待ち</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_wai_dev_u"
+>tk_wai_dev_u</A
+> - デバイスの要求完了待ち(マイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+> - デバイスの書込み開始</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#tk_wri_dev_du"
+>tk_wri_dev_du</A
+> - デバイスの書込み開始(64ビットマイクロ秒単位)</P
+></LI
+><LI
+><P
+><A
+HREF="utility_functions.html#Unlock"
+>Unlock</A
+> - 高速ロックのロック解除操作</P
+></LI
+><LI
+><P
+><A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+> - 完了待ち関数</P
+></LI
+><LI
+><P
+><A
+HREF="io_port_management_functions.html#WaitNsec"
+>WaitNsec</A
+> - 微小待ち(ナノ秒)</P
+></LI
+><LI
+><P
+><A
+HREF="io_port_management_functions.html#WaitUsec"
+>WaitUsec</A
+> - 微小待ち(マイクロ秒)</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="index_of_utk_os_api.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="index_of_utk_ds_api.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>μT-Kernel/OS API索引</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>μT-Kernel/DS API索引</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

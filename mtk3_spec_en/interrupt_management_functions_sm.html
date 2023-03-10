@@ -1,0 +1,3613 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Interrupt Management Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/SM Functions"
+HREF="utk_sm_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Device Management Functions"
+HREF="device_management_functions.html"><LINK
+REL="NEXT"
+TITLE="I/O Port Access Support Functions"
+HREF="io_port_management_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="device_management_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/SM Functions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="io_port_management_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="interrupt_management_functions_sm"
+>Interrupt Management Functions</A
+></H1
+><P
+>μT-Kernel/SM interrupt management functions are functions for disabling or enabling external interrupt, retrieving interrupt disable status, controlling interrupt controller, etc.</P
+><P
+>Interrupt handling is largely hardware-dependent, different on each system, and therefore difficult to standardize. The following are given as standard specification, but it may not be possible to follow these exactly on all systems. Implementors should comply with these specifications as much as possible; but where implementation is not feasible, full compliance is not mandatory. If functions not in the standard specification are added, however, the function names must be different from those given here. In any case, <A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI</A
+>, <A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI</A
+>, and <A
+HREF="interrupt_management_functions_sm.html#isDI"
+>isDI</A
+> must be implemented in accordance with the standard specification.</P
+><P
+>Interrupt management functions are provided as library functions or C language macros. These can be called from a task-independent portion and while dispatching and interrupts are disabled.</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="cpu_interrupt_control"
+>CPU Interrupt Control</A
+></H2
+><P
+>These functions control the external interrupt mask flag or interrupt mask level in the CPU. Generally speaking, interrupt controller is not touched.</P
+><P
+><A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI</A
+> disables all the external interrupts and <A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI</A
+> enables them. After <A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI</A
+> is issued and until <A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI</A
+> is issued, the system is in external interrupt disabled state. In this state, an indivisible processing can be performed since no interruption occurs and no dispatching takes place.</P
+><P
+>There are a few restrictions about the API to control CPU interrupt and the external interrupt disabled state.</P
+><P
+></P
+><UL
+><LI
+><P
+>CPU interrupt control API is usually implemented as C language compile time macro to set the external interrupt mask flag or interrupt mask level inside the CPU. Hence, this API can be invoked only in the privileged level that can access and control hardware directly. The precise meaning of the level is implementation-dependent.</P
+></LI
+><LI
+><P
+>CPU interrupt control API only sets CPU's external interrupt mask flag or interrupt mask level only. Hence, generally speaking, except for some implementations, the execution of these APIs will not cause delayed dispatching.</P
+></LI
+><LI
+><P
+>There are restrictions on the available APIs in the external interrupt disabled state. API that puts the calling task into waiting state cannot be invoked. The system should return <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>. However, the proper error checking to return <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+> is implementation-dependent. The following APIs of μT-Kernel/SM, <A
+HREF="interrupt_management_functions_sm.html"
+>Interrupt Management Functions</A
+> and <A
+HREF="io_port_management_functions.html"
+>I/O Port Access Support Functions</A
+>, can be invoked even when external interrupt is disabled. Whether other APIs can be invoked when external interrupt is disabled is implementation-dependent.</P
+></LI
+><LI
+><P
+>System timer interrupt is disabled in the external interrupt disabled state. Hence, no timeout occurs, and no time event handler processing occurs.</P
+></LI
+></UL
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Additional Notes</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>The APIs for controlling CPU interrupt is meant for device drivers to perform indivisible execution for low-level control such as hardware by disabling external interrupt temporarily. However, the disabling of external interrupt reduces the system responsiveness and the real-time performance suffers. So the indivisible operation should be finished quickly and external interrupt disabled state should be exited soon.</P
+><P
+>External interrupt disabled state entered by <A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI</A
+> is very similar to task-independent portion. Even if an API that would usually cause dispatch such as <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> is invoked, dispatching does not occur. Afterward, when <A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI</A
+> is issued to return to external interrupt enabled state, the delayed dispatching associated with <A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI</A
+> do not occur generally (except for some implementations). As a result, after <A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI</A
+> is issued, we may have an unexpected situation where a lower priority task continues to run even though a higher priority task in READY state exists.</P
+><P
+>To avoid the unexpected situation, when a program needs to issue an API that causes dispatching during the time interval that starts with <A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI</A
+> and ends with <A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI</A
+>, it is recommended to surround the interval of external interrupt disabled state by a pair of <A
+HREF="system_management_functions.html#tk_dis_dsp"
+>tk_dis_dsp</A
+> and <A
+HREF="system_management_functions.html#tk_ena_dsp"
+>tk_ena_dsp</A
+>. Namely, the APIs should be issued in the following order: <A
+HREF="system_management_functions.html#tk_dis_dsp"
+>tk_dis_dsp</A
+> → <A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI</A
+> → API that causes dispatching → <A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI</A
+> → <A
+HREF="system_management_functions.html#tk_ena_dsp"
+>tk_ena_dsp</A
+>. With this order of issuing the APIs, external interrupt and dispatching are disabled between <A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI</A
+> and <A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI</A
+>. Only dispatching is disabled bewteen <A
+HREF="system_management_functions.html#tk_dis_dsp"
+>tk_dis_dsp</A
+> and <A
+HREF="system_management_functions.html#tk_ena_dsp"
+>tk_ena_dsp</A
+>. And at the timing of the last <A
+HREF="system_management_functions.html#tk_ena_dsp"
+>tk_ena_dsp</A
+>, delayed dispatching does take place. Hence, the unexpected situation mentioned in the preceding sentences is corrected after all. Issueing the APIs in this order guarantees the same system behavior that is not implementation-dependent.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="DI"
+>DI - Disable External Interrupts</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23535"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN23537"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>&#13;            DI
+          </CODE
+>(UINT intsts);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23544"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23546"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>intsts</CODE
+>
+              </TD
+><TD
+>Interrupt Status</TD
+><TD
+>Variable that stores the CPU external interrupt flag</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23559"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23562"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23565"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23567"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23582"
+>Description</A
+></H4
+><P
+>Controls the external interrupt flag in the CPU and disables all external interrupts. Also stores the flag state in <CODE
+CLASS="varname"
+>intsts</CODE
+> before disabling interrupt.</P
+><P
+><CODE
+CLASS="varname"
+>intsts</CODE
+> is not a pointer. Write a variable directly. Generally, this API is defined as a C language macro.</P
+><P
+>Regarding the APIs that can be issued during external interrupt disabled state, see the explanation at the beginning of <A
+HREF="interrupt_management_functions_sm.html#cpu_interrupt_control"
+>the Section called <I
+>CPU Interrupt Control</I
+></A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="EI"
+>EI - Enable External Interrupt</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23592"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN23594"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>&#13;            EI
+          </CODE
+>(UINT intsts);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23601"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23603"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>intsts</CODE
+>
+              </TD
+><TD
+>Interrupt Status</TD
+><TD
+>Variable that stores the CPU external interrupt flag</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23616"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23619"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23622"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23624"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23639"
+>Description</A
+></H4
+><P
+>Controls the external interrupt flag in the CPU and reverts the flag state to <CODE
+CLASS="varname"
+>intsts</CODE
+>. That is, this API reverts the flag state to the state before disabling external interrupts by the previously executed <A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI(intsts)</A
+>.</P
+><P
+>If the state before executing <A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI(intsts)</A
+> was the external-interrupt-enabled, the subsequent <A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI(intsts)</A
+> enables external interrupts. On the other hand, if the state was already interrupt-disabled at the time <A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI(intsts)</A
+> was executed, interrupt is not enabled by <A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI(intsts)</A
+>. However, if 0 is specified in <CODE
+CLASS="varname"
+>intsts</CODE
+>, the external interrupt flag in the CPU is set to the interrupt-enable state.</P
+><P
+><CODE
+CLASS="varname"
+>intsts</CODE
+> must be either the value saved by <A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI</A
+> or 0. If any other value is specified, the subsequent correct behavior is not guaranteed.</P
+><P
+>The specifications pays attention to the execution efficiency to minimize overhead. Therefore, this API is usually implemented using assembly language or C language macro. This API controls the external interrupt mask flag in the CPU only and does nothing else. No error result is returned. Hence, except for some implementations, the execution of this API will not cause delayed dispatching, generally speaking.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="isDI"
+>isDI - Get Interrupt Disable Status</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23656"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN23658"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>BOOL disint = isDI</CODE
+>(UINT intsts);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23665"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23667"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>intsts</CODE
+>
+              </TD
+><TD
+>Interrupt Status</TD
+><TD
+>Variable that stores the CPU external interrupt flag</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23680"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23682"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>BOOL</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>disint</CODE
+>
+              </TD
+><TD
+>Interrupt Disabled Status</TD
+><TD
+>External interrupt disabled status</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23695"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23698"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23700"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23715"
+>Description</A
+></H4
+><P
+>Checks the external interrupt flag in the CPU that was stored in <CODE
+CLASS="varname"
+>intsts</CODE
+> by the previously executed <A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI</A
+>, and returns <TT
+CLASS="literal"
+>TRUE</TT
+>(a non-zero value) if the flag status is determined as the interrupt-disabled, or <TT
+CLASS="literal"
+>FALSE</TT
+> otherwise.</P
+><P
+><CODE
+CLASS="varname"
+>intsts</CODE
+> must be the value saved by <A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI</A
+>. If any other value is specified, the subsequent correct behavior is not guaranteed.</P
+><P
+>This specification pay attention to the execution efficiency to minimize overhead. Therefore, this API is usually implemented using assembly language or C language macro.</P
+><DIV
+CLASS="example"
+><A
+NAME="AEN23726"
+></A
+><P
+><B
+>Example 4. Sample Usage of isDI</B
+></P
+><PRE
+CLASS="programlisting"
+>&#13;void foo()
+{
+        UINT    intsts;
+
+        DI(intsts);
+
+        if ( isDI(intsts) ) {
+                /* Interrupt was already disabled at the time the above DI() was called */
+        } else {
+                /* Interrupt was enabled at the time the above DI() was called */
+        }
+
+        EI(intsts);
+}
+</PRE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="SetCpuIntLevel"
+>SetCpuIntLevel - Set Interrupt Mask Level in CPU</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23731"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN23733"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void SetCpuIntLevel</CODE
+>(INT level);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23740"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23742"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>level</CODE
+>
+              </TD
+><TD
+>Interrupt Mask Level</TD
+><TD
+>Interrupt mask level</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23755"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23758"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23761"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23763"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23778"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23781"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_CPUINTLEVEL</TT
+>
+              </TD
+><TD
+>Support of CPU interrupt mask level</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23790"
+>Description</A
+></H4
+><P
+>Set interrupt mask level of CPU and disable interrupts that have lower interrupt priority than <CODE
+CLASS="varname"
+>level</CODE
+>. Interrupts that have interrupt priority that is equal to <CODE
+CLASS="varname"
+>level</CODE
+> or higher are enabled.</P
+><P
+>When <TT
+CLASS="literal"
+>INTLEVEL_DI</TT
+> is specified to <CODE
+CLASS="varname"
+>level</CODE
+>, the interrupt mask level within the interrupt controller is set to disable all external interrupts at all priority levels. Generally speaking, this is the same state of the system after <A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI</A
+> is called.</P
+><P
+>When <TT
+CLASS="literal"
+>INTLEVEL_EI</TT
+> is specified to <CODE
+CLASS="varname"
+>level</CODE
+>, the mask level within the interrupt controller is set to enable all external interrupts at all priority levels. Generally speaking, this is the same state of the system after <A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI(0)</A
+> is called.</P
+><P
+>While interrupts are disabled due to the execution of this API, dispatch may be delayed, as in the case of the interrupt handler's being executed, until the interrupts are enabled again.</P
+><P
+>The range of value that can be specified by <CODE
+CLASS="varname"
+>level</CODE
+> and the concrete value of <CODE
+CLASS="varname"
+>INTLEVEL_DI</CODE
+> are implementation-dependent. The ordering relation of the interrupt level as numeric value and the interrupt priority is implementation-dependent. Generally speaking, the specification about these is decided based on the CPU architecture.</P
+><P
+>The specifications pays attention to the execution efficiency to minimize overhead. Therefore, this API is usually implemented using assembly language or C language macro. This API controls the interrupt mask level in the CPU only and does nothing else. No error result is returned. Hence, except for some implementations, the execution of this API will not cause delayed dispatching, generally speaking.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23808"
+>Additional Notes</A
+></H4
+><P
+>"Interrupt mask level" is defined to be the lower bound of interrupt priority level (interrupt level) for external interrupts that are enabled (masked). External interrupts with priorities equal to or higher than the interrupt mask level are enabled.</P
+><P
+>This API sets the interrupt mask level within CPU, and has a similar function as that of <A
+HREF="interrupt_management_functions_sm.html#SetCtrlIntLevel"
+>SetCtrlIntLevel</A
+> which sets the interrupt mask level within the interrupt controller. The former affects the result of interrupt enable/disable setting done by <A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI</A
+>, <A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI</A
+>. The latter has nothing to do with this.</P
+><P
+>This API sets the interrupt mask level within CPU without regard to the previous setting. Note that there are both cases of either the increase of the disabled interrupts, or the decrease of disabled interrupts after the execution of this API.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="GetCpuIntLevel"
+>GetCpuIntLevel - Get Interrupt Mask Level in CPU</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23818"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN23820"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT level = GetCpuIntLevel</CODE
+>(void);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23826"
+>Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23829"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23831"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>level</CODE
+>
+              </TD
+><TD
+>Interrupt Mask Level</TD
+><TD
+>Interrupt mask level</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23844"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23847"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23849"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23864"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23867"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_CPUINTLEVEL</TT
+>
+              </TD
+><TD
+>Support of CPU interrupt mask level</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23876"
+>Description</A
+></H4
+><P
+>Get the current value of interrupt mask level in CPU, and return it as the value of return parameter <CODE
+CLASS="varname"
+>level</CODE
+>.</P
+><P
+>The range of value that can be specified by <CODE
+CLASS="varname"
+>level</CODE
+> is implementation-dependent.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23882"
+>Additional Notes</A
+></H4
+><P
+>See the explanation and additional notes in <A
+HREF="interrupt_management_functions_sm.html#SetCpuIntLevel"
+>SetCpuIntLevel</A
+>.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="control_of_interrupt_controller"
+>Control of Interrupt Controller</A
+></H2
+><P
+>These functions control the interrupt controller. Generally they do not perform any operation with respect to the CPU interrupt flag.</P
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="EnableInt"
+>EnableInt - Enable Interrupts</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23891"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN23893"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void EnableInt</CODE
+>(UINT intno);</CODE
+></P
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void EnableInt</CODE
+>(UINT intno, INT level);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23907"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23909"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>intno</CODE
+>
+              </TD
+><TD
+>Interrupt Number</TD
+><TD
+>Interrupt number</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>level</CODE
+>
+              </TD
+><TD
+>Interrupt Priority Level</TD
+><TD
+>Interrupt priority level</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23928"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23931"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23934"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23936"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23951"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23954"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_INTCTRL</TT
+>
+              </TD
+><TD
+>Support of interrupt controller management</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>Additionally, the following service profile items are related to this API.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN23964"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_HAS_ENAINTLEVEL</TT
+>
+              </TD
+><TD
+>Interrupt priority level (<CODE
+CLASS="varname"
+>level</CODE
+>) can be specified as the 2nd argument</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23974"
+>Description</A
+></H4
+><P
+>Enable interrupt with interrupt number, <CODE
+CLASS="varname"
+>intno</CODE
+>. On a system where interrupt priority level can be specified, <CODE
+CLASS="varname"
+>level</CODE
+> is used to specify the interrupt priority level.</P
+><P
+>The interrupt number that can be specified in <CODE
+CLASS="varname"
+>intno</CODE
+> is limited to a number that can be usable by <A
+HREF="interrupt_management_functions_os.html#tk_def_int"
+>tk_def_int</A
+> and at the same time, an interrupt number that is controlled by the interrupt controller. The subsequent correct behavior of the system as a whole when an invalid <CODE
+CLASS="varname"
+>intno</CODE
+> is specified is not guaranteed.</P
+><P
+>Either the support of <CODE
+CLASS="varname"
+>level</CODE
+> or the support without <CODE
+CLASS="varname"
+>level</CODE
+> is provided.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23986"
+>Additional Notes</A
+></H4
+><P
+>This API does not check for error just as other interrupt-related APIs do not.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="DisableInt"
+>DisableInt - Disable Interrupts</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN23991"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN23993"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void DisableInt</CODE
+>(UINT intno);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24000"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24002"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>intno</CODE
+>
+              </TD
+><TD
+>Interrupt Number</TD
+><TD
+>Interrupt number</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24015"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24018"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24021"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24023"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24038"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24041"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_INTCTRL</TT
+>
+              </TD
+><TD
+>Support of interrupt controller management</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24050"
+>Description</A
+></H4
+><P
+>Disable interrupt with the interrupt number, <CODE
+CLASS="varname"
+>intno</CODE
+>. Generally speaking, an interrupt that is disabled will become pending and, once it is enabled by <A
+HREF="interrupt_management_functions_sm.html#EnableInt"
+>EnableInt</A
+>, an interrupt is generated. If it is desired to cancel an interrupt condition that became pending because the interrupt was disabled, <A
+HREF="interrupt_management_functions_sm.html#ClearInt"
+>ClearInt</A
+> must be called.</P
+><P
+>The interrupt number that can be specified in <CODE
+CLASS="varname"
+>intno</CODE
+> is limited to a number that can be usable by <A
+HREF="interrupt_management_functions_os.html#tk_def_int"
+>tk_def_int</A
+> and at the same time, an interrupt number that is controlled by the interrupt controller. The subsequent correct behavior of the system as a whole when an invalid <CODE
+CLASS="varname"
+>intno</CODE
+> is specified is not guaranteed.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24060"
+>Additional Notes</A
+></H4
+><P
+>This API does not check for error just as other interrupt-related APIs do not.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="ClearInt"
+>ClearInt - Clear Interrupt</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24065"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN24067"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void ClearInt</CODE
+>(UINT intno);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24074"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24076"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>intno</CODE
+>
+              </TD
+><TD
+>Interrupt Number</TD
+><TD
+>Interrupt number</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24089"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24092"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24095"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24097"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24112"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24115"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_INTCTRL</TT
+>
+              </TD
+><TD
+>Support of interrupt controller management</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24124"
+>Description</A
+></H4
+><P
+>If an interrupt with interrupt number, <CODE
+CLASS="varname"
+>intno</CODE
+>, has been generated, it is cleared.</P
+><P
+>The interrupt number that can be specified in <CODE
+CLASS="varname"
+>intno</CODE
+> is limited to a number that can be usable by <A
+HREF="interrupt_management_functions_os.html#tk_def_int"
+>tk_def_int</A
+> and at the same time, an interrupt number that is controlled by the interrupt controller. The subsequent correct behavior of the system as a whole when an invalid <CODE
+CLASS="varname"
+>intno</CODE
+> is specified is not guaranteed.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24132"
+>Additional Notes</A
+></H4
+><P
+>This API does not check for errors since it focuses on the execution efficiency to minimize overhead.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="EndOfInt"
+>EndOfInt - Issue EOI to Interrupt Controller</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24137"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN24139"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void EndOfInt</CODE
+>(UINT intno);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24146"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24148"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>intno</CODE
+>
+              </TD
+><TD
+>Interrupt Number</TD
+><TD
+>Interrupt number</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24161"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24164"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24167"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24169"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24184"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24187"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_INTCTRL</TT
+>
+              </TD
+><TD
+>Support of interrupt controller management</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24196"
+>Description</A
+></H4
+><P
+>Issue EOI to Interrupt Controller. <CODE
+CLASS="varname"
+>intno</CODE
+> must identify an interrupt that is the target of EOI. Generally this must be executed at the end of an interrupt handler.</P
+><P
+>The interrupt number that can be specified in <CODE
+CLASS="varname"
+>intno</CODE
+> is limited to a number that can be usable by <A
+HREF="interrupt_management_functions_os.html#tk_def_int"
+>tk_def_int</A
+> and at the same time, an interrupt number that is controlled by the interrupt controller. The subsequent correct behavior of the system as a whole when an invalid <CODE
+CLASS="varname"
+>intno</CODE
+> is specified is not guaranteed.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24204"
+>Additional Notes</A
+></H4
+><P
+>This API does not check for errors since it focuses on the execution efficiency to minimize overhead.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="CheckInt"
+>CheckInt - Check Interrupt</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24209"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN24211"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>BOOL rasint = CheckInt</CODE
+>(UINT intno);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24218"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24220"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>intno</CODE
+>
+              </TD
+><TD
+>Interrupt Number</TD
+><TD
+>Interrupt number</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24233"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24235"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>BOOL</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>rasint</CODE
+>
+              </TD
+><TD
+>Interrupt Raised Status</TD
+><TD
+>External interrupt raised status</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24248"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24251"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24253"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24268"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24271"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_INTCTRL</TT
+>
+              </TD
+><TD
+>Support of interrupt controller management</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24280"
+>Description</A
+></H4
+><P
+>Check to see if an interrupt with interrupt number, <CODE
+CLASS="varname"
+>intno</CODE
+>, has been generated. If an interrupt with the interrupt number, <CODE
+CLASS="varname"
+>intno</CODE
+>, has been generated, <TT
+CLASS="literal"
+>TRUE</TT
+> (a non-zero value) is returned, and if it has not, then <TT
+CLASS="literal"
+>FALSE</TT
+> is returned.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="SetIntMode"
+>SetIntMode - Set Interrupt Mode</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24289"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN24291"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void SetIntMode</CODE
+>(UINT intno, UINT mode);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24300"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24302"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>intno</CODE
+>
+              </TD
+><TD
+>Interrupt Number</TD
+><TD
+>Interrupt number</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mode</CODE
+>
+              </TD
+><TD
+>Mode</TD
+><TD
+>Interrupt mode</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24321"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24324"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24327"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24329"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24344"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24347"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_INTMODE</TT
+>
+              </TD
+><TD
+>Support of setting interrupt mode</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24356"
+>Description</A
+></H4
+><P
+>Set the interrupt mode of interrupt specified by <CODE
+CLASS="varname"
+>intno</CODE
+> to <CODE
+CLASS="varname"
+>mode</CODE
+>.</P
+><P
+>The interrupt number that can be specified in <CODE
+CLASS="varname"
+>intno</CODE
+> is limited to a number that can be usable by <A
+HREF="interrupt_management_functions_os.html#tk_def_int"
+>tk_def_int</A
+> and at the same time, an interrupt number that is controlled by the interrupt controller. The subsequent correct behavior of the system as a whole when an invalid <CODE
+CLASS="varname"
+>intno</CODE
+> is specified is not guaranteed.</P
+><P
+>The settable modes and how to specify <CODE
+CLASS="varname"
+>mode</CODE
+> are implementation-dependent. The following is an example of settable modes:</P
+><PRE
+CLASS="synopsis"
+>&#13;mode := (IM_LEVEL || IM_EDGE) | (IM_HI || IM_LOW)
+</PRE
+><PRE
+CLASS="programlisting"
+>&#13;#define IM_LEVEL        0x0002          /* Level trigger */
+#define IM_EDGE         0x0000          /* Edge trigger */
+#define IM_HI           0x0000          /* H level/Interrupt at rising edge */
+#define IM_LOW          0x0001          /* L level/Interrupt at falling edge */
+</PRE
+><P
+>If invalid <CODE
+CLASS="varname"
+>mode</CODE
+> is specified, the subsequent correct behavior is not guaranteed.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24371"
+>Additional Notes</A
+></H4
+><P
+>This API does not check for error just as other interrupt-related APIs do not.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="SetCtrlIntLevel"
+>SetCtrlIntLevel - Set Interrupt Mask Level in Interrupt Controller</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24376"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN24378"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void SetCtrlIntLevel</CODE
+>(INT level);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24385"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24387"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>level</CODE
+>
+              </TD
+><TD
+>Interrupt Mask Level</TD
+><TD
+>Interrupt mask level</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24400"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24403"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24406"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24408"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24423"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24426"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_CTRLINTLEVEL</TT
+>
+              </TD
+><TD
+>Support of interrupt controller mask level</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24435"
+>Description</A
+></H4
+><P
+>Set interrupt mask level of the interrupt controller and disable interrupts that have lower interrupt priority than <CODE
+CLASS="varname"
+>level</CODE
+>. Interrupts that have interrupt priority that is equal to <CODE
+CLASS="varname"
+>level</CODE
+> or higher are enabled.</P
+><P
+>When <TT
+CLASS="literal"
+>INTLEVEL_DI</TT
+> is specified to <CODE
+CLASS="varname"
+>level</CODE
+>, the interrupt mask level within the interrupt controller is set to disable all external interrupts at all priority levels.</P
+><P
+>When <TT
+CLASS="literal"
+>INTLEVEL_EI</TT
+> is specified to <CODE
+CLASS="varname"
+>level</CODE
+>, the mask level within the interrupt controller is set to enable all external interrupts at all priority levels.</P
+><P
+>While interrupts are disabled due to the execution of this API, dispatch may be delayed, as in the case of the interrupt handler's being executed, until the interrupts are enabled again.</P
+><P
+>The range of value that can be specified by <CODE
+CLASS="varname"
+>level</CODE
+> and the concrete value of <CODE
+CLASS="varname"
+>INTLEVEL_DI</CODE
+> are implementation-dependent. The ordering relation of the interrupt level as numeric value and the interrupt priority is implementation-dependent. Generally speaking, the specification about these is decided based on the CPU architecture.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24450"
+>Additional Notes</A
+></H4
+><P
+>See the additional notes for <A
+HREF="interrupt_management_functions_sm.html#SetCpuIntLevel"
+>SetCpuIntLevel</A
+>.</P
+><P
+>This API sets the interrupt mask level within interrupt controller without regard to the previous setting. Note that there are both cases of either the increase of the disabled interrupts, or the decrease of disabled interrupts after the execution of this API.</P
+><P
+>This API does not check for errors since it focuses on the execution efficiency to minimize overhead.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="GetCtrlIntLevel"
+>GetCtrlIntLevel - Get Interrupt Mask Level in Interrupt Controller</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24458"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN24460"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT level = GetCtrlIntLevel</CODE
+>(void);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24466"
+>Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24469"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24471"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>level</CODE
+>
+              </TD
+><TD
+>Interrupt Mask Level</TD
+><TD
+>Interrupt mask level</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24484"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24487"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24489"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24504"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN24507"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_CTRLINTLEVEL</TT
+>
+              </TD
+><TD
+>Support of interrupt controller mask level</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24516"
+>Description</A
+></H4
+><P
+>This returns the current interrupt mask level configured inside the interrupt controller, and return it in the return parameter <CODE
+CLASS="varname"
+>level</CODE
+>.</P
+><P
+>The range of value that can be specified by <CODE
+CLASS="varname"
+>level</CODE
+> is implementation-dependent.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN24522"
+>Additional Notes</A
+></H4
+><P
+>See the additional notes for <A
+HREF="interrupt_management_functions_sm.html#SetCpuIntLevel"
+>SetCpuIntLevel</A
+>.</P
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="device_management_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="io_port_management_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Device Management Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_sm_functions.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>I/O Port Access Support Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

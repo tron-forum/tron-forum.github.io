@@ -1,0 +1,6094 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>タスク付属同期機能</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/OSの機能"
+HREF="utk_os_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="μT-Kernel/OSの機能"
+HREF="utk_os_functions.html"><LINK
+REL="NEXT"
+TITLE="タスク例外処理機能"
+HREF="task_exception_handling_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/OSの機能</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="task_exception_handling_functions.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="task_dependent_synchronization_functions"
+>タスク付属同期機能</A
+></H1
+><P
+>タスク付属同期機能は、タスクの状態を直接的に操作することによって同期を行うための機能である。タスクを起床待ちにする機能とそこから起床する機能、タスクの起床要求をキャンセルする機能、タスクの待ち状態を強制解除する機能、タスクを強制待ち状態へ移行する機能とそこから再開する機能、自タスクの実行を遅延する機能、タスクイベントに関する機能、タスクの待ち状態を禁止する機能が含まれる。</P
+><P
+>タスクに対する起床要求は、キューイングされる。すなわち、起床待ち状態でないタスクを起床しようとすると、そのタスクを起床しようとしたという記録が残り、後でそのタスクが起床待ちに移行しようとした時に、タスクを起床待ち状態にしない。タスクに対する起床要求のキューイングを実現するために、タスクは起床要求キューイング数を持つ。タスクの起床要求キューイング数は、タスクの起動時に0にクリアする。</P
+><P
+>タスクに対する強制待ち要求は、ネストされる。すなわち、すでに強制待ち状態(二重待ち状態を含む)になっているタスクを再度強制待ち状態に移行させようとすると、そのタスクを強制待ち状態に移行させようとしたという記録が残り、後でそのタスクを強制待ち状態(二重待ち状態を含む)から再開させようとした時に、強制待ちからの再開を行わない。タスクに対する強制待ち要求のネストを実現するために、タスクは強制待ち要求ネスト数を持つ。タスクの強制待ち要求ネスト数は、タスクの起動時に0にクリアする。</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_slp_tsk"
+>tk_slp_tsk - 自タスクを起床待ち状態へ移行</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4063"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN4065"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_slp_tsk</CODE
+>(TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4072"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4074"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト指定(ミリ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4087"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4089"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4102"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4104"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>tmout</CODE
+>≦(-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>ポーリング失敗またはタイムアウト</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4135"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4137"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4152"
+>関連するサービスプロファイル</A
+></H3
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4155"
+>解説</A
+></H3
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> システムコールでは、自タスクを実行状態(RUNNING)から起床待ち状態(<A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> を待つ状態)に移す。ただし、自タスクに対する起床要求がキューイングされている場合、具体的には自タスクの起床要求キューイング数が1以上の場合には、起床要求キューイング数から1を減じ、自タスクを待ち状態に移行させず、そのまま実行を継続する。</P
+><P
+><CODE
+CLASS="varname"
+>tmout</CODE
+> で指定した時間が経過する前にこのタスクを対象とした <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> が発行された場合は、このシステムコールは正常終了する。一方、<CODE
+CLASS="varname"
+>tmout</CODE
+> で指定した時間が経過する間に <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> が発行されなかった場合は、タイムアウトエラー <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> となる。なお、<CODE
+CLASS="varname"
+>tmout</CODE
+>＝<TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1)により、タイムアウトまでの時間が無限大であることを示す。この場合は、<A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> が発行されるまで永久に待ち状態になる。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4169"
+>補足事項</A
+></H3
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> は自タスクを待ち状態に移すシステムコールであるため、<A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> がネストすることはあり得ない。しかし、<A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> によって待ち状態になっているタスクに対して、他のタスクから <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> が実行される可能性はある。この場合、このタスクは二重待ち状態(WAITING-SUSPENDED)となる。</P
+><P
+>タスクの単純な遅延(時間待ち)を行うのであれば、<A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> ではなく、<A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk"
+>tk_dly_tsk</A
+> を用いるべきである。</P
+><P
+>タスク起床待ちはアプリケーションでの利用を前提とし、ミドルウェアでは原則として使用してはいけない。これは、次の理由による。</P
+><P
+>同一タスクにおいて、2ヵ所以上でタスク起床待ちによる同期を行うと、起床要求が混同してしまい誤動作することになる。例えば、アプリケーションとミドルウェアの双方で起床待ちによる同期を利用していた場合、ミドルウェア内で起床待ちしている間に、アプリケーションが起床要求してしまうことがありえる。このような状況になれば、ミドルウェアもアプリケーションも正常な動作はできなくなる。</P
+><P
+>このように、どこで起床待ちしているかなどの状況がわからないと、正しいタスクの同期ができなくなる。タスク起床待ちによるタスクの同期は簡便な方法としてよく利用されるため、アプリケーションで自由に利用できることを確保するために、ミドルウェアでは使用しないことを原則とする。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_slp_tsk_u"
+>tk_slp_tsk_u - 自タスクを起床待ち状態へ移行(マイクロ秒単位)</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4184"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN4186"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_slp_tsk_u</CODE
+>(TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4193"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4195"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト指定(マイクロ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4208"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4210"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4223"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4225"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>tmout_u</CODE
+>≦(-2))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>ポーリング失敗またはタイムアウト</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4256"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4258"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4273"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4276"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>マイクロ秒のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4285"
+>解説</A
+></H3
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> のパラメータである <CODE
+CLASS="varname"
+>tmout</CODE
+> を64ビットマイクロ秒単位の <CODE
+CLASS="varname"
+>tmout_u</CODE
+> としたシステムコールである。</P
+><P
+>パラメータが <CODE
+CLASS="varname"
+>tmout_u</CODE
+> となった点を除き、本システムコールの仕様は <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> と同じである。詳細は <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> の説明を参照のこと。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_wup_tsk"
+>tk_wup_tsk - 他タスクの起床</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4297"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN4299"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_wup_tsk</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4306"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4308"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>タスクID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4321"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4323"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4336"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4338"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>オブジェクトの状態が不正(対象タスクが自タスクまたは休止状態(DORMANT))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_QOVR</SPAN
+>
+              </TD
+><TD
+>キューイングまたはネストのオーバーフロー(キューイング数 <CODE
+CLASS="varname"
+>wupcnt</CODE
+> のオーバーフロー)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4366"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4368"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4383"
+>関連するサービスプロファイル</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4385"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_WAKEUP_MAXCNT</TT
+>
+              </TD
+><TD
+>タスクの起床要求の最大キューイング数 (&#62;= 1)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4394"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> で示されるタスクが <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> の実行による待ち状態であった場合に、その待ち状態を解除する。</P
+><P
+>本システムコールでは、自タスクを指定することはできない。自タスクを指定した場合には、<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> のエラーとなる。</P
+><P
+>対象タスクが <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> を実行しておらず、待ち状態でない場合には、<A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> による起床要求はキューイングされる。すなわち、対象タスクに対して <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> が発行されたという記録が残り、この後で対象タスクが <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> を実行した場合にも、待ち状態にはならない。これを起床要求のキューイングと呼ぶ。</P
+><P
+>起床要求のキューイングの動作は、具体的には次のようになる。各タスクは、TCBの中に起床要求キューイング数(<CODE
+CLASS="varname"
+>wupcnt</CODE
+>)という状態を持っており、その初期値(<A
+HREF="utk_os_functions.html#tk_sta_tsk"
+>tk_sta_tsk</A
+> 実行時の値)は0である。起床待ち状態でないタスクに対して <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> を実行することにより、対象タスクの起床要求キューイング数がプラス1される。一方、タスクが <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> を実行することにより、そのタスクの起床要求キューイング数がマイナス1される。そうして、起床要求キューイング数＝0のタスクが <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> を実行した時に、起床要求キューイング数がマイナスになる代わりに、そのタスクが待ち状態になる。</P
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> を1回キューイングすること(<CODE
+CLASS="varname"
+>wupcnt</CODE
+>＝1)は常に可能であるが、起床要求キューイング数(<CODE
+CLASS="varname"
+>wupcnt</CODE
+>)の最大値は実装依存であり、最大値はサービスプロファイル <TT
+CLASS="literal"
+>TK_WAKEUP_MAXCNT</TT
+> で規定される。すなわち、待ち状態でないタスクに対して <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> を1回発行してもエラーとはならないが、2回目以降の <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> がエラーとなるかどうかは実装依存である。</P
+><P
+>起床要求キューイング数(<CODE
+CLASS="varname"
+>wupcnt</CODE
+>)の最大値の制限を越えて <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> を発行した場合には、<SPAN
+CLASS="errorname"
+>E_QOVR</SPAN
+> のエラーとなる。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_can_wup"
+>tk_can_wup - タスクの起床要求を無効化</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4425"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN4427"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT wupcnt = tk_can_wup</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4434"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4436"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>タスクID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4449"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4451"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>wupcnt</CODE
+>
+              </TD
+><TD
+>Wakeup Count</TD
+><TD
+>キューイングされていた起床要求回数</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4468"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4470"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>オブジェクトの状態が不正(対象タスクが休止状態(DORMANT))</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4489"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4491"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4506"
+>関連するサービスプロファイル</A
+></H3
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4509"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> で示されたタスクの起床要求キューイング数(<CODE
+CLASS="varname"
+>wupcnt</CODE
+>)をリターンパラメータとして返し、同時にその起床要求をすべてキャンセルする。すなわち、対象タスクの起床要求キューイング数(<CODE
+CLASS="varname"
+>wupcnt</CODE
+>)を0にする。</P
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+>＝<TT
+CLASS="literal"
+>TSK_SELF</TT
+>＝0によって自タスクの指定になる。ただし、タスク独立部から発行したシステムコールで <CODE
+CLASS="varname"
+>tskid</CODE
+>＝<TT
+CLASS="literal"
+>TSK_SELF</TT
+>＝0を指定した場合には、<SPAN
+CLASS="errorname"
+>E_ID</SPAN
+> のエラーとなる。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4521"
+>補足事項</A
+></H3
+><P
+>このシステムコールは、周期的にタスクを起床して動かすような処理を行う場合に、時間内に処理が終わっているかどうかを判定するために利用できる。すなわち、前の起床要求に対する処理が終了して <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> を発行する前に、それを監視するタスクが <A
+HREF="task_dependent_synchronization_functions.html#tk_can_wup"
+>tk_can_wup</A
+> を発行し、そのリターンパラメータである <CODE
+CLASS="varname"
+>wupcnt</CODE
+> が1以上の値であった場合、前の起床要求に対する処理が時間内に終了しなかったということを示す。したがって、処理の遅れに対して何らかの処置をとることができる。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_rel_wai"
+>tk_rel_wai - 他タスクの待ち状態解除</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4529"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN4531"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_rel_wai</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4538"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4540"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>タスクID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4553"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4555"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4568"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4570"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>オブジェクトの状態が不正(対象タスクが待ち状態ではない(自タスクや休止状態(DORMANT)の場合を含む))</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4593"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4595"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4610"
+>関連するサービスプロファイル</A
+></H3
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4613"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> で示されるタスクが何らかの待ち状態(強制待ち状態(SUSPENDED)を除く)にある場合に、それを強制的に解除する。</P
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> により待ち状態が解除されたタスクに対しては、エラー <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+> が返る。このとき、対象タスクは資源を確保せずに(待ち解除の条件が満たされないまま)待ち解除となることが保証される。</P
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> では、待ち状態解除要求のキューイングは行わない。すなわち、<CODE
+CLASS="varname"
+>tskid</CODE
+> で示される対象タスクが既に待ち状態であればその待ち状態を解除するが、対象タスクが待ち状態でなければ、発行元にエラー <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> が返る。本システムコールで自タスクを指定した場合にも、同様に <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> のエラーとなる。</P
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> では、強制待ち状態(SUSPENDED)の解除は行わない。二重待ち状態(WAITING-SUSPENDED)のタスクを対象として <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を発行すると、対象タスクは強制待ち状態(SUSPENDED)となる。強制待ち状態(SUSPENDED)も解除する必要がある場合には、別に <A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> または <A
+HREF="task_dependent_synchronization_functions.html#tk_frsm_tsk"
+>tk_frsm_tsk</A
+> を発行する。</P
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> の対象タスクの状態と実行結果との関係についてまとめたものを <A
+HREF="task_dependent_synchronization_functions.html#table_tk_rel_wai"
+>表3</A
+> に示す。</P
+><DIV
+CLASS="table"
+><A
+NAME="table_tk_rel_wai"
+></A
+><P
+><B
+>表 3. tk_rel_waiの対象タスクの状態と実行結果
+</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="45%"><COL
+WIDTH="27%"><COL
+WIDTH="27%"><THEAD
+><TR
+><TH
+ALIGN="left"
+>対象タスク状態</TH
+><TH
+ALIGN="left"
+><A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> の <CODE
+CLASS="varname"
+>ercd</CODE
+></TH
+><TH
+ALIGN="left"
+>処理</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>実行できる状態(RUNNING, READY)(自タスク以外)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>何もしない</TD
+></TR
+><TR
+><TD
+>実行状態(RUNNING)(自タスク)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>何もしない</TD
+></TR
+><TR
+><TD
+>待ち状態(WAITING)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>待ち解除</TD
+></TR
+><TR
+><TD
+>強制待ち状態(SUSPENDED)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>何もしない</TD
+></TR
+><TR
+><TD
+>二重待ち状態(WAITING-SUSPENDED)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>SUSPENDED状態に移行</TD
+></TR
+><TR
+><TD
+>休止状態(DORMANT)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>何もしない</TD
+></TR
+><TR
+><TD
+>未登録状態(NON-EXISTENT)</TD
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>何もしない</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4682"
+>補足事項</A
+></H3
+><P
+>アラームハンドラ等を用いて、あるタスクが待ち状態に入ってから一定時間後にこのシステムコールを発行することにより、タイムアウトに類似した機能を実現することができる。</P
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> と <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> とは次のような違いがある。</P
+><P
+></P
+><UL
+><LI
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> は <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> による待ち状態のみを解除するが、<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> ではそれ以外の要因(<A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+>, <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_sem"
+>tk_wai_sem</A
+>, <A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+>, <A
+HREF="memory_pool_management_functions.html#tk_get_mpl"
+>tk_get_mpl</A
+>, <A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk"
+>tk_dly_tsk</A
+> 等) による待ち状態も解除する。</P
+></LI
+><LI
+><P
+>待ち状態に入っていたタスクから見ると、<A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> による待ち状態の解除は正常終了(<SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>)であるのに対して、<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> による待ち状態の解除はエラー(<SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>)である。</P
+></LI
+><LI
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> の場合は、対象タスクがまだ <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> を実行していなくても、要求がキューイングされる。一方、<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> の場合は、対象タスクが既に待ち状態に無い場合には、<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> のエラーとなる。</P
+></LI
+></UL
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_sus_tsk"
+>tk_sus_tsk - 他タスクを強制待ち状態へ移行</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4713"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN4715"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_sus_tsk</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4722"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4724"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>タスクID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4737"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4739"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4752"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4754"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>オブジェクトの状態が不正(対象タスクが自タスクまたは休止状態(DORMANT))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>ディスパッチ禁止状態で実行状態のタスクを指定した</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_QOVR</SPAN
+>
+              </TD
+><TD
+>キューイングまたはネストのオーバーフロー(ネスト数 <CODE
+CLASS="varname"
+>suscnt</CODE
+> のオーバーフロー)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4786"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4788"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4803"
+>関連するサービスプロファイル</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4805"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUSPEND_MAXCNT</TT
+>
+              </TD
+><TD
+>タスクの強制待ち要求の最大ネスト数 (&#62;= 1)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4814"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> で示されたタスクを強制待ち状態(SUSPENDED)に移し、タスクの実行を中断させる。</P
+><P
+>強制待ち状態(SUSPENDED)は、<A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+>, <A
+HREF="task_dependent_synchronization_functions.html#tk_frsm_tsk"
+>tk_frsm_tsk</A
+> システムコールの発行によって解除される。</P
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> の対象タスクが既に待ち状態であった場合には、<A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> の実行により、対象タスクは待ち状態と強制待ち状態が複合した二重待ち状態(WAITING-SUSPENDED)となる。その後、このタスクの待ち解除の条件が満たされると、対象タスクは強制待ち状態(SUSPENDED)に移行する。一方、このタスクに対して <A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> が発行されると、対象タスクは前と同じ待ち状態に戻る。(<A
+HREF="task_states_and_scheduling_rules.html#figure_task_status"
+>図1<I
+>タスク状態</I
+>項<I
+>μT-Kernelの概念</I
+>章</A
+> を参照)</P
+><P
+>強制待ち状態(SUSPENDED)は他タスクの発行したシステムコールによる中断状態を意味するものなので、本システムコールで自タスクを指定することはできない。自タスクを指定した場合には、<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> のエラーとなる。</P
+><P
+>タスク独立部からの本システムコールの発行において、ディスパッチ禁止状態で実行状態(RUNNING)のタスクを指定した場合は <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+> のエラーとなる。</P
+><P
+>あるタスクに対して複数回の <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> が発行された場合、そのタスクは多重の強制待ち状態(SUSPENDED)になる。これを強制待ち要求のネストと呼ぶ。この場合、<A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> が発行された回数(<CODE
+CLASS="varname"
+>suscnt</CODE
+>)と同じ回数の <A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> を発行することにより、対象タスクが元の状態に戻る。したがって、<A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+>～<A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> の対をネストすることが可能である。</P
+><P
+>強制待ち要求のネストの機能(同一タスクに対して2回以上の <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> を発行する機能)の有無およびその回数の上限値は、実装依存である。</P
+><P
+>強制待ち要求をネストできないシステムで複数の <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> が発行された場合や、ネスト回数の制限値を越えた場合には、<SPAN
+CLASS="errorname"
+>E_QOVR</SPAN
+> のエラーとなる。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4842"
+>補足事項</A
+></H3
+><P
+>あるタスクが資源獲得のための待ち状態(セマフォ待ちなど)で、かつ強制待ち状態(SUSPENDED)の場合でも、強制待ち状態(SUSPENDED)でない時と同じ条件によって資源の割当て(セマフォの割当てなど)が行われる。強制待ち状態(SUSPENDED)であっても、資源割当ての遅延などが行われるわけではなく、資源割当てや待ち状態の解除に関する条件や優先度は全く変わらない。すなわち、強制待ち状態(SUSPENDED)は、他の処理やタスク状態と直交関係にある。</P
+><P
+>強制待ち状態(SUSPENDED)のタスクに対して資源割当ての遅延(一時的な優先度の低下) を行いたいのであれば、ユーザ側で、<A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+>, <A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> に <A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+> を組み合せて発行すれば良い。</P
+><P
+>タスク強制待ちは、デバッガのブレークポイント処理等のOSに密接に関連したごく一部でのみ使用することを原則とする。一般のアプリケーションおよびミドルウェアでは原則として使用してはいけない。これは、次のような理由による。</P
+><P
+>タスク強制待ちは、対象のタスクの実行状態に関係なく行われる。例えば、タスクがあるミドルウェアの機能を呼び出しているとき、そのタスクを強制待ち状態にするとミドルウェアの内部でタスクが停止することになる。ミドルウェアでは、リソース管理などで排他制御等を行っている場合があり、あるタスクがミドルウェア内でリソースを獲得したまま停止してしまったことにより、他のタスクがそのミドルウェアを使用できなくなる状況が起きうる。このようにして連鎖的にタスクが停止してしまい、システム全体が停止(デッドロック)することもありうる。</P
+><P
+>このように、タスクの状態(何を実行中か)が不明な状況で、そのタスクを停止させることはできない。したがって、一般にタスク強制待ちは使用してはならない。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_rsm_tsk"
+>tk_rsm_tsk - 強制待ち状態のタスクを再開</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4854"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN4856"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_rsm_tsk</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4863"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4865"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>タスクID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4878"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4880"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4893"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4895"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>オブジェクトの状態が不正(対象タスクが強制待ち状態(SUSPENDED)ではない(自タスクや休止状態(DORMANT)の場合を含む))</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4918"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4920"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4935"
+>関連するサービスプロファイル</A
+></H3
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4938"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> で示されたタスクの強制待ち状態(SUSPENDED)を解除する。すなわち、対象タスクが以前に発行された <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> によって強制待ち状態(SUSPENDED)に入り、その実行が中断している場合に、その状態を解除し、実行を再開させる。</P
+><P
+>対象タスクが待ち状態(WAITING)と強制待ち状態(SUSPENDED)の複合した二重待ち状態(WAITING-SUSPENDED)であった場合には、<A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> の実行により強制待ち状態(SUSPENDED)のみが解除され、対象タスクは待ち状態となる。([<A
+HREF="task_states_and_scheduling_rules.html#figure_task_status"
+>図1<I
+>タスク状態</I
+>項<I
+>μT-Kernelの概念</I
+>章</A
+>]を参照)</P
+><P
+>本システムコールでは、自タスクを指定することはできない。自タスクを指定した場合には、<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> のエラーとなる。</P
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> では、強制待ち要求のネスト(<CODE
+CLASS="varname"
+>suscnt</CODE
+>)を1回分だけ解除する。したがって、対象タスクに対して2回以上の <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> が発行されていた場合(<CODE
+CLASS="varname"
+>suscnt</CODE
+>≧2)には、<A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> の実行が終わった後も、対象タスクはまだ強制待ち状態(SUSPENDED)のままである。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4954"
+>補足事項</A
+></H3
+><P
+>実行状態(RUNNING)もしくは実行可能状態(READY)のタスクが <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> により強制待ち状態(SUSPENDED)になった後、<A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> や <A
+HREF="task_dependent_synchronization_functions.html#tk_frsm_tsk"
+>tk_frsm_tsk</A
+> によって実行を再開した場合、そのタスクは同じ優先度を持つタスクの中で最低の優先順位となる。</P
+><P
+>たとえば、同じ優先度のtask_Aとtask_Bに対して以下のシステムコールを実行した場合、次のような動作をする。</P
+><PRE
+CLASS="programlisting"
+>&#13;tk_sta_tsk (tskid＝task_A, stacd_A);
+tk_sta_tsk (tskid＝task_B, stacd_B);
+  /* この時はFCFSの原則により、優先順位はtask_A→task_Bとなっている */
+
+tk_sus_tsk (tskid＝task_A);
+tk_rsm_tsk (tskid＝task_A);
+  /* この時に優先順位はtask_B→task_Aとなる */
+</PRE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_frsm_tsk"
+>tk_frsm_tsk - 強制待ち状態のタスクを強制再開</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4964"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN4966"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_frsm_tsk</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4973"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4975"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>タスクID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN4988"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN4990"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5003"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5005"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>オブジェクトの状態が不正(対象タスクが強制待ち状態(SUSPENDED)ではない(自タスクや休止状態(DORMANT)の場合を含む))</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5028"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5030"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5045"
+>関連するサービスプロファイル</A
+></H3
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5048"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> で示されたタスクの強制待ち状態(SUSPENDED)を解除する。すなわち、対象タスクが以前に発行された <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> によって強制待ち状態(SUSPENDED)に入り、その実行が中断している場合に、その状態を解除し、実行を再開させる。</P
+><P
+>対象タスクが待ち状態(WAITING)と強制待ち状態(SUSPENDED)の複合した二重待ち状態(WAITING-SUSPENDED)であった場合には、<A
+HREF="task_dependent_synchronization_functions.html#tk_frsm_tsk"
+>tk_frsm_tsk</A
+> の実行により強制待ち状態(SUSPENDED)のみが解除され、対象タスクは待ち状態となる。([<A
+HREF="task_states_and_scheduling_rules.html#figure_task_status"
+>図1<I
+>タスク状態</I
+>項<I
+>μT-Kernelの概念</I
+>章</A
+>]を参照)</P
+><P
+>本システムコールでは、自タスクを指定することはできない。自タスクを指定した場合には、<SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+> のエラーとなる。</P
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_frsm_tsk"
+>tk_frsm_tsk</A
+> では、強制待ち要求のネスト(<CODE
+CLASS="varname"
+>suscnt</CODE
+>)をすべて解除(<CODE
+CLASS="varname"
+>suscnt</CODE
+>＝0)する。したがって、対象タスクに対して2回以上の <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> が発行されていた場合(<CODE
+CLASS="varname"
+>suscnt</CODE
+>≧2)でも、それらの要求をすべて解除(<CODE
+CLASS="varname"
+>suscnt</CODE
+>＝0)する。すなわち、強制待ち状態(SUSPENDED)は必ず解除され、対象タスクが二重待ち状態(WAITING-SUSPENDED)でない限り実行を再開できる。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5065"
+>補足事項</A
+></H3
+><P
+>実行状態(RUNNING)もしくは実行可能状態(READY)のタスクが <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+> により強制待ち状態(SUSPENDED)になった後、<A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+> や <A
+HREF="task_dependent_synchronization_functions.html#tk_frsm_tsk"
+>tk_frsm_tsk</A
+> によって実行を再開した場合、そのタスクは同じ優先度を持つタスクの中で最低の優先順位となる。</P
+><P
+>たとえば、同じ優先度のtask_Aとtask_Bに対して以下のシステムコールを実行した場合、次のような動作をする。</P
+><PRE
+CLASS="programlisting"
+>&#13;tk_sta_tsk (tskid＝task_A, stacd_A);
+tk_sta_tsk (tskid＝task_B, stacd_B);
+  /* この時はFCFSの原則により、優先順位はtask_A→task_Bとなっている */
+
+tk_sus_tsk (tskid＝task_A);
+tk_frsm_tsk (tskid＝task_A);
+  /* この時に優先順位はtask_B→task_Aとなる */
+</PRE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_dly_tsk"
+>tk_dly_tsk - タスク遅延</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5075"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN5077"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_dly_tsk</CODE
+>(RELTIM dlytim);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5084"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5086"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>RELTIM</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dlytim</CODE
+>
+              </TD
+><TD
+>Delay Time</TD
+><TD
+>遅延時間(ミリ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5099"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5101"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5114"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5116"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>dlytim</CODE
+> が不正)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5143"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5145"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5160"
+>関連するサービスプロファイル</A
+></H3
+><P
+>なし</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5163"
+>解説</A
+></H3
+><P
+>自タスクの実行を一時的に停止し、時間経過待ちの状態に入る。タスクの実行を停止する時間は、<CODE
+CLASS="varname"
+>dlytim</CODE
+> により指定される。</P
+><P
+>時間経過待ちの状態は待ち状態の一つであり、<A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> により時間経過待ちを解除することができる。</P
+><P
+>このシステムコールを発行したタスクが強制待ち状態(SUSPENDED)または二重待ち状態(WAITING-SUSPENDED)になっている間も、時間経過のカウントは行われる。</P
+><P
+><CODE
+CLASS="varname"
+>dlytim</CODE
+> の基準時間(時間の単位)はシステム時刻の基準時間(＝1ミリ秒)と同じである。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5172"
+>補足事項</A
+></H3
+><P
+>このシステムコールは、<A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+> とは異なり、遅延時間として指定された時間が経過した場合に正常終了となる。また、遅延時間中に <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> が実行されても、待ち解除とはならない。遅延時間が経過する前に <A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk"
+>tk_dly_tsk</A
+> が終了するのは、<A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+> や <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> が発行された場合に限られる。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_dly_tsk_u"
+>tk_dly_tsk_u - タスク遅延(マイクロ秒単位)</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5182"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN5184"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_dly_tsk_u</CODE
+>(RELTIM_U dlytim_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5191"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5193"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>RELTIM_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>dlytim_u</CODE
+>
+              </TD
+><TD
+>Delay Time</TD
+><TD
+>遅延時間(マイクロ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5206"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5208"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5221"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5223"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>dlytim_u</CODE
+> が不正)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5250"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5252"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5267"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5270"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>マイクロ秒のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5279"
+>解説</A
+></H3
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk"
+>tk_dly_tsk</A
+> のパラメータである <CODE
+CLASS="varname"
+>dlytim</CODE
+> を64ビットマイクロ秒単位の <CODE
+CLASS="varname"
+>dlytim_u</CODE
+> としたシステムコールである。</P
+><P
+>パラメータが <CODE
+CLASS="varname"
+>dlytim_u</CODE
+> となった点を除き、本システムコールの仕様は <A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk"
+>tk_dly_tsk</A
+> と同じである。詳細は <A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk"
+>tk_dly_tsk</A
+> の説明を参照のこと。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_sig_tev"
+>tk_sig_tev - タスクイベントの送信</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5291"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN5293"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_sig_tev</CODE
+>(ID tskid, INT tskevt);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5302"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5304"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>タスクID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskevt</CODE
+>
+              </TD
+><TD
+>Task Event</TD
+><TD
+>タスクイベント番号(1～8)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5323"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5325"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5338"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5340"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+>オブジェクトの状態が不正(対象タスクが休止状態(DORMANT))</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>tskevt</CODE
+> が不正)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5368"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5370"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5385"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5388"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEVENT</TT
+>
+              </TD
+><TD
+>タスクイベント関連機能のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5397"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクへ <CODE
+CLASS="varname"
+>tskevt</CODE
+> で指定したタスクイベントを送信する。</P
+><P
+>タスクイベントは、タスクごとに保持される8種類のイベントであり、1～8の番号で指定する。</P
+><P
+>タスクイベントの発生回数は保持されず、発生の有無のみが保持される。</P
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+>＝<TT
+CLASS="literal"
+>TSK_SELF</TT
+>＝0によって自タスクの指定になる。ただし、タスク独立部から発行したシステムコールで <CODE
+CLASS="varname"
+>tskid</CODE
+>＝<TT
+CLASS="literal"
+>TSK_SELF</TT
+>＝0を指定した場合には、<SPAN
+CLASS="errorname"
+>E_ID</SPAN
+> のエラーとなる。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5410"
+>補足事項</A
+></H3
+><P
+>タスクイベントは、<A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+>～<A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> と同様のタスク付属の同期機能であるが、次の点が異なる。<P
+></P
+><UL
+><LI
+><P
+>起床要求(タスクイベント)の回数は保持されない。</P
+></LI
+><LI
+><P
+>8種類のイベントタイプで起床要求を分類できる。</P
+></LI
+></UL
+></P
+><P
+>同一タスクにおいて、同じイベントタイプを使用して2ヵ所以上で同期を行うと混乱することになる。イベントタイプの割当ては明確に行うべきである。</P
+><P
+>タスクイベントは、ミドルウェアでの利用を前提とし、アプリケーションでは原則として使用しない。アプリケーションでは、<A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+>～<A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+> の利用を推奨する。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_wai_tev"
+>tk_wai_tev - タスクイベント待ち</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5426"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN5428"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT tevptn = tk_wai_tev</CODE
+>(UINT waiptn, TMO tmout);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5437"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5439"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>waiptn</CODE
+>
+              </TD
+><TD
+>Wait Event Pattern</TD
+><TD
+>待ちタスクイベントのパターン</TD
+></TR
+><TR
+><TD
+>TMO</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト指定(ミリ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5458"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5460"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tevptn</CODE
+>
+              </TD
+><TD
+>Task Event Pattern</TD
+><TD
+>待ち解除時のタスクイベント発生状況</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5477"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5479"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>waiptn</CODE
+>, <CODE
+CLASS="varname"
+>tmout</CODE
+> が不正)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>ポーリング失敗またはタイムアウト</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5507"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5509"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5524"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5527"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEVENT</TT
+>
+              </TD
+><TD
+>タスクイベント関連機能のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5536"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>waiptn</CODE
+> で指定したタスクイベントのいずれかが発生するまで待つ。タスクイベントの発生で待ちが解除された場合、<CODE
+CLASS="varname"
+>waiptn</CODE
+> で指定したタスクイベントはクリア(発生中のタスクイベント &#38;= ~<CODE
+CLASS="varname"
+>waiptn</CODE
+>)される。また、戻値(<CODE
+CLASS="varname"
+>tevptn</CODE
+>)に待ちが解除された時に発生していたタスクイベントの状態(クリア前の状態)を返す。</P
+><P
+><CODE
+CLASS="varname"
+>waiptn</CODE
+> および <CODE
+CLASS="varname"
+>tevptn</CODE
+> は、各タスクイベントを1&#60;&#60;(タスクイベント番号-1)のビット値として論理和(OR)した値である。</P
+><P
+><CODE
+CLASS="varname"
+>tmout</CODE
+> により待ち時間の最大値(タイムアウト値)を指定することができる。<CODE
+CLASS="varname"
+>tmout</CODE
+> の基準時間(時間の単位)はシステム時刻の基準時間(＝1ミリ秒)と同じである。待ち解除の条件が満足されない(<A
+HREF="task_dependent_synchronization_functions.html#tk_sig_tev"
+>tk_sig_tev</A
+> が実行されない)まま <CODE
+CLASS="varname"
+>tmout</CODE
+> の時間が経過すると、タイムアウトエラー <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> となってシステムコールが終了する。</P
+><P
+><CODE
+CLASS="varname"
+>tmout</CODE
+> として <TT
+CLASS="literal"
+>TMO_POL</TT
+>＝0を指定した場合は、タイムアウト値として0を指定したことを示し、タスクイベントが発生していなくても待ちに入らず <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> を返す。また、<CODE
+CLASS="varname"
+>tmout</CODE
+> として <TT
+CLASS="literal"
+>TMO_FEVR</TT
+>＝(-1)を指定した場合は、タイムアウト値として無限大の時間を指定したことを示し、タイムアウトせずにタスクイベントが発生するまで待ち続ける。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_wai_tev_u"
+>tk_wai_tev_u - タスクイベント待ち(マイクロ秒単位)</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5560"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN5562"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT tevptn = tk_wai_tev_u</CODE
+>(UINT waiptn, TMO_U tmout_u);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5571"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5573"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>waiptn</CODE
+>
+              </TD
+><TD
+>Wait Event Pattern</TD
+><TD
+>待ちタスクイベントのパターン</TD
+></TR
+><TR
+><TD
+>TMO_U</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tmout_u</CODE
+>
+              </TD
+><TD
+>Timeout</TD
+><TD
+>タイムアウト指定(マイクロ秒)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5592"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5594"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tevptn</CODE
+>
+              </TD
+><TD
+>Task Event Pattern</TD
+><TD
+>待ち解除時のタスクイベント発生状況</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5611"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5613"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>waiptn</CODE
+>, <CODE
+CLASS="varname"
+>tmout_u</CODE
+> が不正)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RLWAI</SPAN
+>
+              </TD
+><TD
+>待ち状態強制解除(待ちの間に <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+> を受け付け)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+>
+              </TD
+><TD
+>待ち禁止による待ち解除</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>
+              </TD
+><TD
+>ポーリング失敗またはタイムアウト</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5641"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5643"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5658"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のサービスプロファイルがすべて有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5661"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEVENT</TT
+>
+              </TD
+><TD
+>タスクイベント関連機能のサポート</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+              </TD
+><TD
+>マイクロ秒のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5674"
+>解説</A
+></H3
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_wai_tev"
+>tk_wai_tev</A
+> のパラメータである <CODE
+CLASS="varname"
+>tmout</CODE
+> を64ビットマイクロ秒単位の <CODE
+CLASS="varname"
+>tmout_u</CODE
+> としたシステムコールである。</P
+><P
+>パラメータが <CODE
+CLASS="varname"
+>tmout_u</CODE
+> となった点を除き、本システムコールの仕様は <A
+HREF="task_dependent_synchronization_functions.html#tk_wai_tev"
+>tk_wai_tev</A
+> と同じである。詳細は <A
+HREF="task_dependent_synchronization_functions.html#tk_wai_tev"
+>tk_wai_tev</A
+> の説明を参照のこと。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_dis_wai"
+>tk_dis_wai - タスク待ち状態の禁止</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5686"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN5688"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT tskwait = tk_dis_wai</CODE
+>(ID tskid, UW waitmask);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5697"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5699"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>タスクID</TD
+></TR
+><TR
+><TD
+>UW</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>waitmask</CODE
+>
+              </TD
+><TD
+>Wait Mask</TD
+><TD
+>タスク待ち禁止設定</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5718"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5720"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskwait</CODE
+>
+              </TD
+><TD
+>Task Wait</TD
+><TD
+>タスク待ち禁止後のタスク待ち状態</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5737"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5739"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>waitmask</CODE
+> が不正)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5759"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5761"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5776"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5779"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>タスクの待ち禁止状態のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5788"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクに対して、<CODE
+CLASS="varname"
+>waitmask</CODE
+> で指定した待ち要因による待ちに入ることを禁止する。タスクがすでに <CODE
+CLASS="varname"
+>waitmask</CODE
+> で指定した待ち要因の待ちに入っている場合は、その待ちを解除する。</P
+><P
+><CODE
+CLASS="varname"
+>waitmask</CODE
+> には、以下の待ち要因を任意に組み合わせて論理和(OR)で指定する。</P
+><PRE
+CLASS="programlisting"
+>&#13;#define TTW_SLP         0x00000001      /* 起床待ちによる待ち */
+#define TTW_DLY         0x00000002      /* タスクの遅延による待ち */
+#define TTW_SEM         0x00000004      /* セマフォ待ち */
+#define TTW_FLG         0x00000008      /* イベントフラグ待ち */
+#define TTW_MBX         0x00000040      /* メールボックス待ち */
+#define TTW_MTX         0x00000080      /* ミューテックス待ち */
+#define TTW_SMBF        0x00000100      /* メッセージバッファ送信待ち */
+#define TTW_RMBF        0x00000200      /* メッセージバッファ受信待ち */
+#define TTW_CAL         0x00000400      /* (予約) */
+#define TTW_ACP         0x00000800      /* (予約) */
+#define TTW_RDV         0x00001000      /* (予約) */
+#define TTW_MPF         0x00002000      /* 固定長メモリプール待ち */
+#define TTW_MPL         0x00004000      /* 可変長メモリプール待ち */
+#define TTW_EV1         0x00010000      /* タスクイベント＃１待ち */
+#define TTW_EV2         0x00020000      /* タスクイベント＃２待ち */
+#define TTW_EV3         0x00040000      /* タスクイベント＃３待ち */
+#define TTW_EV4         0x00080000      /* タスクイベント＃４待ち */
+#define TTW_EV5         0x00100000      /* タスクイベント＃５待ち */
+#define TTW_EV6         0x00200000      /* タスクイベント＃６待ち */
+#define TTW_EV7         0x00400000      /* タスクイベント＃７待ち */
+#define TTW_EV8         0x00800000      /* タスクイベント＃８待ち */
+#define TTX_SVC         0x80000000      /* 拡張SVC呼出禁止 */
+</PRE
+><P
+><TT
+CLASS="literal"
+>TTX_SVC</TT
+> はタスクの待ちではないが、拡張SVCの呼出を禁止する特殊な指定となる。<TT
+CLASS="literal"
+>TTX_SVC</TT
+> が指定されている場合、そのタスクが拡張SVCを呼び出そうとすると、拡張SVCを呼び出さずに <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+> を返す。すでに呼び出している拡張SVCを終了させるような効果はない。</P
+><P
+>戻値(<CODE
+CLASS="varname"
+>tskwait</CODE
+>)には、<A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> によって待ち禁止処理が行われた後のタスクの待ち状態を(INT型のビット幅 - 1)個分のビットパターンで返す。INT型のビット幅が32ビットの場合、この値は <A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+> の <CODE
+CLASS="varname"
+>tskwait</CODE
+> と同じ値となる。なお、<CODE
+CLASS="varname"
+>tskwait</CODE
+> には <TT
+CLASS="literal"
+>TTX_SVC</TT
+> に関する情報は返されない。<CODE
+CLASS="varname"
+>tskwait</CODE
+> が0であれば、タスクは待ち状態に入っていない(または待ちが解除された)ことを示す。<CODE
+CLASS="varname"
+>tskwait</CODE
+> が0でなければ、<CODE
+CLASS="varname"
+>waitmask</CODE
+> に指定した以外の要因で待っていることになる。INT型のビット幅が32ビットより小さい場合、ビット幅に入りきらない上位ビット分の情報は返されない。そのため、<CODE
+CLASS="varname"
+>tskwait</CODE
+> が0であっても、タスクが <CODE
+CLASS="varname"
+>waitmask</CODE
+> に指定した以外の要因で待っている可能性がある。</P
+><P
+>タスクの待ちが <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> により解除された場合、または待ち禁止状態で新たに待ちに入ろうとした場合は、<SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+> が返される。</P
+><P
+>待ち禁止状態でその待ちに入る可能性があるシステムコールを呼び出したとき、待ちに入らずに処理できる場合であっても <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+> が返される。例えば、メッセージバッファに空きがあり、待ちに入ることなく送信できるような状況で、メッセージバッファへ送信(<A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+>)を行った場合も、メッセージの送信は行われずに <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+> が返される。</P
+><P
+>拡張SVCの実行中に設定された待ち禁止は、拡張SVCから呼出元に戻る際に自動的に解除される。また、拡張SVCを呼び出した時も自動的に解除され、拡張SVCから戻ってきたときに元の設定に復帰する。</P
+><P
+>タスクが休止状態(DORMANT)に戻るときにも、自動的に解除される。ただし、休止状態(DORMANT)であるときの設定は有効であり、次にタスクが起動したときはその待ち禁止が適用される。</P
+><P
+>セマフォなど主なオブジェクトでは、オブジェクト生成時に <TT
+CLASS="literal"
+>TA_NODISWAI</TT
+> を指定することができる。<TT
+CLASS="literal"
+>TA_NODISWAI</TT
+> を指定して生成されたオブジェクトでは、<A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> による待ち禁止は拒否され、待ちは禁止されない。</P
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+>＝<TT
+CLASS="literal"
+>TSK_SELF</TT
+>＝0によって自タスクの指定になる。ただし、タスク独立部から発行したシステムコールで <CODE
+CLASS="varname"
+>tskid</CODE
+>＝<TT
+CLASS="literal"
+>TSK_SELF</TT
+>＝0を指定した場合には、<SPAN
+CLASS="errorname"
+>E_ID</SPAN
+> のエラーとなる。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5832"
+>補足事項</A
+></H3
+><P
+>待ち禁止機能は、拡張SVCの処理を途中で中止したい場合に使用することを想定した機能である。ただし、その用途に限定されるものではない。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5835"
+>移植ガイドライン</A
+></H3
+><P
+><A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> の戻値(<CODE
+CLASS="varname"
+>tskwait</CODE
+>)がINT型であり、処理系によってとれる値の範囲に異なる可能性があるため注意が必要である。例えば、16ビット環境ではタスクイベントの待ちに関する情報をすべては取得できない。μT-Kernelでプロセッサのビット幅に関係なくタスク待ち状態を取得するには、<A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+> の <CODE
+CLASS="varname"
+>tskwait</CODE
+> を参照する必要がある。なお、T-KernelではINT型のビット幅が32ビット以上であると定義されているので、<A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> の戻値でタスクの待ち状態をすべて取得できる。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ena_wai"
+>tk_ena_wai - タスク待ち禁止の解除</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5845"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN5847"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ena_wai</CODE
+>(ID tskid);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5854"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5856"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>tskid</CODE
+>
+              </TD
+><TD
+>Task ID</TD
+><TD
+>タスクID</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5869"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5871"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5884"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5886"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>tskid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクが存在しない)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5905"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5907"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5922"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN5925"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+              </TD
+><TD
+>タスクの待ち禁止状態のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN5934"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> のタスクに <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> によって設定された待ち禁止をすべて解除する。</P
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+>＝<TT
+CLASS="literal"
+>TSK_SELF</TT
+>＝0によって自タスクの指定になる。ただし、タスク独立部から発行したシステムコールで <CODE
+CLASS="varname"
+>tskid</CODE
+>＝<TT
+CLASS="literal"
+>TSK_SELF</TT
+>＝0を指定した場合には、<SPAN
+CLASS="errorname"
+>E_ID</SPAN
+> のエラーとなる。</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="task_exception_handling_functions.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>μT-Kernel/OSの機能</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="U"
+>上に戻る</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>タスク例外処理機能</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,604 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Task States and Scheduling Rules</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel Concepts"
+HREF="concepts_underlying_utk.html"><LINK
+REL="PREVIOUS"
+TITLE="μT-Kernel Concepts"
+HREF="concepts_underlying_utk.html"><LINK
+REL="NEXT"
+TITLE="Interrupt Handling"
+HREF="interrupt_handling.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="concepts_underlying_utk.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel Concepts</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="interrupt_handling.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="task_states_and_scheduling_rules"
+>Task States and Scheduling Rules</A
+></H1
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="task_status"
+>Task States</A
+></H2
+><P
+>Task states are classified primarily into the five below. Of these, Waiting state in the broad sense is further classified into three states. Saying that a task is in a RUN state means it is in either RUNNING state or READY state.</P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>RUNNING state</DT
+><DD
+><P
+>The task is currently being executed. When a task-independent portion is executing, except when otherwise specified, the task that was executing prior to the start of task-independent portion execution is said to be in RUNNING state.</P
+></DD
+><DT
+>READY state</DT
+><DD
+><P
+>The task has completed preparations for running, but cannot run because a task with higher precedence is running. In this state, the task is able to run whenever it becomes the task with the highest precedence among the tasks in READY state.</P
+></DD
+><DT
+>Waiting states</DT
+><DD
+><P
+>The task cannot run because the conditions for running are not in place. In other words, the task is waiting for the conditions for its execution to be met. While a task is in one of the Waiting states, the program counter and register values, and the other information representing the program execution state, are saved. When the task resumes running from this state, the program counter, registers and other values revert to their values immediately prior to going to the Waiting state. This state is subdivided into the following three states.<P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>WAITING state</DT
+><DD
+><P
+>Execution is stopped because a system call was invoked that interrupts execution of the invoking task until some condition is met.</P
+></DD
+><DT
+>SUSPENDED state</DT
+><DD
+><P
+>Execution was forcibly interrupted by another task.</P
+></DD
+><DT
+>WAITING-SUSPENDED state</DT
+><DD
+><P
+>The task is in both WAITING state and SUSPENDED state at the same time. WAITING-SUSPENDED state results when another task requests suspension of a task already in WAITING state.</P
+><P
+>μT-Kernel makes a clear distinction between WAITING state and SUSPENDED state. A task cannot go to SUSPENDED state on its own.</P
+></DD
+></DL
+></DIV
+></P
+></DD
+><DT
+>DORMANT state</DT
+><DD
+><P
+>The task has not yet been started or has completed execution. While a task is in DORMANT state, information presenting its execution state is not saved. When a task is started from DORMANT state, execution starts from the task start address. Except when otherwise specified, the register values are not saved.</P
+></DD
+><DT
+>NON-EXISTENT state</DT
+><DD
+><P
+>A virtual state before a task is created, or after it is deleted, and is not registered in the system.</P
+></DD
+></DL
+></DIV
+><P
+>Depending on the implementation, there may also be transient states that do not fall into any of the above categories (see <A
+HREF="system_states.html"
+>the Section called <I
+>System States</I
+></A
+>).</P
+><P
+>When a task going to READY state has higher precedence than the currently running task, a dispatch may occur at the same time as the task goes to READY state and it may make an immediate transition to RUNNING state. In such a case the task that was in RUNNING state up to that time is said to have been preempted by the task that goes to RUNNING state anew. Note also that in explanations of system call functions, even when a task is said to go to READY state, depending on the task precedence it may go immediately to RUNNING state.</P
+><P
+>Task starting means transferring a state from DORMANT state to READY state. A task is therefore said to be in "started" state if it is in any state other than DORMANT or NON-EXISTENT. Task exit means that a task in started state goes to DORMANT state.</P
+><P
+>Task wait release means that a task in WAITING state goes to READY state, or a task in WAITING-SUSPENDED state goes to SUSPENDED state. The resumption of a suspended task means that a task in SUSPENDED state goes to READY state, or a task in WAITING-SUSPENDED state goes to WAITING state.</P
+><P
+>Task state transitions in a typical implementation are shown in <A
+HREF="task_states_and_scheduling_rules.html#figure_task_status"
+>Figure 1</A
+>. Depending on the implementation, there may be other states besides those shown here.</P
+><DIV
+CLASS="figure"
+><A
+NAME="figure_task_status"
+></A
+><P
+><B
+>Figure 1. Task State Transition Diagram</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_02s.png"></P
+></DIV
+></DIV
+><P
+>A feature of μT-Kernel is the clear distinction made between system calls that perform operations affecting the invoking task and those whose operations affect other tasks (see <A
+HREF="task_states_and_scheduling_rules.html#table_task_status"
+>Table 1</A
+>). The reason for this is to clarify task state transitions and facilitate understanding of system calls. This distinction between system call operations in the invoking task and operations affecting other tasks can also be seen as a distinction between state transitions from RUNNING state and those from other states.</P
+><DIV
+CLASS="table"
+><A
+NAME="table_task_status"
+></A
+><P
+><B
+>Table 1. State Transitions Distinguishing Invoking Task and Other Tasks</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"
+TITLE="c1"><COL
+WIDTH="33%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><THEAD
+><TR
+><TH
+>&nbsp;</TH
+><TH
+ALIGN="center"
+>&#13;                  <P
+>Operations in invoking tasks</P
+>
+                  <P
+>(Transition from RUNNING state)</P
+>
+                </TH
+><TH
+ALIGN="center"
+>&#13;                  <P
+>Operations on other tasks</P
+>
+                  <P
+>(Transitions from other states)</P
+>
+                </TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+VALIGN="middle"
+>&#13;                  <P
+>Task transition to a waiting state (including SUSPENDED)</P
+>
+                </TD
+><TD
+ALIGN="center"
+>&#13;                  <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+>
+                  <P
+>RUNNING state → WAITING state</P
+>
+                </TD
+><TD
+ALIGN="center"
+>&#13;                  <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+>
+                  <P
+>READY state, WAITING state → SUSPENDED state, WAITING-SUSPENDED state</P
+>
+                </TD
+></TR
+><TR
+><TD
+ALIGN="center"
+VALIGN="middle"
+>Task exit</TD
+><TD
+ALIGN="center"
+>&#13;                  <A
+HREF="utk_os_functions.html#tk_ext_tsk"
+>tk_ext_tsk</A
+>
+                  <P
+>RUNNING state → DORMANT state</P
+>
+                </TD
+><TD
+ALIGN="center"
+>&#13;                  <A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+>
+                  <P
+>READY state, WAITING state → DORMANT state</P
+>
+                </TD
+></TR
+><TR
+><TD
+ALIGN="center"
+VALIGN="middle"
+>Task deletion</TD
+><TD
+ALIGN="center"
+>&#13;                  <A
+HREF="utk_os_functions.html#tk_exd_tsk"
+>tk_exd_tsk</A
+>
+                  <P
+>RUNNING state → NON-EXISTENT state</P
+>
+                </TD
+><TD
+ALIGN="center"
+>&#13;                  <A
+HREF="utk_os_functions.html#tk_del_tsk"
+>tk_del_tsk</A
+>
+                  <P
+>DORMANT state → NON-EXISTENT state</P
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Additional Notes</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>WAITING state and SUSPENDED state are orthogonally related, in that a request for transition to SUSPENDED state cannot have any effect on the conditions for task wait release. That is, the task wait release conditions are the same whether the task is in WAITING state or WAITING-SUSPENDED state. Thus even if transition to SUSPENDED state is requested for a task that is in a state of waiting to acquire some resource (semaphore resource, memory block, etc.), and the task goes to WAITING-SUSPENDED state, the conditions for allocation of the resource do not change but remain the same as before the request to go to SUSPENDED state.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Rationale for the Specification</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>The reason the μT-Kernel makes a distinction between WAITING state (wait caused by the invoking task) and SUSPENDED state (wait caused by another task) is that these states sometimes overlap. By recognising these overlapped states as WAITING-SUSPENDED states, the task state transitions become clearer and system calls are easier to understand. On the other hand, since a task in WAITING state cannot invoke a system call, different types of WAITING state (e.g., waiting for wakeup, or waiting to acquire a semaphore resource) will never overlap. Since there is only one kind of waiting state caused by another task (SUSPENDED state), the μT-Kernel treats repeated entries to SUSPENDED state as nesting, thereby achieving clarity of task state transitions.</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="task_scheduling"
+>Task Scheduling Rules</A
+></H2
+><P
+>The μT-Kernel adopts a preemptive priority-based scheduling method based on priority levels assigned to each task. Tasks having the same priority are scheduled on a FCFS (First Come First Served) basis. Specifically, task precedence is used as the task scheduling rule, and precedence among tasks is determined as follows based on the priority of each task. If there are multiple tasks that can be run, the one with the highest precedence goes to RUNNING state and the others go to READY state. In determining precedence among tasks, of those tasks having different priority levels, that with the highest priority has the highest precedence. Among tasks having the same priority, the one that entered a run state (RUNNING state or READY state) first has the highest precedence. It is possible, however, to use a system call to change the precedence among tasks having the same priority.</P
+><P
+>When the task with the highest precedence changes from one task to another, a dispatch occurs immediately and the task in RUNNING state is switched. If no dispatch occurs (during execution of a handler, during dispatch disabled state, etc.), however, the switching of the task in RUNNING state is held off until the next dispatch occurs.</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Additional Notes</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>According to the scheduling rules adopted in the μT-Kernel, so long as there is a higher precedence task in a run state, a task with lower precedence will simply not run. That is, unless the highest-precedence task goes to WAITING state or for other reason cannot run, other tasks are not run. This is a fundamental difference from TSS (Time Sharing System) scheduling in which multiple tasks are treated equally.</P
+><P
+>It is possible, however, to issue a system call changing the precedence among tasks having the same priority. An application can use such a system call to realize round-robin scheduling, which is a typical kind of TSS scheduling.</P
+><P
+>Examples in figures below illustrate how the task that first goes to a run state (RUNNING state or READY state) gains precedence among tasks having the same priority. <A
+HREF="task_states_and_scheduling_rules.html#figure_a_task_scheduling"
+>Figure 2</A
+> shows the precedence among tasks after Task A of priority 1, Task E of priority 3, and Tasks B, C and D of priority 2 are started in that order. The task with the highest precedence, Task A, goes to RUNNING state.</P
+><P
+>When Task A exits, Task B with the next-highest precedence goes to RUNNING state (<A
+HREF="task_states_and_scheduling_rules.html#figure_b_task_scheduling"
+>Figure 3</A
+>). When Task A is again started, Task B is preempted and reverts to READY state; but since Task B went to a run state earlier than Task C and Task D, it still has the highest precedence among tasks with the same priority. In other words, the task precedence reverts to that in <A
+HREF="task_states_and_scheduling_rules.html#figure_a_task_scheduling"
+>Figure 2</A
+>.</P
+><P
+>Next, consider what happens when Task B goes to WAITING state in the conditions in <A
+HREF="task_states_and_scheduling_rules.html#figure_b_task_scheduling"
+>Figure 3</A
+>. Since task precedence is defined among tasks that can be run, the precedence among tasks becomes as shown in <A
+HREF="task_states_and_scheduling_rules.html#figure_c_task_scheduling"
+>Figure 4</A
+>. Thereafter when the Task B waiting state is released, Task B goes to run state after Task C and Task D, and thus assumes the lowest precedence among tasks of the same priority (<A
+HREF="task_states_and_scheduling_rules.html#figure_d_task_scheduling"
+>Figure 5</A
+>).</P
+><P
+>Summarizing the above, immediately after a task that goes from READY state to RUNNING state reverts to READY state, it has the highest precedence among tasks of the same priority; but after a task goes from RUNNING state to WAITING state and then the wait is released, its precedence is the lowest among tasks of the same priority.</P
+><P
+>Note that after a task goes from SUSPENDED state to a run state, it has the lowest precedence among tasks of the same priority.</P
+><DIV
+CLASS="figure"
+><A
+NAME="figure_a_task_scheduling"
+></A
+><P
+><B
+>Figure 2. Precedence in Initial State</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_03_as.png"></P
+></DIV
+></DIV
+><DIV
+CLASS="figure"
+><A
+NAME="figure_b_task_scheduling"
+></A
+><P
+><B
+>Figure 3. Precedence After Task B Goes To RUNNING State</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_03_bs.png"></P
+></DIV
+></DIV
+><DIV
+CLASS="figure"
+><A
+NAME="figure_c_task_scheduling"
+></A
+><P
+><B
+>Figure 4. Precedence After Task B Goes To WAITING State</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_03_cs.png"></P
+></DIV
+></DIV
+><DIV
+CLASS="figure"
+><A
+NAME="figure_d_task_scheduling"
+></A
+><P
+><B
+>Figure 5. Precedence After Task B WAITING State Is Released</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_03_ds.png"></P
+></DIV
+></DIV
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="concepts_underlying_utk.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="interrupt_handling.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>μT-Kernel Concepts</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="concepts_underlying_utk.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Interrupt Handling</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

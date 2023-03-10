@@ -1,0 +1,5241 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>List of APIs and Service Profile Items</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Reference"
+HREF="reference.html"><LINK
+REL="PREVIOUS"
+TITLE="List of Error Codes"
+HREF="list_of_error_codes.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="list_of_error_codes.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Reference</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+>&nbsp;</TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="list_of_api_and_service_profiles"
+>List of APIs and Service Profile Items</A
+></H1
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="AEN36178"
+>μT-Kernel/OS</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN36180"
+>Task Management Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN36182"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_os_functions.html#tk_cre_tsk"
+>tk_cre_tsk</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_ASM</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_USERBUF</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_AUTOBUF</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_FPU</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_COPn</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_HAS_SYSSTACK</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_os_functions.html#tk_del_tsk"
+>tk_del_tsk</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_os_functions.html#tk_sta_tsk"
+>tk_sta_tsk</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_os_functions.html#tk_ext_tsk"
+>tk_ext_tsk</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_os_functions.html#tk_exd_tsk"
+>tk_exd_tsk</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_os_functions.html#tk_ter_tsk"
+>tk_ter_tsk</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_os_functions.html#tk_chg_pri"
+>tk_chg_pri</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_MAX_TSKPRI</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_os_functions.html#tk_get_reg"
+>tk_get_reg</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_REGOPS</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_os_functions.html#tk_set_reg"
+>tk_set_reg</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_REGOPS</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_os_functions.html#tk_get_cpr"
+>tk_get_cpr</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_COPn</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_os_functions.html#tk_set_cpr"
+>tk_set_cpr</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_COPn</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEVENT</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN36284"
+>Task Synchronization Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN36286"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk"
+>tk_slp_tsk</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_dependent_synchronization_functions.html#tk_slp_tsk_u"
+>tk_slp_tsk_u</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_WAKEUP_MAXCNT</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_dependent_synchronization_functions.html#tk_can_wup"
+>tk_can_wup</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUSPEND_MAXCNT</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_dependent_synchronization_functions.html#tk_rsm_tsk"
+>tk_rsm_tsk</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_dependent_synchronization_functions.html#tk_frsm_tsk"
+>tk_frsm_tsk</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk"
+>tk_dly_tsk</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_dependent_synchronization_functions.html#tk_dly_tsk_u"
+>tk_dly_tsk_u</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_dependent_synchronization_functions.html#tk_sig_tev"
+>tk_sig_tev</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEVENT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_dependent_synchronization_functions.html#tk_wai_tev"
+>tk_wai_tev</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEVENT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_dependent_synchronization_functions.html#tk_wai_tev_u"
+>tk_wai_tev_u</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_TASKEVENT</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_dependent_synchronization_functions.html#tk_ena_wai"
+>tk_ena_wai</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN36386"
+>Task Exception Handling Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN36388"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="task_exception_handling_functions.html#tk_def_tex"
+>tk_def_tex</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_exception_handling_functions.html#tk_ena_tex"
+>tk_ena_tex</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_exception_handling_functions.html#tk_dis_tex"
+>tk_dis_tex</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_exception_handling_functions.html#tk_end_tex"
+>tk_end_tex</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="task_exception_handling_functions.html#tk_ref_tex"
+>tk_ref_tex</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN36435"
+>Synchronization and Communication Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN36437"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_cre_sem"
+>tk_cre_sem</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SEMAPHORE_MAXCNT</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_del_sem"
+>tk_del_sem</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_sig_sem"
+>tk_sig_sem</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_sem"
+>tk_wai_sem</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_sem_u"
+>tk_wai_sem_u</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_ref_sem"
+>tk_ref_sem</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_cre_flg"
+>tk_cre_flg</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_del_flg"
+>tk_del_flg</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_clr_flg"
+>tk_clr_flg</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg"
+>tk_wai_flg</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_wai_flg_u"
+>tk_wai_flg_u</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_ref_flg"
+>tk_ref_flg</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_cre_mbx"
+>tk_cre_mbx</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_del_mbx"
+>tk_del_mbx</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_snd_mbx"
+>tk_snd_mbx</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx"
+>tk_rcv_mbx</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_rcv_mbx_u"
+>tk_rcv_mbx_u</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="synchronzation_and_communication_functions.html#tk_ref_mbx"
+>tk_ref_mbx</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN36563"
+>Extended Synchronization and Communication Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN36565"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="extended_synchronization_and_communication_functions.html#tk_cre_mtx"
+>tk_cre_mtx</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="extended_synchronization_and_communication_functions.html#tk_del_mtx"
+>tk_del_mtx</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="extended_synchronization_and_communication_functions.html#tk_loc_mtx"
+>tk_loc_mtx</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="extended_synchronization_and_communication_functions.html#tk_loc_mtx_u"
+>tk_loc_mtx_u</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="extended_synchronization_and_communication_functions.html#tk_unl_mtx"
+>tk_unl_mtx</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="extended_synchronization_and_communication_functions.html#tk_ref_mtx"
+>tk_ref_mtx</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="extended_synchronization_and_communication_functions.html#tk_cre_mbf"
+>tk_cre_mbf</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_USERBUF</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_AUTOBUF</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="extended_synchronization_and_communication_functions.html#tk_del_mbf"
+>tk_del_mbf</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf"
+>tk_snd_mbf</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="extended_synchronization_and_communication_functions.html#tk_snd_mbf_u"
+>tk_snd_mbf_u</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf"
+>tk_rcv_mbf</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="extended_synchronization_and_communication_functions.html#tk_rcv_mbf_u"
+>tk_rcv_mbf_u</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="extended_synchronization_and_communication_functions.html#tk_ref_mbf"
+>tk_ref_mbf</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN36658"
+>Memory Pool Management Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN36660"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="memory_pool_management_functions.html#tk_cre_mpf"
+>tk_cre_mpf</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_USERBUF</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_AUTOBUF</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="memory_pool_management_functions.html#tk_del_mpf"
+>tk_del_mpf</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="memory_pool_management_functions.html#tk_get_mpf"
+>tk_get_mpf</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="memory_pool_management_functions.html#tk_get_mpf_u"
+>tk_get_mpf_u</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="memory_pool_management_functions.html#tk_rel_mpf"
+>tk_rel_mpf</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="memory_pool_management_functions.html#tk_ref_mpf"
+>tk_ref_mpf</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="memory_pool_management_functions.html#tk_cre_mpl"
+>tk_cre_mpl</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_USERBUF</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_AUTOBUF</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="memory_pool_management_functions.html#tk_del_mpl"
+>tk_del_mpl</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="memory_pool_management_functions.html#tk_get_mpl"
+>tk_get_mpl</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="memory_pool_management_functions.html#tk_get_mpl_u"
+>tk_get_mpl_u</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="memory_pool_management_functions.html#tk_rel_mpl"
+>tk_rel_mpl</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="memory_pool_management_functions.html#tk_ref_mpl"
+>tk_ref_mpl</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN36751"
+>Time Management Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN36753"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_set_utc"
+>tk_set_utc</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_UTC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_set_utc_u"
+>tk_set_utc_u</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_UTC</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_set_tim"
+>tk_set_tim</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_TRONTIME</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_set_tim_u"
+>tk_set_tim_u</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_TRONTIME</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_get_utc"
+>tk_get_utc</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_UTC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_get_utc_u"
+>tk_get_utc_u</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_UTC</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_get_tim"
+>tk_get_tim</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_TRONTIME</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_get_tim_u"
+>tk_get_tim_u</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_TRONTIME</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_get_otm"
+>tk_get_otm</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_get_otm_u"
+>tk_get_otm_u</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_cre_cyc"
+>tk_cre_cyc</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_ASM</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_cre_cyc_u"
+>tk_cre_cyc_u</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_ASM</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_del_cyc"
+>tk_del_cyc</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_sta_cyc"
+>tk_sta_cyc</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_stp_cyc"
+>tk_stp_cyc</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_ref_cyc"
+>tk_ref_cyc</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_ref_cyc_u"
+>tk_ref_cyc_u</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_cre_alm"
+>tk_cre_alm</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_ASM</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_del_alm"
+>tk_del_alm</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_sta_alm"
+>tk_sta_alm</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_sta_alm_u"
+>tk_sta_alm_u</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_stp_alm"
+>tk_stp_alm</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_ref_alm"
+>tk_ref_alm</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="time_management_functions.html#tk_ref_alm_u"
+>tk_ref_alm_u</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN36916"
+>Interrupt Management Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN36918"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="interrupt_management_functions_os.html#tk_def_int"
+>tk_def_int</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_ASM</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_ASM</TT
+>
+                  </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN36941"
+>System Management Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN36943"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="system_management_functions.html#tk_rot_rdq"
+>tk_rot_rdq</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="system_management_functions.html#tk_get_tid"
+>tk_get_tid</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="system_management_functions.html#tk_dis_dsp"
+>tk_dis_dsp</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="system_management_functions.html#tk_ena_dsp"
+>tk_ena_dsp</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="system_management_functions.html#tk_ref_sys"
+>tk_ref_sys</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="system_management_functions.html#tk_set_pow"
+>tk_set_pow</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_LOWPOWER</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="system_management_functions.html#tk_ref_ver"
+>tk_ref_ver</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN36990"
+>Subsystem Management Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN36992"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="subsystem_management_functions.html#tk_def_ssy"
+>tk_def_ssy</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_SUBSYSTEM</TT
+>
+                  </TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_SSYEVENT</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_SUBSYSTEM</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_SSYEVENT</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="subsystem_management_functions.html#tk_ref_ssy"
+>tk_ref_ssy</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_SUBSYSTEM</TT
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_SSYEVENT</TT
+>
+                  </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="AEN37028"
+>μT-Kernel/SM</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN37030"
+>System Memory Management Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN37032"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_sm_functions.html#Kmalloc"
+>Kmalloc</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_MEMLIB</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_sm_functions.html#Kcalloc"
+>Kcalloc</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_MEMLIB</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_sm_functions.html#Krealloc"
+>Krealloc</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_MEMLIB</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_sm_functions.html#Kfree"
+>Kfree</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_MEMLIB</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN37067"
+>Device Management Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN37069"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_opn_dev"
+>tk_opn_dev</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_cls_dev"
+>tk_cls_dev</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_rea_dev"
+>tk_rea_dev</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_rea_dev_du"
+>tk_rea_dev_du</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_LARGEDEV</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_srea_dev"
+>tk_srea_dev</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_srea_dev_d"
+>tk_srea_dev_d</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_LARGEDEV</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_wri_dev"
+>tk_wri_dev</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_wri_dev_du"
+>tk_wri_dev_du</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_LARGEDEV</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_swri_dev"
+>tk_swri_dev</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_swri_dev_d"
+>tk_swri_dev_d</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_LARGEDEV</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_wai_dev"
+>tk_wai_dev</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_wai_dev_u"
+>tk_wai_dev_u</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_sus_dev"
+>tk_sus_dev</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_LOWPOWER</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_get_dev"
+>tk_get_dev</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_ref_dev"
+>tk_ref_dev</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_oref_dev"
+>tk_oref_dev</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_lst_dev"
+>tk_lst_dev</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_evt_dev"
+>tk_evt_dev</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_def_dev"
+>tk_def_dev</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#tk_ref_idv"
+>tk_ref_idv</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#openfn"
+>openfn</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#closefn"
+>closefn</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#execfn"
+>execfn</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_LARGEDEV</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#waitfn"
+>waitfn</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_LARGEDEV</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#abortfn"
+>abortfn</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_LARGEDEV</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="device_management_functions.html#eventfn"
+>eventfn</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN37231"
+>Interrupt Management Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN37233"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="interrupt_management_functions_sm.html#isDI"
+>isDI</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="interrupt_management_functions_sm.html#SetCpuIntLevel"
+>SetCpuIntLevel</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_CPUINTLEVEL</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="interrupt_management_functions_sm.html#GetCpuIntLevel"
+>GetCpuIntLevel</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_CPUINTLEVEL</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="interrupt_management_functions_sm.html#EnableInt"
+>EnableInt</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_INTCTRL</TT
+>
+                  </TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_HAS_ENAINTLEVEL</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="interrupt_management_functions_sm.html#DisableInt"
+>DisableInt</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_INTCTRL</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="interrupt_management_functions_sm.html#ClearInt"
+>ClearInt</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_INTCTRL</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="interrupt_management_functions_sm.html#EndOfInt"
+>EndOfInt</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_INTCTRL</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="interrupt_management_functions_sm.html#CheckInt"
+>CheckInt</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_INTCTRL</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="interrupt_management_functions_sm.html#SetIntMode"
+>SetIntMode</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_INTMODE</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="interrupt_management_functions_sm.html#SetCtrlIntLevel"
+>SetCtrlIntLevel</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_CTRLINTLEVEL</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="interrupt_management_functions_sm.html#GetCtrlIntLevel"
+>GetCtrlIntLevel</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_CTRLINTLEVEL</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN37322"
+>I/O Port Access Support Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN37324"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="io_port_management_functions.html#out_b"
+>out_b</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="io_port_management_functions.html#out_h"
+>out_h</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="io_port_management_functions.html#out_w"
+>out_w</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="io_port_management_functions.html#out_d"
+>out_d</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_HAS_DOUBLEWORD</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="io_port_management_functions.html#in_b"
+>in_b</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="io_port_management_functions.html#in_h"
+>in_h</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="io_port_management_functions.html#in_w"
+>in_w</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="io_port_management_functions.html#in_d"
+>in_d</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_IOPORT</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_HAS_DOUBLEWORD</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="io_port_management_functions.html#WaitUsec"
+>WaitUsec</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_MICROWAIT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="io_port_management_functions.html#WaitNsec"
+>WaitNsec</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_MICROWAIT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN37397"
+>Power Management Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN37399"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="power_management_functions.html#low_pow"
+>low_pow</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_LOWPOWER</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="power_management_functions.html#off_pow"
+>off_pow</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_LOWPOWER</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN37422"
+>System Configuration Information Management Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN37424"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="system_configuration_information_management_functions.html#tk_get_cfn"
+>tk_get_cfn</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_SYSCONF</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="system_configuration_information_management_functions.html#tk_get_cfs"
+>tk_get_cfs</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_SYSCONF</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN37447"
+>Memory Cache Control Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN37449"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="memory_cache_control_functions.html#SetCacheMode"
+>SetCacheMode</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_CACHECTRL</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_SETCACHEMODE</TT
+></TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_WBCACHE</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_WTCACHE</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="memory_cache_control_functions.html#ControlCache"
+>ControlCache</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_CACHECTRL</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN37478"
+>Physical Timer Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN37480"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="physical_timer_functions.html#StartPhysicalTimer"
+>StartPhysicalTimer</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_PTIMER</TT
+>
+                  </TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_MAX_PTIMER</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="physical_timer_functions.html#StopPhysicalTimer"
+>StopPhysicalTimer</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_PTIMER</TT
+>
+                  </TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_MAX_PTIMER</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="physical_timer_functions.html#GetPhysicalTimerCount"
+>GetPhysicalTimerCount</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_PTIMER</TT
+>
+                  </TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_MAX_PTIMER</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="physical_timer_functions.html#DefinePhysicalTimerHandler"
+>DefinePhysicalTimerHandler</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_PTIMER</TT
+>
+                  </TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_MAX_PTIMER</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="physical_timer_functions.html#GetPhysicalTimerConfig"
+>GetPhysicalTimerConfig</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_PTIMER</TT
+>
+                  </TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_MAX_PTIMER</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN37536"
+>Utility Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN37538"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="utility_functions.html#SetOBJNAME"
+>SetOBJNAME</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utility_functions.html#CreateLock"
+>CreateLock</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utility_functions.html#DeleteLock"
+>DeleteLock</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utility_functions.html#Lock"
+>Lock</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utility_functions.html#Unlock"
+>Unlock</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utility_functions.html#CreateMLock"
+>CreateMLock</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utility_functions.html#DeleteMLock"
+>DeleteMLock</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utility_functions.html#MLock"
+>MLock</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utility_functions.html#MLockTmo"
+>MLockTmo</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utility_functions.html#MLockTmo_u"
+>MLockTmo_u</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utility_functions.html#MUnlock"
+>MUnlock</A
+>
+                  </TD
+><TD
+>Always</TD
+><TD
+>None</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="AEN37605"
+>μT-Kernel/DS</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN37607"
+>Kernel Internal State Acquisition Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN37609"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_lst_tsk"
+>td_lst_tsk</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_lst_sem"
+>td_lst_sem</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_lst_flg"
+>td_lst_flg</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_lst_mbx"
+>td_lst_mbx</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_lst_mtx"
+>td_lst_mtx</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_lst_mbf"
+>td_lst_mbf</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_lst_mpf"
+>td_lst_mpf</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_lst_mpl"
+>td_lst_mpl</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_lst_cyc"
+>td_lst_cyc</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_lst_alm"
+>td_lst_alm</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_lst_ssy"
+>td_lst_ssy</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_SUBSYSTEM</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_rdy_que"
+>td_rdy_que</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_sem_que"
+>td_sem_que</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_flg_que"
+>td_flg_que</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_mbx_que"
+>td_mbx_que</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_mtx_que"
+>td_mtx_que</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_smbf_que"
+>td_smbf_que</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_rmbf_que"
+>td_rmbf_que</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_mpf_que"
+>td_mpf_que</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_mpl_que"
+>td_mpl_que</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_ref_tsk"
+>td_ref_tsk</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>&#13;                    <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_DISWAI</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEVENT</TT
+>
+                      </TD
+></TR
+><TR
+><TD
+>&#13;                        <TT
+CLASS="literal"
+>TK_HAS_SYSSTACK</TT
+>
+                      </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+                  </TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_ref_tex"
+>td_ref_tex</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_ref_sem"
+>td_ref_sem</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_ref_flg"
+>td_ref_flg</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_ref_mbx"
+>td_ref_mbx</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_ref_mtx"
+>td_ref_mtx</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_ref_mbf"
+>td_ref_mbf</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_ref_mpf"
+>td_ref_mpf</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_ref_mpl"
+>td_ref_mpl</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_ref_cyc"
+>td_ref_cyc</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_ref_cyc_u"
+>td_ref_cyc_u</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_ref_alm"
+>td_ref_alm</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_ref_alm_u"
+>td_ref_alm_u</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_ref_sys"
+>td_ref_sys</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_ref_ssy"
+>td_ref_ssy</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_SUBSYSTEM</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_get_reg"
+>td_get_reg</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_REGOPS</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_set_reg"
+>td_set_reg</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_REGOPS</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_get_utc"
+>td_get_utc</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_UTC</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_get_utc_u"
+>td_get_utc_u</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_UTC</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_get_tim"
+>td_get_tim</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_TRONTIME</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_get_tim_u"
+>td_get_tim_u</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_TRONTIME</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_get_otm"
+>td_get_otm</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_get_otm_u"
+>td_get_otm_u</A
+>
+                  </TD
+><TD
+><TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+> &#38;&#38;
+                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+></TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_ref_dsname"
+>td_ref_dsname</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="utk_ds_functions.html#td_set_dsname"
+>td_set_dsname</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DSNAME</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN37913"
+>Trace Functions</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN37915"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+>API name</TH
+><TH
+>Availability</TH
+><TH
+>Other related service profile items</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <A
+HREF="trace_functions.html#td_hok_svc"
+>td_hok_svc</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="trace_functions.html#td_hok_dsp"
+>td_hok_dsp</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+><TR
+><TD
+>&#13;                    <A
+HREF="trace_functions.html#td_hok_int"
+>td_hok_int</A
+>
+                  </TD
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_DBGSPT</TT
+>
+                  </TD
+><TD
+>None</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="list_of_error_codes.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>&nbsp;</TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>List of Error Codes</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="reference.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>&nbsp;</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

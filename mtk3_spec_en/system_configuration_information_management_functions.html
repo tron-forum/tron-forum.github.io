@@ -1,0 +1,1465 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>System Configuration Information Management Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/SM Functions"
+HREF="utk_sm_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Power Management Functions"
+HREF="power_management_functions.html"><LINK
+REL="NEXT"
+TITLE="Memory Cache Control Functions"
+HREF="memory_cache_control_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="power_management_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/SM Functions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="memory_cache_control_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="system_configuration_information_management_functions"
+>System Configuration Information Management Functions</A
+></H1
+><P
+>System configuration information management functions maintain and manage various information related to system configuration.</P
+><P
+>A part of system configuration information including the information on the maximum number of tasks, timer interrupt intervals, etc. are defined as the standard definition. Other than these, any information arbitrarily defined in applications, subsystems, or device drivers can be used by adding it to the system configuration information.</P
+><P
+>The format of system configuration information consists of a name and defined data as a pair.</P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>Name</DT
+><DD
+><P
+>The name is a string of up to 16 characters. A character encoding is US-ASCII.</P
+><P
+>Characters that can be used (UB) are a to z, A to Z, 0 to 9 and '_' (underscore).</P
+></DD
+><DT
+>Defined Data</DT
+><DD
+><P
+>Data consists of numbers (integers) or character strings.</P
+><P
+>Characters that can be used (UB) are any characters other than 0x00 to 0x1F, 0x7F, or 0xFF (in character code).</P
+><DIV
+CLASS="example"
+><A
+NAME="AEN25484"
+></A
+><P
+><B
+>Example 5. Example of Format of System Configuration Information</B
+></P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25486"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Name</TH
+><TH
+>Defined Data</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>SysVer</TD
+><TD
+>3 0</TD
+></TR
+><TR
+><TD
+>SysName</TD
+><TD
+>microT-Kernel Version 3.00</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DD
+></DL
+></DIV
+><P
+>How the system configuration information is to be stored is not specified here, but it is generally put in memory (ROM/RAM). This functionality is therefore not intended for storing large amounts of information.</P
+><P
+>System configuration information can be retrieved by <A
+HREF="system_configuration_information_management_functions.html#tk_get_cfn"
+>tk_get_cfn</A
+> and <A
+HREF="system_configuration_information_management_functions.html#tk_get_cfs"
+>tk_get_cfs</A
+>.</P
+><P
+>However, system configuration information cannot be added or changed during system execution.</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="system_configuration_information_acquisition"
+>System Configuration Information Acquisition</A
+></H2
+><P
+>There are <A
+HREF="system_configuration_information_management_functions.html#tk_get_cfn"
+>tk_get_cfn</A
+> and <A
+HREF="system_configuration_information_management_functions.html#tk_get_cfs"
+>tk_get_cfs</A
+> as API to retrieve system configuration information. These are callable from applications, subsystems, device drivers, etc. and are also used internally in the μT-Kernel.</P
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_get_cfn"
+>tk_get_cfn - Get Numbers</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25511"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN25513"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT ct = tk_get_cfn</CODE
+>(CONST UB *name, W *val, INT max);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25524"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25526"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST UB*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>name</CODE
+>
+              </TD
+><TD
+>Name</TD
+><TD
+>Name</TD
+></TR
+><TR
+><TD
+>W*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>val</CODE
+>
+              </TD
+><TD
+>Value</TD
+><TD
+>Array storing numbers</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>max</CODE
+>
+              </TD
+><TD
+>Maximum Count</TD
+><TD
+>Number of elements in <CODE
+CLASS="varname"
+>val</CODE
+> array</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25552"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25554"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ct</CODE
+>
+              </TD
+><TD
+>Defined Numeric Information Count</TD
+><TD
+>Number of defined numeric information</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25571"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25573"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>No information is defined for the name specified in the <CODE
+CLASS="varname"
+>name</CODE
+> parameter</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25583"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25585"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25600"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25603"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_SYSCONF</TT
+>
+              </TD
+><TD
+>Support of system configuration information management functions</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25612"
+>Description</A
+></H4
+><P
+>Gets numeric information from system configuration information. This function gets up to <CODE
+CLASS="varname"
+>max</CODE
+> items of numerical information defined for the name specified in the <CODE
+CLASS="varname"
+>name</CODE
+> parameter and stores the acquired information in <CODE
+CLASS="varname"
+>val</CODE
+>. The number of defined numeric information is passed in the return code. If return code &#62; <CODE
+CLASS="varname"
+>max</CODE
+>, this indicates that not all the information could be stored. By specifying <CODE
+CLASS="varname"
+>max</CODE
+> = 0, the number of defined numeric values can be found out without actually storing them in <CODE
+CLASS="varname"
+>val</CODE
+>.</P
+><P
+><SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> is returned if no information is defined for the name specified in the <CODE
+CLASS="varname"
+>name</CODE
+> parameter. The behavior if the information defined for <CODE
+CLASS="varname"
+>name</CODE
+> is a character string is indeterminate.</P
+><P
+>This function can be invoked from any protection level, without being limited to the protection level from which μT-Kernel/OS system call can be invoked.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="tk_get_cfs"
+>tk_get_cfs - Get Character String</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25628"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN25630"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>INT rlen = tk_get_cfs</CODE
+>(CONST UB *name, UB *buf, INT max);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25641"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25643"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"><COL
+WIDTH="15%"><COL
+WIDTH="31%"><COL
+WIDTH="38%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>CONST UB*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>name</CODE
+>
+              </TD
+><TD
+>Name</TD
+><TD
+>Name</TD
+></TR
+><TR
+><TD
+>UB*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>buf</CODE
+>
+              </TD
+><TD
+>Buffer</TD
+><TD
+>Array storing character string</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>max</CODE
+>
+              </TD
+><TD
+>Maximum Length</TD
+><TD
+>Maximum size of buf (in bytes)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25668"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25670"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="15%"
+TITLE="c1"><COL
+WIDTH="15%"
+TITLE="c2"><COL
+WIDTH="31%"
+TITLE="c3"><COL
+WIDTH="38%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>rlen</CODE
+>
+              </TD
+><TD
+>Size of Defined Character String Information</TD
+><TD
+>Size of defined character string information (in bytes)</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>or</TD
+><TD
+>Error Code</TD
+><TD
+>Error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25687"
+>Error Code</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25689"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>No information is defined for the name specified in the <CODE
+CLASS="varname"
+>name</CODE
+> parameter</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25699"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25701"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25716"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25719"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_SYSCONF</TT
+>
+              </TD
+><TD
+>Support of system configuration information management functions</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN25728"
+>Description</A
+></H4
+><P
+>Gets character string information from system configuration information. This function gets up to <CODE
+CLASS="varname"
+>max</CODE
+> characters of character string information defined for the name specified in the <CODE
+CLASS="varname"
+>name</CODE
+> parameter and stores the acquired information in <CODE
+CLASS="varname"
+>buf</CODE
+>. If the acquired character string is shorter than <CODE
+CLASS="varname"
+>max</CODE
+> characters, it is terminated by '\0' when stored. The length of the defined character string information (not including '\0') is passed in the return code. If return code &#62; <CODE
+CLASS="varname"
+>max</CODE
+>, this indicates that not all the information could be stored. By specifying <CODE
+CLASS="varname"
+>max</CODE
+> = 0, the character string length can be found out without actually storing anything in <CODE
+CLASS="varname"
+>buf</CODE
+> .</P
+><P
+><SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> is returned if no information is defined for the name specified in the <CODE
+CLASS="varname"
+>name</CODE
+> parameter. The behavior if the information defined for <CODE
+CLASS="varname"
+>name</CODE
+> is a numeric string is indeterminate.</P
+><P
+>This function can be invoked from any protection level, without being limited to the protection level from which μT-Kernel/OS system call can be invoked.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="standard_system_configuration_information"
+>Standard System Configuration Information</A
+></H2
+><P
+>The following information is defined as standard system configuration information. A standard information name is prefixed by T.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25746"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>character string</TH
+><TH
+>Summary description</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>N</TD
+><TD
+>Numeric string information</TD
+></TR
+><TR
+><TD
+>S</TD
+><TD
+>Character string information</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+></P
+><UL
+><LI
+><P
+>Product information</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25762"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>character string</TH
+><TH
+>Name of standard definition</TH
+><TH
+>Summary description</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>S</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TSysName</TT
+>
+                    </TD
+><TD
+>System name (product name)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></LI
+><LI
+><P
+>Maximum number of objects</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25777"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>character string</TH
+><TH
+>Name of standard definition</TH
+><TH
+>Summary description</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TMaxTskId</TT
+>
+                    </TD
+><TD
+>Maximum number of tasks</TD
+></TR
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TMaxSemId</TT
+>
+                    </TD
+><TD
+>Maximum number of semaphores</TD
+></TR
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TMaxFlgId</TT
+>
+                    </TD
+><TD
+>Maximum number of event flags</TD
+></TR
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TMaxMbxId</TT
+>
+                    </TD
+><TD
+>Maximum number of mailboxes</TD
+></TR
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TMaxMtxId</TT
+>
+                    </TD
+><TD
+>Maximum number of mutexes</TD
+></TR
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TMaxMbfId</TT
+>
+                    </TD
+><TD
+>Maximum number of message buffers</TD
+></TR
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TMaxMpfId</TT
+>
+                    </TD
+><TD
+>Maximum number of fixed-size memory pools</TD
+></TR
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TMaxMplId</TT
+>
+                    </TD
+><TD
+>Maximum number of variable-size memory pools</TD
+></TR
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TMaxCycId</TT
+>
+                    </TD
+><TD
+>Maximum number of cyclic handlers</TD
+></TR
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TMaxAlmId</TT
+>
+                    </TD
+><TD
+>Maximum number of alarm handlers</TD
+></TR
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TMaxSsyId</TT
+>
+                    </TD
+><TD
+>Maximum number of subsystems</TD
+></TR
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TMaxSsyPri</TT
+>
+                    </TD
+><TD
+>Maximum number of subsystem priorities</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></LI
+><LI
+><P
+>Other</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25847"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>character string</TH
+><TH
+>Name of standard definition</TH
+><TH
+>Summary description</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TSysStkSz</TT
+>
+                    </TD
+><TD
+>Default system stack size (in bytes)</TD
+></TR
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TSVCLimit</TT
+>
+                    </TD
+><TD
+>Lowest protection level for system call invoking</TD
+></TR
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TTimPeriod</TT
+>
+                    </TD
+><TD
+>Timer interrupt interval (in milliseconds)<P
+>Timer interrupt interval (in microseconds)</P
+></TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>The actual length of timer interrupt interval is a sum of time in milliseconds and time in microseconds. The interval in microseconds is assumed to be 0 when omitted.</P
+><P
+>For example, when timer interrupt interval should be 5 milliseconds, describe as "<TT
+CLASS="literal"
+>TTimPeriod</TT
+> 5" or "<TT
+CLASS="literal"
+>TTimPeriod</TT
+> 0 5000". When timer interrupt interval should be 1.5 milliseconds (1,500 microseconds), describe as "<TT
+CLASS="literal"
+>TTimPeriod</TT
+> 1 500" or "<TT
+CLASS="literal"
+>TTimPeriod</TT
+> 0 1500".</P
+></LI
+><LI
+><P
+>device management function</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25879"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>character string</TH
+><TH
+>Name of standard definition</TH
+><TH
+>Summary description</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TMaxRegDev</TT
+>
+                    </TD
+><TD
+>Maximum number of device registrations</TD
+></TR
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TMaxOpnDev</TT
+>
+                    </TD
+><TD
+>Maximum device open count</TD
+></TR
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TMaxReqDev</TT
+>
+                    </TD
+><TD
+>Maximum number of device requests</TD
+></TR
+><TR
+><TD
+>N</TD
+><TD
+>&#13;                      <TT
+CLASS="literal"
+>TDEvtMbfSz</TT
+>
+                    </TD
+><TD
+>Event notification message buffer size (in bytes)<P
+>Maximum event notification message length (in bytes)</P
+></TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>If <TT
+CLASS="literal"
+>TDEvtMbfSz</TT
+> is not defined or if the message buffer size is a negative value, an event notification message buffer is not used.</P
+></LI
+></UL
+><P
+>When multiple values are defined for any of the above numeric strings, they are stored in the same order as in the explanation.</P
+><DIV
+CLASS="example"
+><A
+NAME="AEN25911"
+></A
+><P
+><B
+>Example 6. Example of Storage Order of More than One Numeric Value</B
+></P
+><PRE
+CLASS="programlisting"
+>&#13;tk_get_cfn("TDEvtMbfSz", val, 2)
+</PRE
+><P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>val[0] = Event notification message buffer size</TD
+></TR
+><TR
+><TD
+>val[1] = Maximum event notification message length</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="power_management_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="memory_cache_control_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Power Management Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_sm_functions.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Memory Cache Control Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

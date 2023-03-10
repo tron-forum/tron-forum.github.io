@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Adaptability and Service Profile</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Overview of μT-Kernel 3.0"
+HREF="utk_overview.html"><LINK
+REL="PREVIOUS"
+TITLE="Reference Code"
+HREF="reference_code_of_utk.html"><LINK
+REL="NEXT"
+TITLE="Implementation Specification Document"
+HREF="implementation_specification_of_utk.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="reference_code_of_utk.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Overview of μT-Kernel 3.0</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="implementation_specification_of_utk.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="adaptability_and_service_profile_of_utk"
+>Adaptability and Service Profile</A
+></H1
+><P
+>μT-Kernel 3.0 has been designed by paying attention to the the compatibility with T-Kernel. Namely, porting between μT-Kernel 3.0 and T-Kernel ought to be simple. If only common features are used, a simple re-compilation will do. Even if changes are necessary, the amount of change is small. That is the design goal.</P
+><P
+>For features that have strong dependency on hardware such as MMU and FPU, unnecessary features for the intended narrow target, and features that have potential implications for run-time efficiency such as hooks for debug support, the specification allows subsetting. To accommodate the subsetting in this manner, and the desire to keep the distribution and portability of middleware and application high, such software needs to obtain information about the implementation details of μT-Kernel 3.0. μT-Kernel 3.0 has introduced a mechanism, "<A
+HREF="service_profile_overview.html"
+>service profile</A
+>", to let each implementation of μT-Kernel 3.0 describe implementation details clearly. All μT-Kernel 3.0 implementations shall provide a service profile and provide information on the functions that were omitted to create a subset.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference_code_of_utk.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="implementation_specification_of_utk.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Reference Code</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_overview.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Implementation Specification Document</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

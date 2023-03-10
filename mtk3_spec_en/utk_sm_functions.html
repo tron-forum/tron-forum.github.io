@@ -1,0 +1,1493 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>μT-Kernel/SM Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="Subsystem Management Functions"
+HREF="subsystem_management_functions.html"><LINK
+REL="NEXT"
+TITLE="Device Management Functions"
+HREF="device_management_functions.html"></HEAD
+><BODY
+CLASS="chapter"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="subsystem_management_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="device_management_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="chapter"
+><H1
+><A
+NAME="utk_sm_functions"
+></A
+>μT-Kernel/SM Functions</H1
+><P
+>This chapter describes details of the functions provided by μT-Kernel/SM (System Manager).</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Overall Note and Supplement</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+></P
+><UL
+><LI
+><P
+>There are two types of API names that are defined in μT-Kernel/SM specification: ones beginning with 'tk_' and others. It is generally assumed that APIs with a name beginning with 'tk_' are implemented using extended SVC (a Subsystem Management Function), and other APIs are implemented as library functions (including in-line functions) or macros of the C language. However, μT-Kernel specification does not define the implementation of these APIs. So the developers are free to adopt different implementation methods. API implemented by libraries and macros may call extended SVCs or system calls indirectly.</P
+></LI
+><LI
+><P
+>Error codes such as <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>, <SPAN
+CLASS="errorname"
+>E_MACV</SPAN
+>, and <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+> that can be returned in many situations are not described here always unless there is some special reason for doing so.</P
+></LI
+><LI
+><P
+>Except where otherwise noted, extended SVC and libraries of μT-Kernel/SM cannot be called from a task-independent portion and while dispatching and interrupts are disabled. There may be some limitations, however, imposed by particular implementations (<SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>).</P
+></LI
+><LI
+><P
+>Extended SVC and libraries of μT-Kernel/SM cannot be invoked from a lower protection level than that at which T-Kernel/OS system calls can be invoked (lower than <TT
+CLASS="literal"
+>TSVCLimit</TT
+> )(<SPAN
+CLASS="errorname"
+>E_OACV</SPAN
+>).</P
+></LI
+><LI
+><P
+>Extended SVC and libraries of μT-Kernel/SM are reentrant except when a special explanation is given. Note that some functions perform mutual exclusion internally.</P
+></LI
+></UL
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="system_memory_management_functions"
+>System Memory Management Functions</A
+></H1
+><P
+>The system memory management functions manage all the memory (system memory) allocated dynamically by μT-Kernel. This includes memory used internally by μT-Kernel as well as task stacks, message buffers, and memory pools.</P
+><P
+>System memory management functions include memory allocation libraries that manage memory through subdividing system memory into smaller blocks.</P
+><P
+>The system memory management functions are for use not only within μT-Kernel but also used by applications, subsystems, and device drivers.</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="memory_allocation_libraries"
+>Memory Allocation Library Functions</A
+></H2
+><P
+>Memory allocation library provides functions equivalent to <CODE
+CLASS="function"
+>malloc</CODE
+>/<CODE
+CLASS="function"
+>calloc</CODE
+>/<CODE
+CLASS="function"
+>realloc</CODE
+>/<CODE
+CLASS="function"
+>free</CODE
+> provided by C standard library.</P
+><P
+>These memories are all allocated as memory with a protection level specified in <CODE
+CLASS="function"
+>TSVCLimit</CODE
+>.</P
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="Kmalloc"
+>Kmalloc - Allocate Memory</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18540"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN18542"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void* Kmalloc</CODE
+>(size_t size);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18549"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18551"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>size_t</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>size</CODE
+>
+              </TD
+><TD
+>Size</TD
+><TD
+>Memory size to be allocated (in bytes)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18564"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18566"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>addr</CODE
+>
+              </TD
+><TD
+>Memory Start Address</TD
+><TD
+>Start address of the allocated memory</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18579"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18582"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18584"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18599"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18602"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_MEMLIB</TT
+>
+              </TD
+><TD
+>Support of memory allocation library</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18611"
+>Description</A
+></H4
+><P
+>Allocates the memory of bytes specified in <CODE
+CLASS="varname"
+>size</CODE
+> and returns the start address of the allocated memory in <CODE
+CLASS="varname"
+>addr</CODE
+>.</P
+><P
+>When the specified size of memory cannot be allocated or 0 is specified in <CODE
+CLASS="varname"
+>size</CODE
+>, <TT
+CLASS="literal"
+>NULL</TT
+> is returned in <CODE
+CLASS="varname"
+>addr</CODE
+>.</P
+><P
+>APIs in the memory allocation library, including <A
+HREF="utk_sm_functions.html#Kmalloc"
+>Kmalloc</A
+>, cannot be called from a task-independent portion and while dispatch or interrupt is disabled. Such a call may lead to an undefined behavior including possible system failure, and the caller is responsible for guaranteeing the state on the call.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18622"
+>Additional Notes</A
+></H4
+><P
+>Any value can be specified in <CODE
+CLASS="varname"
+>size</CODE
+>. Note that a larger memory size than the number of bytes specified in <CODE
+CLASS="varname"
+>size</CODE
+> may be allocated internally due to allocating the management space, aligning the allocated memory address, or other reasons. For example, when the implementation specifies that the least allocatable memory size is 16 bytes and the alignment is an 8-byte unit, 16-byte memory is allocated internally even if a value less than 16 bytes is specified in <CODE
+CLASS="varname"
+>size</CODE
+>. Similarly, 24-byte memory is allocated even if 20 bytes is specified in <CODE
+CLASS="varname"
+>size</CODE
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="Kcalloc"
+>Kcalloc - Allocate Memory and Clear</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18631"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN18633"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void* Kcalloc</CODE
+>(size_t nmemb, size_t size);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18642"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18644"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>size_t</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>nmemb</CODE
+>
+              </TD
+><TD
+>Number of Memory Blocks</TD
+><TD
+>Number of memory blocks to be allocated</TD
+></TR
+><TR
+><TD
+>size_t</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>size</CODE
+>
+              </TD
+><TD
+>Size</TD
+><TD
+>Memory block size to be allocated (in bytes)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18663"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18665"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>addr</CODE
+>
+              </TD
+><TD
+>Memory Start Address</TD
+><TD
+>Start address of the allocated memory</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18678"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18681"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18683"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18698"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18701"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_MEMLIB</TT
+>
+              </TD
+><TD
+>Support of memory allocation library</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18710"
+>Description</A
+></H4
+><P
+>Allocates the specified number (<CODE
+CLASS="varname"
+>nmemb</CODE
+>) of contiguous memory blocks of the specified bytes (<CODE
+CLASS="varname"
+>size</CODE
+>), clears them with 0, then returns the start address of them in <CODE
+CLASS="varname"
+>addr</CODE
+>. This memory allocation operation is identical to allocating one memory block of the number of <CODE
+CLASS="varname"
+>size</CODE
+> * <CODE
+CLASS="varname"
+>nmemb</CODE
+> bytes.</P
+><P
+>When the specified number of memory blocks cannot be allocated or 0 is specified in <CODE
+CLASS="varname"
+>nmemb</CODE
+> or <CODE
+CLASS="varname"
+>size</CODE
+>, <TT
+CLASS="literal"
+>NULL</TT
+> is returned in <CODE
+CLASS="varname"
+>addr</CODE
+>.</P
+><P
+>APIs in the memory allocation libraries, including <A
+HREF="utk_sm_functions.html#Kcalloc"
+>Kcalloc</A
+>, cannot be called from a task-independent portion and while dispatch or interrupt is disabled. Such a call may lead to an undefined behavior including possible system failure, and the caller is responsible for guaranteeing the state on the call.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18725"
+>Additional Notes</A
+></H4
+><P
+>A larger memory size than the number of <CODE
+CLASS="varname"
+>size</CODE
+> * <CODE
+CLASS="varname"
+>nmemb</CODE
+> bytes may be allocated internally. For more details, see the additional note for <A
+HREF="utk_sm_functions.html#Kmalloc"
+>Kmalloc</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="Krealloc"
+>Krealloc - Reallocate Memory</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18733"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN18735"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void* Krealloc</CODE
+>(void *ptr, size_t size);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18744"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18746"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ptr</CODE
+>
+              </TD
+><TD
+>Pointer to Memory</TD
+><TD
+>Memory address to be reallocated</TD
+></TR
+><TR
+><TD
+>size_t</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>size</CODE
+>
+              </TD
+><TD
+>Size</TD
+><TD
+>Reallocated memory size (in bytes)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18765"
+>Return Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18767"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>addr</CODE
+>
+              </TD
+><TD
+>Memory Start Address</TD
+><TD
+>Start address of the reallocated memory</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18780"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18783"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18785"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18800"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18803"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_MEMLIB</TT
+>
+              </TD
+><TD
+>Support of memory allocation library</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18812"
+>Description</A
+></H4
+><P
+>Changes the size of the previously allocated memory specified in <CODE
+CLASS="varname"
+>ptr</CODE
+> to the size specified in <CODE
+CLASS="varname"
+>size</CODE
+>. At that time, reallocates the memory and returns the start address of the reallocated memory in <CODE
+CLASS="varname"
+>addr</CODE
+>.</P
+><P
+>Generally, <CODE
+CLASS="varname"
+>addr</CODE
+> results in different value from <CODE
+CLASS="varname"
+>ptr</CODE
+> because the memory start address is moved by reallocating the memory with resizing. The content of the reallocated memory is retained. To do so, the memory content is copied during the <A
+HREF="utk_sm_functions.html#Krealloc"
+>Krealloc</A
+> processing. The memory that becomes free by reallocation will be released.</P
+><P
+>The start address of the memory allocated previously by <A
+HREF="utk_sm_functions.html#Kmalloc"
+>Kmalloc</A
+>, <A
+HREF="utk_sm_functions.html#Kcalloc"
+>Kcalloc</A
+>, or <A
+HREF="utk_sm_functions.html#Krealloc"
+>Krealloc</A
+> must be specified in <CODE
+CLASS="varname"
+>ptr</CODE
+>. The caller must guarantee the validity of <CODE
+CLASS="varname"
+>ptr</CODE
+>.</P
+><P
+>If <TT
+CLASS="literal"
+>NULL</TT
+> is specified in <CODE
+CLASS="varname"
+>ptr</CODE
+>, only the new memory allocation is performed. This operation is identical to <A
+HREF="utk_sm_functions.html#Kmalloc"
+>Kmalloc</A
+>.</P
+><P
+>When the specified size of memory cannot be reallocated or 0 is specified in <CODE
+CLASS="varname"
+>size</CODE
+>, <TT
+CLASS="literal"
+>NULL</TT
+> is returned in <CODE
+CLASS="varname"
+>addr</CODE
+>. In this case, the memory specified by <CODE
+CLASS="varname"
+>ptr</CODE
+> is only released if a value other than <TT
+CLASS="literal"
+>NULL</TT
+> is specified in <CODE
+CLASS="varname"
+>ptr</CODE
+>. This operation is identical to <A
+HREF="utk_sm_functions.html#Kfree"
+>Kfree</A
+>.</P
+><P
+>APIs in the memory allocation library, including <A
+HREF="utk_sm_functions.html#Krealloc"
+>Krealloc</A
+>, cannot be called from a task-independent portion and while dispatch or interrupt is disabled. Such a call may lead to an undefined behavior including possible system failure, and the caller is responsible for guaranteeing the state on the call.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18842"
+>Additional Notes</A
+></H4
+><P
+>The memory address returned in <CODE
+CLASS="varname"
+>addr</CODE
+> may be the same as <CODE
+CLASS="varname"
+>ptr</CODE
+> in some cases, for example, when the memory size becomes smaller than before by reallocation or when the reallocation is performed without moving the memory start address because an unallocated memory area was around the memory specified in <CODE
+CLASS="varname"
+>ptr</CODE
+>.</P
+><P
+>A larger memory size than the number of bytes specified in <CODE
+CLASS="varname"
+>size</CODE
+> may be allocated internally. For more details, see the additional note for <A
+HREF="utk_sm_functions.html#Kmalloc"
+>Kmalloc</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="Kfree"
+>Kfree - Release Memory</A
+></H3
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18853"
+>C Language Interface</A
+></H4
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN18855"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>void Kfree</CODE
+>(void *ptr);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18862"
+>Parameter</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18864"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ptr</CODE
+>
+              </TD
+><TD
+>Pointer to Memory</TD
+><TD
+>Start address of memory to be released</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18877"
+>Return Parameter</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18880"
+>Error Codes</A
+></H4
+><P
+>None.</P
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18883"
+>Valid Context</A
+></H4
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18885"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>Task portion</TH
+><TH
+ALIGN="center"
+>Quasi-task portion</TH
+><TH
+ALIGN="center"
+>Task-independent portion</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>YES</TD
+><TD
+ALIGN="center"
+>NO</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18900"
+>Related Service Profile Items</A
+></H4
+><P
+>Only when all the service profile items below are set to be effective, this API can be used.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18903"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_MEMLIB</TT
+>
+              </TD
+><TD
+>Support of memory allocation library</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H4
+CLASS="section"
+><A
+NAME="AEN18912"
+>Description</A
+></H4
+><P
+>Releases the memory specified in <CODE
+CLASS="varname"
+>ptr</CODE
+>.</P
+><P
+>The start address of the memory allocated previously by <A
+HREF="utk_sm_functions.html#Kmalloc"
+>Kmalloc</A
+>, <A
+HREF="utk_sm_functions.html#Kcalloc"
+>Kcalloc</A
+>, or <A
+HREF="utk_sm_functions.html#Krealloc"
+>Krealloc</A
+> must be specified in <CODE
+CLASS="varname"
+>ptr</CODE
+>. The caller must guarantee the validity of <CODE
+CLASS="varname"
+>ptr</CODE
+>.</P
+><P
+>APIs in the memory allocation library, including <A
+HREF="utk_sm_functions.html#Kfree"
+>Kfree</A
+>, cannot be called from a task-independent portion and while dispatch or interrupt is disabled. Such a call may lead to an undefined behavior including possible system failure, and the caller is responsible for guaranteeing the state on the call.</P
+></DIV
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="subsystem_management_functions.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="device_management_functions.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Subsystem Management Functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Device Management Functions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

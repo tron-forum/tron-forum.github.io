@@ -1,0 +1,1256 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>System Calls</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0 Specification"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Common Rules of μT-Kernel"
+HREF="common_utk.html"><LINK
+REL="PREVIOUS"
+TITLE="Common Rules of μT-Kernel"
+HREF="common_utk.html"><LINK
+REL="NEXT"
+TITLE="High-Level Language Support Routines"
+HREF="high_level_language_support_routines.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0 Specification</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="common_utk.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Common Rules of μT-Kernel</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="high_level_language_support_routines.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="system_calls"
+>System Calls</A
+></H1
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="system_call_format"
+>System Call Format</A
+></H2
+><P
+>μT-Kernel adopts C as the standard high-level language, and standardizes interfaces for system call execution from C language routines.</P
+><P
+>The method for interfacing with the assembly language shall be implementation-dependent. Calling by means of a C language interface is recommended even when an assembly language is used. In this way, portability is assured for programs written in assembly language even if the OS changes, so long as the CPU is the same.</P
+><P
+>The following common rules are established for system call interfaces.</P
+><P
+></P
+><UL
+><LI
+><P
+>All system calls are defined as C language functions.</P
+></LI
+><LI
+><P
+>A function return code of 0 or a positive value indicates normal completion, while negative values are used for error codes.</P
+></LI
+></UL
+><P
+>The implementation of the system call interface is not standardized, and is implementation-dependent. For example, we can use C language macros, inline functions, inline assembly language description, etc.</P
+><P
+>Among C language interfaces for system calls, those which pass parameters using a packet or pointer have CONST modifier attached to explicitly indicate that μT-Kernel does not overwrite a parameter referred to by the pointer.</P
+><P
+>CONST is intended to be the C language <CODE
+CLASS="varname"
+>const</CODE
+> modifier equivalent. This alias for <CODE
+CLASS="varname"
+>const</CODE
+> is used so that the compiler check can be disabled by using #define macro function when any program that does not support <CODE
+CLASS="varname"
+>const</CODE
+> modifier mixes in.</P
+><P
+>Specific usage of CONST is as follows: Details, however, depend on the development environment.</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>Include the following descriptions in the common include file:</P
+><PRE
+CLASS="programlisting"
+>&#13;/* If TKERNEL_CHECK_CONST definition exists, enable the check for const */
+#ifdef TKERNEL_CHECK_CONST
+#define CONST const
+#else
+#define CONST
+#endif
+</PRE
+></LI
+><LI
+><P
+>Describe a function definition or system call definition in the program by using CONST.</P
+><DIV
+CLASS="example"
+><A
+NAME="AEN1468"
+></A
+><P
+><B
+>Example 1. Description Example of CONST</B
+></P
+><PRE
+CLASS="programlisting"
+>&#13;tk_cre_tsk( CONST T_CTSK *pk_ctsk );
+foo_bar( CONST void *buf );
+</PRE
+></DIV
+></LI
+></OL
+><P
+>In μT-Kernel 3.0 or later, it is strongly recommended that CONST is used explicitly in a program and the check for <CODE
+CLASS="varname"
+>const</CODE
+> is enabled in the configuration.</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="system_call_possible_from_task_independent_portion"
+>APIs Possible from Task-Independent Portion</A
+></H2
+><P
+>The following system calls of μT-Kernel/OS can be issued from a task-independent portion and in dispatch disabled state:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN1476"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+ALIGN="left"
+>System call name</TH
+><TH
+ALIGN="left"
+>Summary description</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                  <A
+HREF="utk_os_functions.html#tk_sta_tsk"
+>tk_sta_tsk</A
+>
+                </TD
+><TD
+>Start Task</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="utk_os_functions.html#tk_ref_tsk"
+>tk_ref_tsk</A
+>
+                </TD
+><TD
+>Reference Task Status</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="task_dependent_synchronization_functions.html#tk_wup_tsk"
+>tk_wup_tsk</A
+>
+                </TD
+><TD
+>Wakeup Task</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="task_dependent_synchronization_functions.html#tk_rel_wai"
+>tk_rel_wai</A
+>
+                </TD
+><TD
+>Release Wait</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="task_dependent_synchronization_functions.html#tk_sus_tsk"
+>tk_sus_tsk</A
+>
+                </TD
+><TD
+>Suspend Task</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="task_dependent_synchronization_functions.html#tk_sig_tev"
+>tk_sig_tev</A
+>
+                </TD
+><TD
+>Signal Task Event</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="synchronzation_and_communication_functions.html#tk_sig_sem"
+>tk_sig_sem</A
+>
+                </TD
+><TD
+>Signal Semaphore</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="synchronzation_and_communication_functions.html#tk_set_flg"
+>tk_set_flg</A
+>
+                </TD
+><TD
+>Set Event Flag</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_sta_cyc"
+>tk_sta_cyc</A
+>
+                </TD
+><TD
+>Start Cyclic Handler</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_stp_cyc"
+>tk_stp_cyc</A
+>
+                </TD
+><TD
+>Stop Cyclic Handler</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_ref_cyc"
+>tk_ref_cyc</A
+>
+                </TD
+><TD
+>Reference Cyclic Handler Status</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_ref_cyc_u"
+>tk_ref_cyc_u</A
+>
+                </TD
+><TD
+>Reference Cyclic Handler Status (Microseconds)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_sta_alm"
+>tk_sta_alm</A
+>
+                </TD
+><TD
+>Start Alarm Handler</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_sta_alm_u"
+>tk_sta_alm_u</A
+>
+                </TD
+><TD
+>Start Alarm Handler (Microseconds)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_stp_alm"
+>tk_stp_alm</A
+>
+                </TD
+><TD
+>Stop Alarm Handler</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_ref_alm"
+>tk_ref_alm</A
+>
+                </TD
+><TD
+>Reference Alarm Handler Status</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="time_management_functions.html#tk_ref_alm_u"
+>tk_ref_alm_u</A
+>
+                </TD
+><TD
+>Reference Alarm Handler Status (Microseconds)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_os.html#tk_ret_int"
+>tk_ret_int</A
+>
+                </TD
+><TD
+>Return from Interrupt Handler (can be issued only from an interrupt handler written in an assembly language)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="system_management_functions.html#tk_rot_rdq"
+>tk_rot_rdq</A
+>
+                </TD
+><TD
+>Rotate Ready Queue</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="system_management_functions.html#tk_get_tid"
+>tk_get_tid</A
+>
+                </TD
+><TD
+>Get Task Identifier</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="system_management_functions.html#tk_ref_sys"
+>tk_ref_sys</A
+>
+                </TD
+><TD
+>Reference System Status</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>The following APIs of μT-Kernel/SM can be issued from a task-independent portion and in dispatch disabled state:</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN1568"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+ALIGN="left"
+>API name</TH
+><TH
+ALIGN="left"
+>Summary description</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#DI"
+>DI</A
+>
+                </TD
+><TD
+>Disable External Interrupts</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#EI"
+>EI</A
+>
+                </TD
+><TD
+>Enable External Interrupts</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#isDI"
+>isDI</A
+>
+                </TD
+><TD
+>Get Interrupt Disable Status</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#SetCpuIntLevel"
+>SetCpuIntLevel</A
+>
+                </TD
+><TD
+>Set CPU Interrupt Mask Level</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#GetCpuIntLevel"
+>GetCpuIntLevel</A
+>
+                </TD
+><TD
+>Get CPU Interrupt Mask Level</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#EnableInt"
+>EnableInt</A
+>
+                </TD
+><TD
+>Enable Interrupts</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#DisableInt"
+>DisableInt</A
+>
+                </TD
+><TD
+>Disable Interrupts</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#ClearInt"
+>ClearInt</A
+>
+                </TD
+><TD
+>Clear Interrupt</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#EndOfInt"
+>EndOfInt</A
+>
+                </TD
+><TD
+>Issue EOI to Interrupt Controller</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#CheckInt"
+>CheckInt</A
+>
+                </TD
+><TD
+>Check Interrupt</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#SetIntMode"
+>SetIntMode</A
+>
+                </TD
+><TD
+>Set Interrupt Mode</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#SetCtrlIntLevel"
+>SetCtrlIntLevel</A
+>
+                </TD
+><TD
+>Set Interrupt Controller Interrupt Mask Level</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="interrupt_management_functions_sm.html#GetCtrlIntLevel"
+>GetCtrlIntLevel</A
+>
+                </TD
+><TD
+>Get Interrupt Controller Interrupt Mask Level</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#out_b"
+>out_b</A
+>
+                </TD
+><TD
+>Write to I/O Port (in Bytes)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#out_h"
+>out_h</A
+>
+                </TD
+><TD
+>Write to I/O Port (in Half-words)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#out_w"
+>out_w</A
+>
+                </TD
+><TD
+>Write to I/O Port (in Words)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#out_d"
+>out_d</A
+>
+                </TD
+><TD
+>Write to I/O Port (in Double-words)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#in_b"
+>in_b</A
+>
+                </TD
+><TD
+>Read from I/O Port (in Bytes)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#in_h"
+>in_h</A
+>
+                </TD
+><TD
+>Read from I/O Port (in Half-words)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#in_w"
+>in_w</A
+>
+                </TD
+><TD
+>Read from I/O Port (in Words)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#in_d"
+>in_d</A
+>
+                </TD
+><TD
+>Read from I/O Port (in Double-words)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#WaitUsec"
+>WaitUsec</A
+>
+                </TD
+><TD
+>Micro Wait (Microseconds)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="io_port_management_functions.html#WaitNsec"
+>WaitNsec</A
+>
+                </TD
+><TD
+>Micro Wait (Nanoseconds)</TD
+></TR
+><TR
+><TD
+>&#13;                  <A
+HREF="utility_functions.html#SetOBJNAME"
+>SetOBJNAME</A
+>
+                </TD
+><TD
+>Set Object Name</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>All system calls of μT-Kernel/DS can be issued from a task-independent portion and in dispatch disabled state.</P
+><P
+>Whether system calls or APIs other than those above can be issued from a task-independent portion or in dispatch disabled state is implementation-dependent.</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="restricting_system_call_invocation"
+>Restricting System Call Invocation</A
+></H2
+><P
+>The protection levels at which a system call is invokable can be restricted. In this case, if a system call is issued from a task (task portion) running at lower privilege than the specified protection level, the error code <SPAN
+CLASS="errorname"
+>E_OACV</SPAN
+> is returned.</P
+><P
+>Extended SVC calling cannot be restricted.</P
+><P
+>If, for example,issuing a system call from a level with lower privilege than level 1 is prohibited, system calls cannot be made from tasks running at protection levels 2 and 3. Tasks running at those levels will only be able to make extended SVC calls, and are programmed using subsystem functions only.</P
+><P
+>This kind of restriction is used when μT-Kernel is combined with middleware that offers process management function and other functions, to prevent tasks (as part of user process, etc.) that use the functions of such middleware (process management, etc.) from directly accessing μT-Kernel functions. It allows μT-Kernel to be used as a micro-kernel. The idea is that the user process cannot control the micro-kernel directly via available process API, and only the middleware can control the micro-kernel directly.</P
+><P
+>The protection level restriction on system call invocation is set using the system configuration information management functions. (see <A
+HREF="system_configuration_information_management_functions.html"
+>the Section called <I
+>System Configuration Information Management Functions</I
+> in the Chapter called <I
+>μT-Kernel/SM Functions</I
+></A
+>).</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="modifying_a_parameter_packet"
+>Modifying a Parameter Packet Format</A
+></H2
+><P
+>Some parameters passed to system calls use packet format. The packet format parameters are of two kinds, either input parameters passing information to a system call (e.g., T_CTSK) or output parameters returning information from a system call (e.g., T_RTSK).</P
+><P
+>Additional information that is implementation-dependent can be added to a parameter packet. When implementation-dependent information is added, it must be positioned after the standard defined information. It is permitted to delete only parameters that are declared ineffective by the service profile, and other parameters shall not be deleted. It is not allowed, however, to change the data types and order of information defined in the standard specification.</P
+><P
+>When implementation-dependent information is added to a packet of input information passed to a system call (T_CTSK, etc.), if the system call is invoked while this additional information is not yet initialized (memory content is indeterminate), the system call must still function normally.</P
+><P
+>Ordinarily a flag indicating that valid values are set in the additional information is defined in the implementation-dependent area of attribute flag included in the standard specification. When that flag is set (1), the additional information is to be used; and when the flag is not set (0), the additional information is not initialized (memory content is indeterminate) and the default values are to be used instead.</P
+><P
+>The reason for this specification is to make sure we can run the same application program merely by recompiling, irrespective of whether implementation dependent function extension is added to an implementation of the specification.</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Porting Guideline</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>A care must be taken now for parameter packet initialization since the parameter may be deleted by declaring it to be ineffective by service profile. For example, it is not recommended to initialize T_CTSK structure in the following manner from the viewpoint f portability.</P
+><PRE
+CLASS="programlisting"
+>&#13;T_CTSK  ctsk = {
+        NULL,
+        TA_HLNG|TA_RNG0|TA_USERBUF,
+        task,
+        10,
+        2048,
+        "",
+        buf
+};
+</PRE
+><P
+>Instead, it is recommended to perform initialization using the syntax specified in ISO/IEC 9899:1999 as follows.</P
+><PRE
+CLASS="programlisting"
+>&#13;T_CTSK  ctsk = {
+        .exinf   = NULL,
+        .tskatr  = TA_HLNG|TA_RNG0|TA_USERBUF,
+        .task    = task,
+        .itskpri = 10,
+        .stksz   = 2048,
+        .bufptr  = buf
+};
+</PRE
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="function_codes"
+>Function Codes</A
+></H2
+><P
+>Function codes are numbers assigned to each system call and used to identify the system call.</P
+><P
+>The system call function codes are not specified here but are to be defined in implementation.</P
+><P
+>See <A
+HREF="subsystem_management_functions.html#tk_def_ssy"
+>tk_def_ssy</A
+> on extended SVC function codes.</P
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="error_codes"
+>Error Codes</A
+></H2
+><P
+>System call return codes are in principle to be signed integers. When an error occurs, a negative error code is returned; and if processing is completed normally, <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+> (= <SPAN
+CLASS="errorcode"
+>0</SPAN
+>) or a positive value is returned. The meaning of returned values in the case of normal completion is specified individually for each system call. An exception to this principle is that there are some system calls that do not return when called. A system call that does not return is declared in the C language interface as having no return code (i.e., a void type function).</P
+><P
+>An error code consists of the main error code and sub error code. The low 16 bits of the error code are the sub error code, and the remaining high bits are the main error code. Main error codes are classified into error classes based on the necessity of their detection, the circumstances in which they occur and other factors.</P
+><PRE
+CLASS="programlisting"
+>&#13;#define MERCD(er)       ( (ER)(er) &#62;&#62; 16 )    /* main error code */
+#define SERCD(er)       ( (H)(er) )           /* sub error code */
+#define ERCD(mer, ser)  ( (ER)(mer) &#60;&#60; 16 | (ER)(UH)(ser) )
+</PRE
+><P
+>Note that, in an environment where ER is 16-bit data type, sub error code can be omitted and main error code can be returned as the error code. In this case, SERCD macro shall not be defined.</P
+><PRE
+CLASS="programlisting"
+>&#13;#define MERCD(er)       ( (ER)(er) )    /* main error code */
+#define ERCD(mer, ser)  ( (ER)(mer) )
+</PRE
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Related Service Profile Items</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Only when the service profile items below are set to be effective, the error code contains sub error code, and SERCD macro is supported.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN1713"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_SERCD</TT
+>
+                  </TD
+><TD
+>Support of sub error code</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="timeout"
+>Timeout</A
+></H2
+><P
+>A system call that may enter WAITING state has a timeout function. If processing is not completed by the time the specified timeout interval has elapsed, the processing is canceled and the system call returns error code <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>.</P
+><P
+>In accordance with the principle that there should be no side-effects from calling a system call if that system call returns an error code, the calling of a system call that times out should in principle result in no change in system state. An exception to this is when the functioning of the system call is such that it cannot return to its original state if processing is canceled. This is indicated in the system call description.</P
+><P
+>If the timeout interval is set to 0, a system call does not enter even when a situation arises in which it would ordinarily go to WAITING state. In other words, a system call with timeout set to 0 when it is invoked has no possibility of entering WAITING state. Invoking a system call with timeout set to 0 is called polling; i.e., a system call that performs polling has no chance of entering WAITING state.</P
+><P
+>The descriptions of individual system calls as a rule describe the behavior when there is no timeout (in other words, when an eternal wait occurs). Even if the system call description states that the system call "enters WAITING state" or "is put in WAITING state," if a timeout is set and that time interval elapses before processing is completed, the WAITING state is released and the system call returns error code <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+>. In the case of polling, the system call returns <SPAN
+CLASS="errorname"
+>E_TMOUT</SPAN
+> without entering WAITING state.</P
+><P
+>Timeout (TMO and TMO_U types) is given as a positive integer, or as <TT
+CLASS="literal"
+>TMO_POL</TT
+>＝0 for polling, or as <TT
+CLASS="literal"
+>TMO_FEVR</TT
+> (= -1) for eternal wait. If a timeout interval is set, the timeout processing must be guaranteed to take place after the specified interval from the system call issuing has elapsed.</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Additional Notes</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Since a system call that performs polling does not enter WAITING state, there is no change in the precedence of the task calling it.</P
+><P
+>In a general implementation, when the timeout is set to 1, timeout processing takes place on the second timer interrupt (sometimes called "time tick") after a system call is invoked. Since a timeout of 0 cannot be specified (0 being allocated to <TT
+CLASS="literal"
+>TMO_POL</TT
+> ), in this kind of implementation timeout does not occur on the initial timer interrupt after the system call is invoked.</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="relative_time_and_system_time"
+>Relative Time and System Time</A
+></H2
+><P
+>When the time of an event occurrence is specified relative to another time, such as the time when a system call was invoked, relative time (RELTIM or RELTIM_U type) is used. If relative time is used to specify event occurrence time, it is necessary to guarantee that the event processing will take place after the specified time has elapsed from the time base. Relative time (RELTIM or RELTIM_U type) is also used for e.g. event occurrence. In such cases the method of interpreting the specified relative time is determined for each case. When time is specified as an absolute value, system time (SYSTIM or SYSTIM_U type) is used. The μT-Kernel provides a function for setting system time, but even if the system time is changed using this function, there is no change in the real world time (actual time) at which an event occurs that was specified using relative time. What changes is the system time at which an event occurs that was specified as relative time.</P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>SYSTIM: System time</DT
+><DD
+><P
+>Time base 1 millisecond, 64-bit signed integer</P
+><PRE
+CLASS="programlisting"
+>&#13;typedef struct systim {
+        W       hi;     /* High 32 bits */
+        UW      lo;     /* Low 32 bits */
+} SYSTIM;
+</PRE
+></DD
+><DT
+>SYSTIM_U: System time</DT
+><DD
+><P
+>Time base 1 microsecond, 64-bit signed integer</P
+><PRE
+CLASS="programlisting"
+>&#13;typedef D       SYSTIM_U;       /* 64-bit */
+</PRE
+></DD
+><DT
+>RELTIM: Relative time</DT
+><DD
+><P
+>Time base 1 millisecond, 32-bit unsigned integer (UW)</P
+><PRE
+CLASS="programlisting"
+>&#13;typedef UW      RELTIM;
+</PRE
+></DD
+><DT
+>RELTIM_U: Relative time</DT
+><DD
+><P
+>Time base 1 microsecond, 64-bit unsigned (UD) integer</P
+><PRE
+CLASS="programlisting"
+>&#13;typedef UD      RELTIM_U;       /* Relative time in microseconds with 64-bit integer */
+</PRE
+></DD
+><DT
+>TMO: Timeout time</DT
+><DD
+><P
+>Time base 1 millisecond, 32-bit signed integer (W)</P
+><PRE
+CLASS="programlisting"
+>&#13;typedef W       TMO;
+</PRE
+><P
+>Eternal wait can be specified as <TT
+CLASS="literal"
+>TMO_FEVR</TT
+> (= -1).</P
+></DD
+><DT
+>TMO_U timeout period</DT
+><DD
+><P
+>Time base 1 microsecond, 64-bit signed (D) integer</P
+><PRE
+CLASS="programlisting"
+>&#13;typedef D       TMO_U;          /* Timeout in microseconds with 64-bit integer */
+</PRE
+><P
+>Eternal wait can be specified as <TT
+CLASS="literal"
+>TMO_FEVR</TT
+> (= -1).</P
+></DD
+></DL
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Related Service Profile Items</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>TMO_U, RELTIM_U, and SYSTEM_U dealing with date and relative time in microsecond resolution are guaranteed to be usable only when the following service profile items are set to be effective.</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN1780"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                    <TT
+CLASS="literal"
+>TK_SUPPORT_USEC</TT
+>
+                  </TD
+><TD
+>Support of microsecond</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>Additional Notes</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Timeout or other such processing must be guaranteed to occur after the time specified as RELTIM, RELTIM_U, TMO, or TMO_U has elapsed. For example, if the timer interrupt interval is 1 ms and a timeout of 1 ms is specified, timeout occurs on the second timer interrupt after system call invocation. (The first timer interrupt does not exceed 1 ms.)</P
+><P
+>When a system time (SYSTIM_U) value that may overflow internally in kernel is specified as an argument, the system call behavior is undefined.</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="common_utk.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="high_level_language_support_routines.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Common Rules of μT-Kernel</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="common_utk.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>High-Level Language Support Routines</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

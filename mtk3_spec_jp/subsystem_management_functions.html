@@ -1,0 +1,1955 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>サブシステム管理機能</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/OSの機能"
+HREF="utk_os_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="システム状態管理機能"
+HREF="system_management_functions.html"><LINK
+REL="NEXT"
+TITLE="μT-Kernel/SMの機能"
+HREF="utk_sm_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="system_management_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/OSの機能</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="utk_sm_functions.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="subsystem_management_functions"
+>サブシステム管理機能</A
+></H1
+><P
+>サブシステム管理機能は、μT-Kernel上で動作するミドルウェア等を実装するために、「サブシステム」と呼ばれるユーザ定義の機能をカーネルに追加し、μT-Kernel本体の機能を拡張するための機能である。μT-Kernel/SMの一部の機能についても、サブシステム管理機能を利用して実装されている。</P
+><P
+>サブシステムは、ユーザ定義のシステムコール(「拡張SVC」と呼ぶ)を実行するための拡張SVCハンドラのほか、例外発生時の処理を行うブレーク関数、デバイス等からのイベント発生時の処理を行うイベント処理関数から構成される(<A
+HREF="subsystem_management_functions.html#figure_subsystem_management_functions"
+>図10</A
+>)。</P
+><DIV
+CLASS="figure"
+><A
+NAME="figure_subsystem_management_functions"
+></A
+><P
+><B
+>図 10. サブシステム概要</B
+></P
+><DIV
+CLASS="mediaobject"
+><P
+><IMG
+SRC="images/f_37s.png"></P
+></DIV
+></DIV
+><P
+>このうち、拡張SVCハンドラはアプリケーションなどからの要求を直接受け付けて処理する。一方、ブレーク関数、イベント処理関数は、いわゆるコールバック型の関数であり、カーネルからの要求を受け付けて処理する。</P
+><DIV
+CLASS="note"
+><P
+></P
+><TABLE
+CLASS="note"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="../images/note.gif"
+HSPACE="5"
+ALT="注意"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="MIDDLE"
+><B
+>補足事項</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>一般に、プロセス管理機能、ファイル管理機能などを含む上位ミドルウェアの機能を実装する場合には、サブシステム管理機能を利用する。このほか、サブシステム管理機能を利用して実装されたミドルウェアの例として、TCP/IPマネージャ、USBマネージャ、PCカードマネージャなどがある。</P
+><P
+>サブシステム管理機能は、大まかに言えばシステムコール(SVC: SuperVisor Call)をユーザが追加するための機能であるが、単なるユーザ定義システムコールの追加だけではなく、追加したシステムコールの処理に付随して必要となる例外発生時の処理機能も提供することによって、高度で複雑な機能を持つミドルウェアを実現可能としたものである。</P
+><P
+>なお、μT-Kernel本体の機能を拡張するための機能としては、サブシステム管理機能のほかに、デバイスドライバの機能がある。サブシステムもデバイスドライバも、μT-Kernel本体とは独立した機能モジュールであり、対応するバイナリプログラムをロードすることによって、μT-Kernel上のタスクからこれらの機能を呼び出して利用できるようになる。また、両者とも保護レベル0で動作する。一方、両者の相違点としては、デバイスドライバを呼び出す際のAPIがオープン/クローズ、リード/ライト型に固定されているのに対して、サブシステムを呼び出す際のAPIは自由に定義できる。</P
+><P
+>サブシステムは、サブシステムID(<CODE
+CLASS="varname"
+>ssid</CODE
+>)によって区別され、複数のサブシステムを同時に定義して利用することが可能である。また、あるサブシステムの中から別のサブシステムを呼び出して利用することも可能である。</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_def_ssy"
+>tk_def_ssy - サブシステム定義</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17931"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN17933"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_def_ssy</CODE
+>(ID ssid, CONST T_DSSY *pk_dssy);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN17942"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17944"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"><COL
+WIDTH="14%"><COL
+WIDTH="29%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ssid</CODE
+>
+              </TD
+><TD
+>Subsystem ID</TD
+><TD
+>サブシステムID</TD
+></TR
+><TR
+><TD
+>CONST T_DSSY*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_dssy</CODE
+>
+              </TD
+><TD
+>Packet to Define Subsystem</TD
+><TD
+>サブシステム定義情報</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_dssy</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN17965"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ATR</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ssyatr</CODE
+>
+              </TD
+><TD
+>Subsystem Attributes</TD
+><TD
+>サブシステム属性</TD
+></TR
+><TR
+><TD
+>PRI</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ssypri</CODE
+>
+              </TD
+><TD
+>Subsystem Priority</TD
+><TD
+>サブシステム優先度</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>svchdr</CODE
+>
+              </TD
+><TD
+>Extended SVC Handler Address</TD
+><TD
+>拡張SVCハンドラアドレス</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>breakfn</CODE
+>
+              </TD
+><TD
+>Break Function Address</TD
+><TD
+>ブレーク関数アドレス</TD
+></TR
+><TR
+><TD
+>FP</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>eventfn</CODE
+>
+              </TD
+><TD
+>Event Handling Function Address</TD
+><TD
+>イベント処理関数アドレス</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18004"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18006"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="21%"
+TITLE="c1"><COL
+WIDTH="14%"
+TITLE="c2"><COL
+WIDTH="29%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18019"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18021"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>ssid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOMEM</SPAN
+>
+              </TD
+><TD
+>メモリ不足(管理ブロック用の領域が確保できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_RSATR</SPAN
+>
+              </TD
+><TD
+>予約属性(<CODE
+CLASS="varname"
+>ssyatr</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>pk_dssy</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OBJ</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>ssid</CODE
+> はすでに定義済みである。(<CODE
+CLASS="varname"
+>pk_dssy</CODE
+>≠<TT
+CLASS="literal"
+>NULL</TT
+> の時)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+><CODE
+CLASS="varname"
+>ssid</CODE
+> は定義されていない。(<CODE
+CLASS="varname"
+>pk_dssy</CODE
+>＝<TT
+CLASS="literal"
+>NULL</TT
+> の時)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18063"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18065"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18080"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18083"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_SUBSYSTEM</TT
+>
+              </TD
+><TD
+>サブシステム管理機能のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>以下のサービスプロファイルが有効に設定されているとき、サブシステム優先度(<CODE
+CLASS="varname"
+>ssypri</CODE
+>)の指定が可能である。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18094"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_SSYEVENT</TT
+>
+              </TD
+><TD
+>サブシステムのイベント処理のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>また、以下のサービスプロファイルが有効に設定されているとき、ブレーク関数の指定が可能である。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18104"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_TASKEXCEPTION</TT
+>
+              </TD
+><TD
+>タスク例外処理機能のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18113"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>ssid</CODE
+> のサブシステムを定義する。</P
+><P
+>1つのサブシステムに1つのサブシステムIDを、他のサブシステムと重複しないように割り当てなければならない。カーネルに自動割当ての機能はない。</P
+><P
+>サブシステムIDは1～9がμT-Kernel用に予約されている。10～255がミドルウェア等で使用できる番号となる。ただし、使用可能なサブシステムIDの最大値は実装定義であり、255より小さい場合がある。</P
+><P
+><CODE
+CLASS="varname"
+>ssyatr</CODE
+> は、下位側がシステム属性を表し、上位側が実装独自属性を表す。<CODE
+CLASS="varname"
+>ssyatr</CODE
+> のシステム属性には、現在のバージョンでは割当てがなく、システム属性は使われていない。</P
+><P
+><CODE
+CLASS="varname"
+>ssypri</CODE
+> は、サブシステムの優先度で、スタートアップ関数、クリーンアップ関数、イベント処理関数が優先度順に呼び出される。同一優先度の場合の呼出順は不定である。サブシステム優先度は、1が最も優先度が高く、数値が大きくなるにしたがって優先度が下がる。指定できる優先度の範囲は実装定義だが、少なくとも1～16が指定できなければならない。</P
+><P
+><CODE
+CLASS="varname"
+>breakfn</CODE
+>、<CODE
+CLASS="varname"
+>eventfn</CODE
+> はそれぞれ <TT
+CLASS="literal"
+>NULL</TT
+> を指定することができる。<TT
+CLASS="literal"
+>NULL</TT
+> を指定した場合、対応する関数は呼び出されない。</P
+><P
+><CODE
+CLASS="varname"
+>pk_dssy</CODE
+>＝<TT
+CLASS="literal"
+>NULL</TT
+> とした場合は、サブシステムの定義を抹消する。</P
+><P
+></P
+><UL
+><LI
+><P
+>拡張SVCハンドラ</P
+><P
+>アプリケーションなどからの要求の受け付け口となる。サブシステムのAPIとなる部分である。システムコールと同様の方法で呼び出すことが可能で、一般的にはトラップ命令などで呼び出す。</P
+><P
+>拡張SVCハンドラは次の形式となる。</P
+><PRE
+CLASS="programlisting"
+>&#13;INT svchdr( void *pk_para, FN fncd )
+{
+        /*
+                fncd により分岐して処理
+        */
+
+        return retcode;  /* 拡張SVCハンドラの終了 */
+}
+</PRE
+><P
+><CODE
+CLASS="varname"
+>fncd</CODE
+> は機能コードである。機能コードの下位8ビットにはサブシステムIDが入る。残りの上位ビットは、サブシステム側で任意に使用できる。通常は、サブシステム内の機能コードとして使用する。ただし、機能コードは正の値でなければならないため、最上位ビットは必ず0となる。</P
+><P
+><CODE
+CLASS="varname"
+>pk_para</CODE
+> は呼出側から渡されたパラメータをパケット形式にしたものである。パケットの形式は、サブシステム側で任意に決めることができる。一般的には、C言語で関数に引数を渡すときのスタックの形式と同じになる。これは、多くの場合C言語の構造体の形式と同じである。</P
+><P
+>拡張SVCハンドラからの戻値は、そのまま呼出元へ関数の戻値として戻される。原則として、負の値をエラー値、0または正の値を正常時の戻値とする。なお、何らかの理由で拡張SVCの呼出に失敗した場合は、拡張SVCハンドラは呼び出されずに、呼出元にはカーネルの返すエラーコード(負の値)が返されるため、それと混同しないようにしておくことが望ましい。</P
+><P
+>拡張SVCの呼出側の形式はカーネルの実装に依存する。ただし、サブシステムのAPIとしてはC言語の関数の形式で、カーネルの実装に依存しないように規定しなければならない。サブシステムは、C言語の関数の形式からカーネル依存の拡張SVCの呼出形式に変換するための、インタフェースライブラリを用意しなければならない。</P
+><P
+>拡張SVCハンドラは、準タスク部として実行される。</P
+><P
+>タスク独立部からも呼出が可能で、タスク独立部から呼び出された場合は、拡張SVCハンドラもタスク独立部として実行される。</P
+></LI
+><LI
+><P
+>ブレーク関数</P
+><P
+>ブレーク関数は、拡張SVCハンドラの実行中のタスクに、タスク例外が発生した場合に呼び出される関数である。</P
+><P
+>ブレーク関数が呼び出されたら、タスク例外が発生した現在実行中の拡張SVCハンドラの処理を速やかに中止し、拡張SVCハンドラから呼出元に戻らなければならない。現在実行中の拡張SVCハンドラの処理を中止するための処理をブレーク関数で行う。</P
+><P
+>ブレーク関数は次の形式となる。</P
+><PRE
+CLASS="programlisting"
+>&#13;void breakfn( ID tskid )
+{
+        /*
+                拡張SVCハンドラの実行中止処理
+        */
+}
+</PRE
+><P
+><CODE
+CLASS="varname"
+>tskid</CODE
+> はタスク例外が発生したタスクのIDである。</P
+><P
+>ブレーク関数は、<A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+> によりタスク例外が発生されたときに呼び出される。また、拡張SVCハンドラがネストして呼び出されていた場合は、拡張SVCハンドラから戻ってネストが１段浅くなったときに、戻った先の拡張SVCハンドラに対応するブレーク関数が呼び出される。</P
+><P
+>ブレーク関数は、１回のタスク例外で、１つの拡張SVCハンドラに対して１回のみ実行される。</P
+><P
+>タスク例外が発生している状態で、さらにネストして拡張SVCを呼び出した場合、呼出先の拡張SVCハンドラに対してはブレーク関数は呼び出されない。</P
+><P
+>ブレーク関数は準タスク部として実行されるが、その要求タスクは次のようになる。<A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+> の発行によるブレーク関数実行の場合は、<A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+> を発行したタスクの準タスク部としてブレーク関数が実行される。一方、拡張SVCハンドラのネストが1段浅くなったときのブレーク関数実行の場合は、タスク例外の発生したタスク(拡張SVCハンドラを実行しているタスク)の準タスク部としてブレーク関数が実行される。したがって、ブレーク関数の実行タスクと拡張SVCハンドラの実行タスクが異なっている場合がある。このような場合、ブレーク関数と拡張SVCハンドラがタスクスケジューリングにしたがって同時に実行されることになる。</P
+><P
+>そのため、ブレーク関数の実行が終了する前に拡張SVCハンドラから呼出元に戻るケースが考えられるが、そのような場合には拡張SVCハンドラから呼出元に戻る直前の状態でブレーク関数が終了するまで待たされる。この待ち状態がタスク状態遷移のどの状態になるかは実装依存とするが、READY状態のまま(RUNNING状態になれないREADY状態)とすることが望ましい。また、ブレーク関数の終了を待つ間、タスクの優先順位が変化することがあるが、タスクの優先順位がどのようになるかは実装依存とする。</P
+><P
+>同様に、ブレーク関数の実行が終了するまで拡張SVCハンドラから拡張SVCを呼び出すことはできず、ブレーク関数の終了まで待たされる。</P
+><P
+>つまり、タスク例外が発生してからブレーク関数が終了するまでの間、タスク例外が発生したときの拡張SVCハンドラから抜けないようにしなくてはならない。</P
+><P
+>ブレーク関数と拡張SVCハンドラの要求タスクが異なるケース、すなわちブレーク関数と拡張SVCハンドラが異なるタスクとして実行されるケースにおいて、ブレーク関数のタスク優先度が拡張SVCハンドラのタスク優先度より低い場合は、ブレーク関数の実行期間だけ、拡張SVCハンドラのタスク優先度と同じ優先度までブレーク関数のタスク優先度が引き上げられる。逆に、ブレーク関数のタスク優先度が同じかより高い場合には、優先度は変更されない。変更される優先度は現在優先度で、ベース優先度は変更されない。</P
+><P
+>優先度変更はブレーク関数へ入る直前のみで、その後に拡張SVCハンドラ側の優先度が変更されても追従してブレーク関数側の優先度が変更されることはない。ブレーク関数実行中にブレーク関数側の優先度を変更した場合も、拡張SVCハンドラ側の優先度が変更されることはない。また、このときブレーク関数を実行中であることにより優先度の変更が制限されることはない。</P
+><P
+>ブレーク関数終了時には現在優先度をベース優先度に戻す。ただし、ミューテックスをロックしていた場合には、ミューテックスにより調整された優先度に戻す。(つまり、ブレーク関数の入口と出口で現在優先度を調整する機能があるのみで、それ以外については通常のタスク実行中と同じである。)</P
+></LI
+><LI
+><P
+>イベント処理関数</P
+><P
+><A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+> の呼出によって呼び出される。</P
+><P
+>サブシステムに対する各種要求を処理する。</P
+><P
+>なお、すべての要求がすべてのサブシステムで処理されなければならないという性質のものではない。処理する必要がなければ何もせず単に <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+> を返せばよい。</P
+><P
+>イベント処理関数は次の形式となる。</P
+><PRE
+CLASS="programlisting"
+>&#13;ER eventfn( INT evttyp, INT info )
+{
+        /*
+                各イベントに対応する処理
+        */
+
+        return ercd;
+}
+</PRE
+><P
+><CODE
+CLASS="varname"
+>evttyp</CODE
+> は要求の種別、<CODE
+CLASS="varname"
+>info</CODE
+> は任意のパラメータで、いずれも <A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+> で指定されたものである。</P
+><P
+>正常に処理した場合は戻値に <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+> を返す。異常があった場合はエラーコード(負の値)を返す。</P
+><P
+><CODE
+CLASS="varname"
+>evttyp</CODE
+> には次のものがある。詳細は <A
+HREF="device_management_functions.html"
+><I
+>デバイス管理機能</I
+>項<I
+>μT-Kernel/SMの機能</I
+>章</A
+> を参照のこと。</P
+><PRE
+CLASS="programlisting"
+>&#13;#define TSEVT_SUSPEND_BEGIN     1       /* デバイスサスペンド開始前 */
+#define TSEVT_SUSPEND_DONE      2       /* デバイスサスペンド完了後 */
+#define TSEVT_RESUME_BEGIN      3       /* デバイスリジューム開始前 */
+#define TSEVT_RESUME_DONE       4       /* デバイスリジューム完了後 */
+#define TSEVT_DEVICE_REGIST     5       /* デバイス登録通知 */
+#define TSEVT_DEVICE_DELETE     6       /* デバイス抹消通知 */
+</PRE
+><P
+>イベント処理関数は、<A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+> の発行タスクの準タスク部として実行される。</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18188"
+>補足事項</A
+></H3
+><P
+>拡張SVCハンドラおよびブレーク関数、イベント関数は <TT
+CLASS="literal"
+>TA_HLNG</TT
+> 属性相当のみで、高級言語対応ルーチンを経由して呼び出される。<TT
+CLASS="literal"
+>TA_ASM</TT
+> 属性を指定する機能はない。</P
+><P
+>拡張SVCハンドラの中で待ち状態に入るシステムコールを発行しても構わないが、ブレーク関数による中止を考慮したプログラムにしておく必要がある。この場合の具体的な処理は次のようになる。拡張SVCハンドラの実行中に、呼出側のタスクを対象とした <A
+HREF="task_exception_handling_functions.html#tk_ras_tex"
+>tk_ras_tex</A
+> が発行された場合、できるだけ速やかに拡張SVCハンドラの実行中止処理を行い、呼出側に対して中止のエラーを返す必要がある。このためにブレーク関数が実行される。ブレーク関数の中では、速やかに実行中止処理を行うため、拡張SVCハンドラの処理中に待ち状態になっていた場合でも、その待ち状態を強制的に解除する必要がある。このためのシステムコールとして、通常は <A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> を使う。<A
+HREF="task_dependent_synchronization_functions.html#tk_dis_wai"
+>tk_dis_wai</A
+> の機能により、その後も拡張SVCハンドラから呼出側に戻るまでの間は待ち状態に入らないようにできるが、拡張SVCハンドラ側のプログラムも、ブレーク関数による実行の中止を考慮しておくべきである。たとえば、待ち状態から <SPAN
+CLASS="errorname"
+>E_DISWAI</SPAN
+> のエラーで抜けた場合には、ブレーク関数による実行の中止を意味すると考えられるので、その後に予定していた処理を行わず、速やかに拡張SVCハンドラを終了し、呼出側に対して中止のエラーを返すようにする。</P
+><P
+>拡張SVCハンドラは、複数のタスクから同時に並行して呼び出される可能性がある。そのため、共通に利用する資源等があった場合には、拡張SVCハンドラの中で、必要に応じて排他制御を行う。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18199"
+>移植ガイドライン</A
+></H3
+><P
+>INT型が16ビット幅の環境では、機能コードのうちサブシステム内の機能コードとして使える上位ビットは7ビット分(0〜127)になるため注意が必要である。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_evt_ssy"
+>tk_evt_ssy - イベント処理関数呼出</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18204"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN18206"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_evt_ssy</CODE
+>(ID ssid, INT evttyp, INT info);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18217"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18219"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ssid</CODE
+>
+              </TD
+><TD
+>Subsystem ID</TD
+><TD
+>サブシステムID</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>evttyp</CODE
+>
+              </TD
+><TD
+>Event Type</TD
+><TD
+>イベント要求種別</TD
+></TR
+><TR
+><TD
+>INT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>info</CODE
+>
+              </TD
+><TD
+>Information</TD
+><TD
+>任意パラメータ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18244"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18246"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18259"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18261"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>ssid</CODE
+>が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>ssid</CODE
+> のサブシステムが定義されていない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_CTX</SPAN
+>
+              </TD
+><TD
+>コンテキストエラー(タスク独立部またはディスパッチ禁止状態で実行)</TD
+></TR
+><TR
+><TD
+>その他</TD
+><TD
+>イベント処理関数の返したエラー値</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18287"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18289"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18304"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のすべてのサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18307"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_SUBSYSTEM</TT
+>
+              </TD
+><TD
+>サブシステム管理機能のサポート</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_SSYEVENT</TT
+>
+              </TD
+><TD
+>サブシステムのイベント処理のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18320"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>ssid</CODE
+> のサブシステムのイベント処理関数を呼び出す。</P
+><P
+><CODE
+CLASS="varname"
+>ssid</CODE
+>＝0を指定したときは、現在定義されているすべてのサブシステムのイベント処理関数を呼び出す。この場合、次の順序で各サブシステムのイベント処理関数を呼び出す。</P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+><CODE
+CLASS="varname"
+>evttyp</CODE
+> が奇数のとき:</DT
+><DD
+><P
+>サブシステム優先度の高い方から順に呼び出す。</P
+></DD
+><DT
+><CODE
+CLASS="varname"
+>evttyp</CODE
+> が偶数のとき:</DT
+><DD
+><P
+>サブシステム優先度の低い方から順に呼び出す。</P
+></DD
+></DL
+></DIV
+><P
+>同一優先度の場合の呼出順は不定である。</P
+><P
+>イベント処理関数が定義されていないサブシステムに対して実行しても、単にイベント処理関数を呼び出さないだけでエラーとはならない。</P
+><P
+>イベント処理関数がエラーを返した場合、システムコールの戻値としてそのエラー値をそのまま返す。<CODE
+CLASS="varname"
+>ssid</CODE
+>＝0の場合、イベント処理関数がエラーを返した場合も、すべてのサブシステムのイベント処理関数が呼び出される。システムコールの戻値には、エラーを返したイベント処理関数の内の１つのエラー値のみ返す。どのサブシステムのイベント処理関数が返したエラーかはわからない。</P
+><P
+>イベント処理関数を実行中に、<A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+> を呼び出したタスクにタスク例外が発生した場合、タスク例外はイベント処理関数が終了するまで保留される。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18343"
+>補足事項</A
+></H3
+><P
+>イベント処理関数の利用例の1つは、省電力機能に関連したサスペンドやリジュームの処理である。具体的には、電源異常などの要因により電源を切った状態(デバイスのサスペンド状態)に移行する際、サスペンド状態への移行を各サブシステムに対して通知し、サブシステム毎に適切な処理を行うために、各サブシステムのイベント処理関数が呼び出される。μT-Kernel/SMの <A
+HREF="device_management_functions.html#tk_sus_dev"
+>tk_sus_dev</A
+> の処理の中では、この目的で <A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+> を実行している。各サブシステムのイベント処理関数では、必要に応じて、サスペンド状態への移行時に処理すべきデータの保存などを行う。一方、電源の再投入などによってサスペンド状態から復帰(リジューム)する際には、サスペンド状態からの復帰を各サブシステムに対して通知し、サブシステム毎に適切な処理を行うために、各サブシステムのイベント処理関数が再度呼び出される。詳細は <A
+HREF="device_management_functions.html#tk_sus_dev"
+>tk_sus_dev</A
+> を参照。</P
+><P
+>このほか、<A
+HREF="device_management_functions.html#tk_def_dev"
+>tk_def_dev</A
+> によって新しいデバイスが登録された際にも、デバイスの登録を各サブシステムに対して通知し、サブシステム毎に適切な処理を行うために、各サブシステムのイベント処理関数が呼び出される。μT-Kernel/SMの <A
+HREF="device_management_functions.html#tk_def_dev"
+>tk_def_dev</A
+> の処理の中では、この目的で <A
+HREF="subsystem_management_functions.html#tk_evt_ssy"
+>tk_evt_ssy</A
+> を実行している。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18353"
+>移植ガイドライン</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>info</CODE
+>がINT型であり、処理系によってとれる値の範囲に異なる可能性があるため注意が必要である。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="tk_ref_ssy"
+>tk_ref_ssy - サブシステム定義情報の参照</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18359"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN18361"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>ER ercd = tk_ref_ssy</CODE
+>(ID ssid, T_RSSY *pk_rssy);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18370"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18372"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="9%"
+TITLE="c1"><COL
+WIDTH="18%"
+TITLE="c2"><COL
+WIDTH="36%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ID</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ssid</CODE
+>
+              </TD
+><TD
+>Subsystem ID</TD
+><TD
+>サブシステムID</TD
+></TR
+><TR
+><TD
+>T_RSSY*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>pk_rssy</CODE
+>
+              </TD
+><TD
+>Packet to Refer Subsystem</TD
+><TD
+>サブシステム定義情報を返す領域へのポインタ</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18391"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18393"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="9%"><COL
+WIDTH="18%"><COL
+WIDTH="36%"><COL
+WIDTH="36%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>ER</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ercd</CODE
+>
+              </TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+><CODE
+CLASS="varname"
+>pk_rssy</CODE
+> の内容</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18408"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="9%"
+TITLE="c1"><COL
+WIDTH="18%"
+TITLE="c2"><COL
+WIDTH="36%"
+TITLE="c3"><COL
+WIDTH="36%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>PRI</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>ssypri</CODE
+>
+              </TD
+><TD
+>Subsystem Priority</TD
+><TD
+>サブシステム優先度</TD
+></TR
+><TR
+><TD
+COLSPAN="4"
+>──(以下に実装独自に他の情報を追加してもよい)──</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18423"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18425"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_ID</SPAN
+>
+              </TD
+><TD
+>不正ID番号(<CODE
+CLASS="varname"
+>ssid</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+>
+              </TD
+><TD
+>オブジェクトが存在していない(<CODE
+CLASS="varname"
+>ssid</CODE
+> のサブシステムが定義されていない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>pk_rssy</CODE
+> が不正)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18449"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18451"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18466"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本システムコールはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18469"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_SUBSYSTEM</TT
+>
+              </TD
+><TD
+>サブシステム管理機能のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>以下のサービスプロファイルが有効に設定されているとき、サブシステム優先度(<CODE
+CLASS="varname"
+>ssypri</CODE
+>)の取得が可能である。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN18480"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_SSYEVENT</TT
+>
+              </TD
+><TD
+>サブシステムのイベント処理のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN18489"
+>解説</A
+></H3
+><P
+><CODE
+CLASS="varname"
+>ssid</CODE
+> で示された対象サブシステムの各種の情報を参照する。</P
+><P
+><CODE
+CLASS="varname"
+>ssypri</CODE
+> には、<A
+HREF="subsystem_management_functions.html#tk_def_ssy"
+>tk_def_ssy</A
+> で指定したサブシステムの優先度が返される。</P
+><P
+><CODE
+CLASS="varname"
+>ssid</CODE
+> のサブシステムが定義されていない場合は、<SPAN
+CLASS="errorname"
+>E_NOEXS</SPAN
+> となる。</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="system_management_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="utk_sm_functions.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>システム状態管理機能</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_os_functions.html"
+ACCESSKEY="U"
+>上に戻る</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>μT-Kernel/SMの機能</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

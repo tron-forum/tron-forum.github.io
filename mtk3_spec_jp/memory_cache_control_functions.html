@@ -1,0 +1,1096 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>メモリキャッシュ制御機能</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="μT-Kernel 3.0仕様書"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="μT-Kernel/SMの機能"
+HREF="utk_sm_functions.html"><LINK
+REL="PREVIOUS"
+TITLE="システム構成情報管理機能"
+HREF="system_configuration_information_management_functions.html"><LINK
+REL="NEXT"
+TITLE="物理タイマ機能"
+HREF="physical_timer_functions.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>μT-Kernel 3.0仕様書</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="system_configuration_information_management_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>μT-Kernel/SMの機能</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="physical_timer_functions.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="memory_cache_control_functions"
+>メモリキャッシュ制御機能</A
+></H1
+><P
+>メモリキャッシュ制御機能は、キャッシュの制御やモード設定を行うための機能である。</P
+><P
+>μT-Kernelにおけるキャッシュについての考え方は、以下の通りである。</P
+><P
+>基本的には、アプリケーションもデバイスドライバも、キャッシュの存在を意識することなくプログラムしていれば、自動的に適切なキャッシュ制御が行われるべきである。特に、プログラムの移植性を考慮すると、キャッシュのようにシステムへの依存性が強いものは、できるだけアプリケーションプログラムと切り離して扱えるのがよい。そのため、μT-Kernelを使った実際の個々のシステムでは、μT-Kernel自身が自動的にキャッシュの制御を行う方針となっている。</P
+><P
+>具体的には、通常のプログラムやデータを入れるメモリ等の領域はキャッシュON、I/Oなどの領域はキャッシュOFFとなるようにμT-Kernelがキャッシュの設定を行う。したがって、通常のアプリケーションプログラムが明示的にキャッシュ制御の関数を呼ぶ必要はない。プログラムから意識的にキャッシュ制御を行わなくても、適切なキャッシュ制御が自動的に行われる。</P
+><P
+>ただし、μT-Kernelによるキャッシュ制御(いわば、デフォルト設定によるキャッシュ制御)だけでは、適切な対応ができない場合もある。たとえば、DMA転送の絡んだ入出力処理を行う場合や、カーネル管理外のメモリ領域を使う場合には、明示的なキャッシュ制御が必要となることがある。また、プログラムを動的にロードあるいは生成(コンパイル)しながら実行するような場合には、データキャッシュと命令キャッシュを適切に同期させるためのキャッシュ制御が必要となることがある。このようなケースで利用することを想定した機能が、メモリキャッシュ制御機能である。</P
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="SetCacheMode"
+>SetCacheMode - キャッシュモードの設定</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25916"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN25918"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>SZ rlen = SetCacheMode</CODE
+>(void *addr, SZ len, UINT mode);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25929"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25931"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>addr</CODE
+>
+              </TD
+><TD
+>Start Address</TD
+><TD
+>先頭アドレス</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>len</CODE
+>
+              </TD
+><TD
+>Length</TD
+><TD
+>領域サイズ(バイト数)</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mode</CODE
+>
+              </TD
+><TD
+>Mode</TD
+><TD
+>キャッシュモード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25956"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25958"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>rlen</CODE
+>
+              </TD
+><TD
+>Result Length</TD
+><TD
+>キャッシュモードを設定できた領域のサイズ(バイト数)</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25975"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN25977"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>addr</CODE
+>, <CODE
+CLASS="varname"
+>len</CODE
+>, <CODE
+CLASS="varname"
+>mode</CODE
+> が不正あるいは利用できない)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOSPT</SPAN
+>
+              </TD
+><TD
+>未サポート機能(<CODE
+CLASS="varname"
+>mode</CODE
+> で指定した機能が未サポート)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN25998"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26000"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26015"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のサービスプロファイルがすべて有効に設定されている場合に限り、本APIはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26018"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_CACHECTRL</TT
+>
+              </TD
+><TD
+>メモリキャッシュ制御機能のサポート</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_SETCACHEMODE</TT
+>
+              </TD
+><TD
+>キャッシュモード設定機能のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><P
+>また、以下のサービスプロファイルが本APIに関係する。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26032"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_WBCACHE</TT
+>
+              </TD
+><TD
+>キャッシュモードにライトバック(<TT
+CLASS="literal"
+>CM_WB</TT
+>)が指定可能</TD
+></TR
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_WTCACHE</TT
+>
+              </TD
+><TD
+>キャッシュモードにライトスルー(<TT
+CLASS="literal"
+>CM_WT</TT
+>)が指定可能</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26047"
+>解説</A
+></H3
+><P
+>メモリ領域のキャッシュモードを設定する。具体的には、<CODE
+CLASS="varname"
+>addr</CODE
+> から <CODE
+CLASS="varname"
+>len</CODE
+> バイトのメモリ領域のキャッシュに対して、<CODE
+CLASS="varname"
+>mode</CODE
+> で指定した設定を行う。</P
+><PRE
+CLASS="synopsis"
+>&#13;mode := ( CM_OFF || CM_WB || CM_WT ) | [CM_CONT]
+                CM_OFF  キャッシュオフ
+                CM_WB   キャッシュオン(ライトバック)
+                CM_WT   キャッシュオン(ライトスルー)
+                CM_CONT アドレス(物理アドレス)が連続した領域のみキャッシュ設定を行う
+                   ...
+                /* 実装独自のモードを追加してもよい */
+</PRE
+><P
+><CODE
+CLASS="varname"
+>mode</CODE
+> に <TT
+CLASS="literal"
+>CM_OFF</TT
+> を指定した場合は、キャッシュをフラッシュ(書き戻し)した後に無効化して、キャッシュモードをオフに設定する。</P
+><P
+><CODE
+CLASS="varname"
+>mode</CODE
+> に <TT
+CLASS="literal"
+>CM_WT</TT
+> を指定した場合は、キャッシュをフラッシュした後にキャッシュモードをライトスルーに設定する。</P
+><P
+><CODE
+CLASS="varname"
+>mode</CODE
+> に <TT
+CLASS="literal"
+>CM_WB</TT
+> を指定した場合は、キャッシュモードをライトバックに設定する。この時にキャッシュフラッシュを行うかどうかは実装依存とする。</P
+><P
+><CODE
+CLASS="varname"
+>mode</CODE
+> に <TT
+CLASS="literal"
+>CM_CONT</TT
+> を指定した場合は、<CODE
+CLASS="varname"
+>addr</CODE
+> からアドレス(物理アドレス)が連続した領域のみキャッシュモード設定を行う。指定した領域内にメモリ割り当てのない部分があった場合は、その直前で処理を中止し、処理が完了した領域のサイズを返す。<TT
+CLASS="literal"
+>CM_CONT</TT
+> を指定しなかった場合は、指定したすべての領域のキャッシュを処理し、処理が完了した領域のサイズを返す。</P
+><P
+>CPUや実装によっては、キャッシュモードの一部、あるいは全部の設定が不可能な場合がある。設定不可能なモードを指定した場合は、何も処理せず <SPAN
+CLASS="errorname"
+>E_NOSPT</SPAN
+> を返す。</P
+><P
+><CODE
+CLASS="varname"
+>len</CODE
+> は1以上とする。0以下の数を指定した場合はエラーコード <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> を返す。</P
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26073"
+>補足事項</A
+></H3
+><P
+>キャッシュモードの設定は、一般にはページなど大きな領域を単位として行われるため、<CODE
+CLASS="varname"
+>addr</CODE
+> がその領域の先頭ではない場合であっても、<CODE
+CLASS="varname"
+>addr</CODE
+> が含まれる領域全体が設定対象となる。また、隣接した領域に対しても、意図しないキャッシュアクセスが発生する可能性があるので、使用には注意が必要である。</P
+><P
+>ハードウェア構成やCPUの持つキャッシュの機能に依存して、さらに詳細なキャッシュモードの設定を行いたい場合は、実装独自の <CODE
+CLASS="varname"
+>mode</CODE
+> を追加して利用する。たとえば、<TT
+CLASS="literal"
+>NORMAL CACHE OFF (Weakly Order)</TT
+>, <TT
+CLASS="literal"
+>DEVICE CACHE OFF (Weakly Order)</TT
+>, <TT
+CLASS="literal"
+>STRONG ORDER</TT
+> などのキャッシュモードを指定可能な場合がある。</P
+><P
+>利用できない <CODE
+CLASS="varname"
+>mode</CODE
+> を指定した場合のエラーが <SPAN
+CLASS="errorname"
+>E_NOSPT</SPAN
+> となるか <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+> となるかは実装依存である。</P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H2
+CLASS="section"
+><A
+NAME="ControlCache"
+>ControlCache - キャッシュの制御</A
+></H2
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26089"
+>C言語インタフェース</A
+></H3
+><DIV
+CLASS="funcsynopsis"
+><P
+></P
+><A
+NAME="AEN26091"
+></A
+><PRE
+CLASS="funcsynopsisinfo"
+>#include &#60;tk/tkernel.h&#62;</PRE
+><P
+><CODE
+><CODE
+CLASS="FUNCDEF"
+>SZ rlen = ControlCache</CODE
+>(void *addr, SZ len, UINT mode);</CODE
+></P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26102"
+>パラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26104"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"><COL
+WIDTH="17%"><COL
+WIDTH="33%"><COL
+WIDTH="42%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>void*</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>addr</CODE
+>
+              </TD
+><TD
+>Start Address</TD
+><TD
+>先頭アドレス</TD
+></TR
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>len</CODE
+>
+              </TD
+><TD
+>Length</TD
+><TD
+>領域サイズ(バイト数)</TD
+></TR
+><TR
+><TD
+>UINT</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>mode</CODE
+>
+              </TD
+><TD
+>Mode</TD
+><TD
+>制御モード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26129"
+>リターンパラメータ</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26131"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="8%"
+TITLE="c1"><COL
+WIDTH="17%"
+TITLE="c2"><COL
+WIDTH="33%"
+TITLE="c3"><COL
+WIDTH="42%"
+TITLE="c4"><TBODY
+VALIGN="top"
+><TR
+><TD
+>SZ</TD
+><TD
+>&#13;                <CODE
+CLASS="varname"
+>rlen</CODE
+>
+              </TD
+><TD
+>Result Length</TD
+><TD
+>キャッシュモードを設定できた領域のサイズ(バイト数)</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="right"
+>または</TD
+><TD
+>Error Code</TD
+><TD
+>エラーコード</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26148"
+>エラーコード</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26150"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="17%"
+TITLE="c1"><COL
+WIDTH="83%"
+TITLE="c2"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_OK</SPAN
+>
+              </TD
+><TD
+>正常終了</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_PAR</SPAN
+>
+              </TD
+><TD
+>パラメータエラー(<CODE
+CLASS="varname"
+>addr</CODE
+>, <CODE
+CLASS="varname"
+>len</CODE
+>, <CODE
+CLASS="varname"
+>mode</CODE
+> が不正)</TD
+></TR
+><TR
+><TD
+>&#13;                <SPAN
+CLASS="errorname"
+>E_NOSPT</SPAN
+>
+              </TD
+><TD
+>未サポート機能(<CODE
+CLASS="varname"
+>mode</CODE
+> で指定した機能が未サポート)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26171"
+>利用可能なコンテキスト</A
+></H3
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26173"
+></A
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="33%"><COL
+WIDTH="33%"><COL
+WIDTH="33%"><THEAD
+><TR
+><TH
+ALIGN="center"
+>タスク部</TH
+><TH
+ALIGN="center"
+>準タスク部</TH
+><TH
+ALIGN="center"
+>タスク独立部</TH
+></TR
+></THEAD
+><TBODY
+VALIGN="top"
+><TR
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>○</TD
+><TD
+ALIGN="center"
+>×</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26188"
+>関連するサービスプロファイル</A
+></H3
+><P
+>以下のサービスプロファイルが有効に設定されている場合に限り、本APIはサポートされる。</P
+><DIV
+CLASS="informaltable"
+><P
+></P
+><A
+NAME="AEN26191"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+RULES="none"
+WIDTH="100%"
+CLASS="CALSTABLE"
+><COL
+WIDTH="38%"
+TITLE="c1"><COL
+WIDTH="62%"><TBODY
+VALIGN="top"
+><TR
+><TD
+>&#13;                <TT
+CLASS="literal"
+>TK_SUPPORT_CACHECTRL</TT
+>
+              </TD
+><TD
+>メモリキャッシュ制御機能のサポート</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="section"
+><H3
+CLASS="section"
+><A
+NAME="AEN26200"
+>解説</A
+></H3
+><P
+>メモリ領域のキャッシュ制御(フラッシュあるいは無効化)を行う。具体的には、論理アドレス <CODE
+CLASS="varname"
+>addr</CODE
+> から <CODE
+CLASS="varname"
+>len</CODE
+> バイトのメモリ領域のキャッシュに対して、<CODE
+CLASS="varname"
+>mode</CODE
+> で指定した制御を行う。</P
+><PRE
+CLASS="synopsis"
+>&#13;mode := (CC_FLUSH | CC_INVALIDATE)
+                CC_FLUSH        キャッシュのフラッシュ(書き戻し)
+                CC_INVALIDATE   キャッシュの無効化
+                     ...
+                /* 実装独自のモード値を追加してもよい */
+</PRE
+><P
+><TT
+CLASS="literal"
+>CC_FLUSH</TT
+> と <TT
+CLASS="literal"
+>CC_INVALIDATE</TT
+> は同時に指定可能である。その場合はキャッシュをフラッシュした後に無効化する。</P
+><P
+>処理が成功すると、処理を行った領域のサイズを返す。</P
+><P
+>キャッシュモードや属性の異なる領域を跨ぐ範囲を指定してはいけない。例えば、キャッシュオンの領域とキャッシュオフの領域、保護レベルの異なる領域のような異なる属性の領域の境界を跨ぐ範囲を指定してはいけない。このような範囲を指定した場合の動作は保証されない。</P
+><P
+>キャッシュ制御はハードウェアに依存する部分が多いため、CPUやハードウェア、実装によってその機能の詳細は異なる。指定された領域を指定されたモードで制御するのが基本だが、指定された領域を含めて、より多くの領域に影響を与える場合がある。例えば、以下のような場合がある。</P
+><P
+></P
+><UL
+><LI
+><P
+>正確な指定範囲のみを制御(フラッシュあるいは無効化)するとは限らない。指定範囲を含む領域が制御されるが、CPUやハードウェア、実装によっては、それ以外の領域(例えば全メモリ)に対しても、フラッシュあるいは無効化が行われる場合がある。</P
+></LI
+><LI
+><P
+>キャッシュオフの領域を指定した場合は、通常は何も行わない。しかしこのケースにおいても、指定範囲以外の領域のキャッシュのフラッシュあるいは無効化が行われる可能性がある。(常に全領域をフラッシュする処理を行うなど)</P
+></LI
+><LI
+><P
+>キャッシュのないシステムでは、何も行わない。</P
+></LI
+></UL
+><P
+>一般に、キャッシュの制御はキャッシュラインサイズ単位で行われる。このため隣接した領域に意図しないキャッシュアクセスが発生する可能性があるので、使用には注意が必要である。</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="system_configuration_information_management_functions.html"
+ACCESSKEY="P"
+>前のページ</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>ホーム</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="physical_timer_functions.html"
+ACCESSKEY="N"
+>次のページ</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>システム構成情報管理機能</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="utk_sm_functions.html"
+ACCESSKEY="U"
+>上に戻る</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>物理タイマ機能</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>
